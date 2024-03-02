@@ -2,14 +2,14 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = require('./routers/routerModel');
 require("dotenv").config();
-
 const app = express();
 
-// access to req.body
+// access to req.body json
 app.use(express.json());
 
+// allow ONLY client to access 
 app.use('/', (req, res, next) => {
-    console.log(req.ip, req.method, req.url, req.protocol, req.httpVersion, req.params)
+    console.log(req.method, req.url, req.protocol, req.httpVersion, req.body)
     
     //TODO: change 
     res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_SIDE);
@@ -17,15 +17,11 @@ app.use('/', (req, res, next) => {
     res.setHeader("Access-Control-Allow-Headers", "*");
     next();
 })
-
 mongoose.connect(process.env.URI_M)
     .then(() => { 
-        app.listen(process.env.PORT, () => {
-            console.log(`Sucessfully connected to MongoDB! `);
-        })
+    app.listen(process.env.PORT, () => { 
+        console.log(`Sucessfully listining on port ${process.env.PORT}`);
     })
-    .catch((error) => { 
-        //TODO: error logging for mongoose
-        console.log(error);
-    });
-app.use('/api/test', router);
+})
+app.use('/api/clients', router);
+
