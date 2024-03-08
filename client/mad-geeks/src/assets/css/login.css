@@ -1,0 +1,77 @@
+*{
+    box-sizing: border-box;
+}
+body, html{
+    margin: 0;
+    padding: 0;
+}
+@media screen and (min-width: 768px){
+
+
+    @keyframes swoopIn {
+        0% {bottom: -0.5em}
+        100% {bottom: 0em}
+    }
+    @keyframes fadeIn{
+        0% { opacity: 0.4}   
+        100% { opacity: 1}
+    }
+
+
+    .grid-container{
+        display:grid;
+        grid-template-columns: 50% 50%;
+        height: 100vh;
+    }
+    .banner{
+        background-color: rgb(167, 145, 145);
+    }
+    .title-banner{
+        animation-name: swoopIn;
+        animation-duration: 0.45s;
+        animation-timing-function: cubic-bezier(.17,.67,.83,.67);
+        margin-left: 0.3em;
+        margin-bottom: 0.3em;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        font-size: min(6vw, 72px);
+    }
+    .sign-in-title{
+        color: rgb(62, 62, 207)
+    }
+
+    .form-label{
+        color:rgb(90, 90, 90);
+
+    }
+
+    .login-section{
+        animation-name: fadeIn;
+        animation-duration: 0.45s;
+        margin: auto;
+        background-color: whitesmoke;
+    }
+
+    .sign-in-form > input, button.login {
+        display: block;
+    }
+    .sign-in-form> input{
+        margin-bottom:1em;
+    }
+
+    button.login{
+        padding: 0em 0.5em;
+        margin: 1em auto;
+    }
+
+    @media (prefers-reduced-motion){
+        .title-banner{
+            animation-name: none
+        }       
+        .login-section{
+            animation-name: none
+        }
+    }
+
+}
