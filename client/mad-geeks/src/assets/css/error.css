@@ -1,0 +1,14 @@
+.error{
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.error > *{
+    margin-bottom: 10px;
+}
+h1.errorHeading{
+    font-size: 3em;
+    color: rgb(236, 82, 82)
+}
