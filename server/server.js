@@ -24,4 +24,3 @@ mongoose.connect(process.env.URI_M)
     })
 })
 app.use('/api/clients', router);
-

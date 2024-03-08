@@ -1,3 +1,4 @@
+const saltAndHash = require('../enbcrypt.js');
 const { userModel, accountModel } = require('../mongoFunctions/schemas/client_Schema.js');
 const mongoose = require('mongoose');
 
@@ -10,6 +11,7 @@ function test1(req, res) {
 async function createNewUser(req, res) {
     const json = req.body;
     try {
+        json.password = await saltAndHash(json.password);
         const session = await mongoose.startSession();
         await session.withTransaction(async () => {
             const user = await userModel.create([{
@@ -25,13 +27,33 @@ async function createNewUser(req, res) {
         })
         session.endSession();
         console.log("this is correctly running!")
-        res.status(200).json(json);
+        res.status(200).json({"status": 200, "message": "Sucessful transaction"});
     } catch (e) {
        console.log("something went wrong...");
        res.status(400).json(e);
     }
 }
 
+async function isValidAuth(req, res) { 
+    var { username, password } = req.body;
+    try {
+        password = await saltAndHash(password);
+    } catch (e) { 
+        console.log(e);
+    }
+    const result = await userModel.findOne({
+        and: ([
+            { userLogin: username },
+            { password: password }
+        ], (err, res) => { 
+            if (err) {
+                console.log(e);
+            }
+        })
+    });    
+    //TODO: replace this with jwt token!
+    res.status(200).json({"status": "ok"});
+}
 module.exports = {
-    test1, createNewUser
+    test1, createNewUser, isValidAuth
 }

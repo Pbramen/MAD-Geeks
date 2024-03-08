@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
 const Schema = mongoose.Schema;
 const customSchema = require('./decoratorSchema.js');
 
@@ -88,13 +87,9 @@ user_Auth_Schema.path("email").validate(async function (value) {
     return true
 }, "Sorry, {VALUE} is taken. Please try again.");
 
-
-user_Auth_Schema.pre('save', async function (next) {
+// logging hook TODO:
+user_Auth_Schema.pre('save', function (next) {
     var user = this;
-    if (user.isModified("password")) {
-        const salt = await bcrypt.genSalt();
-        user.password = await bcrypt.hash(user.password, salt);
-    }
     if (user.isModified("location")) { 
         if (user.location === true) { 
             // record the location! 
