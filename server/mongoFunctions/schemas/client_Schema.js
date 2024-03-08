@@ -67,12 +67,12 @@ user_Account_Schema.index({ userAuthId: 1, displayName: 1 })
 // ======================== MIDDLEWARE FUNCTIONS ================================
 
 
-const decAuth = new customSchema(user_Account_Schema);
+const decAuth = new customSchema(user_Auth_Schema);
 const validateAuthIndex = decAuth.validateUniqueIndex()
-if (validateAuthIndex){
+if (validateAuthIndex) {
     validateAuthIndex('userLogin', "Sorry {VALUE} is already taken.");
     validateAuthIndex('email', "{VALUE} is already in use. Please use a different email.");
-}
+ }
 
 user_Auth_Schema.path("userLogin").validate(async function (value) {
     const v = await this.constructor.findOne({ userLogin : value })
