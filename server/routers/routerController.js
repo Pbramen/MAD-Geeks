@@ -39,7 +39,8 @@ async function isValidAuth(req, res) {
     try {
         password = await saltAndHash(password);
     } catch (e) { 
-        console.log(e);
+        //TODO: LOG HERE
+        return res.status(400).json(e);
     }
     const result = await userModel.findOne({
         and: ([
@@ -47,11 +48,13 @@ async function isValidAuth(req, res) {
             { password: password }
         ], (err, res) => { 
             if (err) {
-                console.log(e);
+                //TODO: LOG HERE
+                return res.status(400).json(err);
             }
         })
     });    
     //TODO: replace this with jwt token!
+    console.log('returning ok')
     res.status(200).json({"status": "ok"});
 }
 module.exports = {
