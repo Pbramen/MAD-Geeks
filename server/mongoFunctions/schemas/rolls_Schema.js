@@ -3,8 +3,12 @@ const Schema = mongoose.Schema;
 const assert = require('node:assert');
 
 const ranged = (e) => { 
-    return (e > 0 || e < 100).test(e);
-};
+    return (e > 0 && e < 100);
+}
+
+const bonusRange = (e) => {
+    return (e >= -100 && e <= 100);
+}
 
 /**
  * History of rolls for each user (many-to-squillion)
@@ -36,22 +40,40 @@ const roll_history = new Schema({
                 },
                 required: true
             },
-            disadvantage: {
+            advantageState: {
+                type: String,
+                enum: {
+                    values: ["low", "high", "normal"],
+                    message: '{VALUE} is not a supported advantage state.'
+                },
+                default: "normal"
+            },
+            inspiration: {
                 type: Boolean,
-                default: false
+                default: false,
+                required: true
             }
-            
         },
         // results of high and low.
         results: { 
-            high: {
+            firstRoll: {
                 type: Number,
                 required: true
             }, 
-            low: {
+            secondRoll: {
                 type: Number,
                 required: false
-            }
+            },
+            bonuses: [
+                {
+                    name: String, 
+                    amount: {
+                        type: Number,
+                        validator: ranged,
+                        message: `{VALUE} must be between -100 and 100`
+                    }
+                }
+            ]
         }
     },
     // creation date automatic TTL
@@ -64,17 +86,21 @@ const roll_history = new Schema({
 
 const roll = mongoose.model("roll", roll_history);
 
-// const r = new roll({
-//     user: 0,
-//     roll: {
-//         config: {
-//             type: '1d1', 
-//             quantity: 111
-//         }
-//     }}
-// );
+const r = new roll({
+    user: 0,
+    roll: {
+        config: {
+            type: '1d2',
+            quantity: -1
+        },
+        results: {
+            firstBase: 10,
+        }
+    }}
+);
 
 // let err = r.validateSync();
+// console.log(err.errors);
 
 // assert.equal(err.errors["roll.config.type"].properties.message, '1d1 is not a supported dice type.');
 // assert.equal(err.errors["roll.config.quantity"].properties.message, `Requested ${Number.MAX_VALUE - 1} number of die rolled. Must be a number greater than 0.`);
