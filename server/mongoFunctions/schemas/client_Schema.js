@@ -1,20 +1,22 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const customSchema = require('./decoratorSchema.js');
+const { checkIfValidAge, checkPassword, checkUsername } = require("../validators/validateFunctions.js");
 
 const user_Auth_Schema = new Schema({
     userLogin: {
         type: String,
         unique: true,
-        minLength: [6, "Min length of login username must be greater than 6."],
+        minLength: [6, "Min length of login username must be greater than 8."],
         maxLength: [16, "Max length of login username must be less than 16"],
-        required: [true, "Username is required to sign up!"]
+        required: [true, "Username is required to sign up!"],
+        validator: [isAlphaNumeric, "Username must be alpha-numeric. No symbols allowed."]
     },
     email: {
         type: String,
         unique: true,
-        minLength: 6,
-        required: ["true", "Email is required to sign up!"]
+        minLength: [6, "Email length must be greater than 6 characters."],
+        required: ["true", "Email is required to sign up!"],
+        lowercase: true
     },
     password: {
         type: String,
@@ -28,13 +30,23 @@ const user_Auth_Schema = new Schema({
     tempPassword: {
         type: String,
         maxLength: 8
+    }, 
+    activity: {
+        active: {
+            type: Boolean,
+            default: true
+        },
+        last_login: {
+            type: Date,
+            default: Date.now()
+        }
     }
 }, {timestamps: true});
 
 const user_Account_Schema = new Schema({
     userAuthId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserAuth'
+        required: true
     },
     displayName: {
         type: String,
@@ -63,80 +75,9 @@ const user_Account_Schema = new Schema({
 }, {timestamps: true})
 user_Account_Schema.index({ userAuthId: 1, displayName: 1 })
 
-// ======================== MIDDLEWARE FUNCTIONS ================================
-
-
-const decAuth = new customSchema(user_Auth_Schema);
-const validateAuthIndex = decAuth.validateUniqueIndex()
-if (validateAuthIndex) {
-    validateAuthIndex('userLogin', "Sorry {VALUE} is already taken.");
-    validateAuthIndex('email', "{VALUE} is already in use. Please use a different email.");
- }
-
-user_Auth_Schema.path("userLogin").validate(async function (value) {
-    const v = await this.constructor.findOne({ userLogin : value })
-    if (v)
-        return false
-    return true
-}, "Sorry, {VALUE} is taken. Please try again.");
-
-user_Auth_Schema.path("email").validate(async function (value) {
-    const v = await this.constructor.findOne({ email : value })
-    if (v)
-        return false
-    return true
-}, "Sorry, {VALUE} is taken. Please try again.");
-
-// logging hook TODO:
-user_Auth_Schema.pre('save', function (next) {
-    var user = this;
-    if (user.isModified("location")) { 
-        if (user.location === true) { 
-            // record the location! 
-            console.log("recording location ...");
-        }
-        else {
-            // remove location from database
-            console.log("deleting location from db...");
-        }
-    }
-    next();
-})
-
-function checkPassword(value) { 
-    //TODO: ADD REGEX FOR SINGLE SPECIAL CHARACTER)S-!!
-    return true;
-}
-function checkIfValidAge(value) { 
-    const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth()
-    const day = date.getDay()
-
-    var splitValue = value.split("-")
-    var validAge = true
-    
-    if (splitValue.length !== 3) {
-        console.log('Invalid user input');
-        return false;
-    }
-    else{
-        splitValue = splitValue.map((el)=>{
-            return parseInt(el, 10)
-        })
-        if (year - splitValue[0] < 13)
-            validAge = false
-        else if (month - splitValue[1] < 0)
-            validAge = false
-        else if (month - splitValue[1] == 0 && day - splitValue[2] < 0)
-            validAge = false
-        return validAge;
-    }
-}
-
-
 const userModel = mongoose.model("UserAuth", user_Auth_Schema);
 const accountModel = mongoose.model("UserAccount", user_Account_Schema);
+
 module.exports = {
     userModel, accountModel
 }
