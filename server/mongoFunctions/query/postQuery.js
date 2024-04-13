@@ -11,34 +11,40 @@ const {userModel, accountModel} = require("../schemas/client_Schema");
  * @returns{rolls_Schema.roll_history} the newly created instance. 
  */
 async function createNewRoll(user_id, config, results) {
-    const doc = new rollHistory({
-        user_id: user_id,
-        config: config,
-        results: results
-    });
     try {
-        await doc.save();
+        await doc.create({
+
+        });
     } catch (e) {
+        console.log("creation failed");
         console.log(e);
-        // log to db here.
-        exit();
+        //log to db here.
+        //exit();
     }
     return doc;
 }
 
-async function createUser(json) {
+async function createUser(json, hashed) {
     const session = await mongoose.startSession();
-    await session.withTransaction(async () => {
-        const user = await userModel.create([{
+    await session.withTransaction(async function () {
+        
+        const user = new userModel({
             userLogin: json.userLogin,
             email: json.email,
-            password: json.password,
-        }], { session })
-        await accountModel.create([{
+            password: json.password
+        })
+        await user.validate();
+        user.password = hashed;
+        const a = await user.save({ session , validateBeforeSave : false});
+       
+        const acct = new accountModel({
+            userAuthId: a._id,
             displayName: json.userLogin,
-            DOB : json.DOB   
-        }], { session })
-        return user;
+            DOB: json.DOB
+        })
+
+        await acct.save({session});
+        
     })
     session.endSession();
 }

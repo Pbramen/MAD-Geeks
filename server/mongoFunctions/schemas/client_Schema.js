@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { checkIfValidAge, checkPassword, checkUsername } = require("../validators/validateFunctions.js");
+const { checkIfValidAge, checkPassword, isAlphaNumeric, checkEmail } = require("../validators/validateFunctions.js");
 
 const user_Auth_Schema = new Schema({
     userLogin: {
@@ -21,10 +21,7 @@ const user_Auth_Schema = new Schema({
     password: {
         type: String,
         required: true,
-        validate: {
-            validator: checkPassword,
-            message: "Password must include at least one special character."
-        },
+        validate: checkPassword,
         minLength: [8, "Password must be at least 8 characters long."]
     },
     tempPassword: {
@@ -52,7 +49,8 @@ const user_Account_Schema = new Schema({
         type: String,
         required: true,
         minLength: [6, "Min length of login username must be greater than 6."],
-        maxLength: [16, "Max length of login username must be less than 16"]
+        maxLength: [16, "Max length of login username must be less than 16"],
+        validate: [isAlphaNumeric, "Display name must be alphanumeric."]
     },
     role: {
         type: String,
@@ -74,6 +72,7 @@ const user_Account_Schema = new Schema({
 
 }, {timestamps: true})
 user_Account_Schema.index({ userAuthId: 1, displayName: 1 })
+
 
 const userModel = mongoose.model("UserAuth", user_Auth_Schema);
 const accountModel = mongoose.model("UserAccount", user_Account_Schema);

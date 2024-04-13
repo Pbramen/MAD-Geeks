@@ -1,8 +1,6 @@
 const saltAndHash = require('../enbcrypt.js');
 const { userModel } = require('../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../mongoFunctions/query/postQuery.js");
-const { isTaken } = require("../mongoFunctions/query/getQuery.js");
-
 require("dotenv").config();
 
 function test1(req, res) { 
@@ -17,31 +15,14 @@ function test1(req, res) {
  */
 async function createNewUser(req, res) {
     const json = req.body;
-    var unique = false;
     try {
-        unique = await isTaken(json.email, json.userLogin);
-        console.log(unique);
+        let hashed = await saltAndHash(json.password);
+        await createUser(json, hashed);
+        let result = {"msg": `${json.userLogin} successfully created!`}
+        return res.status(200).json(result); 
     } catch (e) {
-        console.log(e);
-        return res.status(400).json(e);
-    }
-    
-    switch (unique) {
-        case 0:
-            try {
-                json.password = await saltAndHash(json.password);
-                createUser(json);
-                return res.status(200).json({ "status": 200, "message": "Sucessful transaction" });
-            } catch (e) {
-                console.log(e.message);
-                return res.status(400).json(e);
-            }
-        case -1:
-            return res.status(200).json({ "status": "200", "msg": "Username is taken." });
-        case -2:
-            return res.status(200).json({ "status": "200", "msg": "Email is taken." });
-        default:
-            return res.status(200).json({ "status": "200", "msg": "Username and email is taken." });
+        const err = handleError(e);
+        return res.status(400).json(err);
     }
 }
 
@@ -68,6 +49,43 @@ async function isValidAuth(req, res) {
     console.log('returning ok')
     res.status(200).json({"status": "ok"});
 }
+
+
+const handleError = (error) => {
+    var err = {errors: []};
+    if (error.hasOwnProperty('errors')) {
+        Object.values(error.errors).forEach((el) => {
+            let props = el.properties;
+            err.errors.push(
+                {
+                    path: props.path,
+                    message: props.message,
+                    type: props.type,
+                    value: props.value
+                }
+            )
+            console.log(props);
+        });
+    
+        return err;
+    }
+    // duplicate key found
+    else if (error.hasOwnProperty('code') && error.code == 11000) {
+        if (error.hasOwnProperty("keyPattern") && error.hasOwnProperty("keyValue")) {
+            Object.getOwnPropertyNames(error.keyPattern).forEach((el) => {
+                err.errors.push({
+                    path: el,
+                    message: `${el} must be unique.`,
+                    value: error.keyValue[el]
+                })
+            })
+        }
+        return err;
+    }
+
+    return error;
+}
+
 module.exports = {
     test1, createNewUser, isValidAuth
 }
