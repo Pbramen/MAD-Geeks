@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { test1, createNewUser, isValidAuth } = require('./routerController.js');
+const { test1, createNewUser, isValidAuth } = require('./authController.js');
 
 router.get('/', test1)
 router.post('/newUser', createNewUser)

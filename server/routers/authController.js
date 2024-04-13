@@ -1,5 +1,5 @@
 const saltAndHash = require('../enbcrypt.js');
-const { userModel, accountModel } = require('../mongoFunctions/schemas/client_Schema.js');
+const { userModel } = require('../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../mongoFunctions/query/postQuery.js");
 const { isTaken } = require("../mongoFunctions/query/getQuery.js");
 
