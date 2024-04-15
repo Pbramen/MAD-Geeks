@@ -1,8 +1,43 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+//subdocument for level
+const level_sub = new Schema({
+    level: {
+        type: Number,
+        min: [1, "Min value must be 0 for {Path}. Recieved {Value} instead"],
+        max: [20, "Max value must be 20 for {Path}. Recieved {Value} instead"]
+    }
+});
+// subdocument for class
+const class_sub = new Schema({
+    name: String,
+    obtained: {
+        level: level_sub,
+        session: Number,
+        date: Date
+    },
+    features: [{
+        name: String,
+        descript: String,
+        level: level_sub
+    }],
+    resources: [{
+        name: String,
+        descript: String,
+        quantity: {
+            capacity: {
+                type: Number,
+                min: [0, "{Path} must be a value greater than 0. Recieved {Value} instead."],
+            },
+            // maybe greater than capcity
+            current: Number
+        }
+    }]
+});
 
-const character_sheet = Schema({
+// document revision per level ? 
+const character_sheet = new Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true
@@ -21,31 +56,27 @@ const character_sheet = Schema({
         maxLength: [32, "Max character length for last name is 32!"]
     },
     classes: {
-        type: [{
-            name: String,
-            levelObtained: Number
-        }],
-        validate: {
-            validator: checkMaxLength,
-            message: "Too many classes!"
-        }
+        type: [class_sub]
     },
-    spells: {
-        type: [mongoose.Schema.Types.ObjectId],
-        validate: {
-            validator: checkMaxSpells,
-            message: "Too many spells!"
-        }
-    },
-    feats: {
-        type: [String]
-    },
-    proficiency: {
-        type: [String]
-    }
+    spells: [{
+        name: {
+            type: String,
+            minLength: [4, 'Spell length {Value} must be greater than 4.'],
+            maxLength: [32, 'Spell length {Value} must be less than 32']
+        },
+        descript: String, 
+        level: {
+            type: Number,
+            min: 0,
+            max: 9
+        },
+        obtained: {
+            level: Number,
+            session: Number
+        },
+        spell_id: mongoose.Schema.Types.ObjectId
+    }]
 })
-
-// need features
 
 const checkMaxLength = function (v) { 
     return v.length <= 20;
