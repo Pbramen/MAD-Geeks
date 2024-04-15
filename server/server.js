@@ -1,6 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const router = require('./routers/authModel.js');
+const authRouter = require('./routers/auth/authModel.js');
+const sheetRouter = require('./routers/characterSheet/characterModel.js');
 require("dotenv").config();
 const app = express();
 
@@ -10,7 +11,6 @@ app.use(express.json());
 // allow ONLY client to access 
 app.use('/', (req, res, next) => {
     console.log(req.method, req.url, req.protocol, req.httpVersion, req.body)
-    
     //TODO: change 
     res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_SIDE);
     res.setHeader("Access-Control-Allow-Methods", "POST GET DELETE PATCH");
@@ -23,4 +23,5 @@ mongoose.connect(process.env.URI_M)
         console.log(`Sucessfully listining on port ${process.env.PORT}`);
     })
 })
-app.use('/api/clients', router);
+app.use('/api/clients', authRouter);
+app.use('/api/sheet', sheetRouter);
