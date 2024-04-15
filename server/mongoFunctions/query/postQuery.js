@@ -26,27 +26,30 @@ async function createNewRoll(user_id, config, results) {
 
 async function createUser(json, hashed) {
     const session = await mongoose.startSession();
-    await session.withTransaction(async function () {
-        
-        const user = new userModel({
-            userLogin: json.userLogin,
-            email: json.email,
-            password: json.password
-        })
-        await user.validate();
-        user.password = hashed;
-        const a = await user.save({ session , validateBeforeSave : false});
-       
-        const acct = new accountModel({
-            userAuthId: a._id,
-            displayName: json.userLogin,
-            DOB: json.DOB
-        })
-
-        await acct.save({session});
-        
-    })
+    await session.withTransaction(await handleTransaction(json, session, hashed));
     session.endSession();
+}
+
+async function handleTransaction(json, session, hashed) {
+    var err = "";
+    const user = new userModel({
+        userLogin: json.userLogin,
+        email: json.email,
+        password: json.password
+    })
+    
+    await user.validate();
+    user.password = hashed;
+    const a = await user.save({ session , validateBeforeSave : false});
+   
+    const acct = new accountModel({
+        userAuthId: a._id,
+        displayName: json.userLogin,
+        DOB: json.DOB
+    })
+
+    await acct.save({session});
+    
 }
 
 module.exports = {
