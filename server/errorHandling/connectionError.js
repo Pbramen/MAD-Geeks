@@ -1,22 +1,17 @@
+const { createJson } = require("../jsonFormat.js");
 /**
- * Builds a basic error response. 
- * @param {ERROR} e - error object thrown 
- * @param {*} code - HTTP status code
- * @param {*} msg - Custom message for client
- * @param {*} action - description or link to next step
+ * creates a json response for all fields.
+ * @param {params} - array of string variables that are undefined.
+ * @returns {JSON} - json fomratted object that contains the response.
  */
-function handleError(e, code, msg, action) {
-    //TODO MUST LOG TO DB HERE
-    console.log(`${e.code} : ${e.message}`)
-    let json = {
-        "Status": code,
-        "MSG": msg,
-        "Action": action
-    }
-    json = JSON.stringify(json);
+function handleMissingFields(params){
+    var json = createJson("Missing fields", "ERROR");
+    json['errors'] = { 'fields': [] }
+    json.errors.fields = params;
     return json;
-}
+}   
+
 
 module.exports = {
-    handleError
+    handleMissingFields
 }

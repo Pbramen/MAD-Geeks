@@ -53,9 +53,8 @@ const user_Account_Schema = new Schema({
         validate: [isAlphaNumeric, "Display name must be alphanumeric."]
     },
     role: [{
-        name: String,
-        ref: mongoose.Schema.Types.ObjectId,
-        required: true
+        id: { type: String },
+        rel: { type: mongoose.Schema.Types.ObjectId }
     }],
     DOB: {
         type: String,

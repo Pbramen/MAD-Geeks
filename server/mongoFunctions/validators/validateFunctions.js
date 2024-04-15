@@ -12,7 +12,6 @@ function checkPassword(value) {
     //excludes ( ' " . $ )
     var symbols = new Set([32, 33, 35, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 58, 59, 60, 61, 62, 63, 64, 91, ,92, 93, 94, 95, 96, 123, 124, 125, 126 ]);
     if (n >= 8) {
-        console.log("password is :" + value);
         for (i = 0; !(oneUpper && oneLower && oneSymbol && oneDigit) && (i < n); i++){
             let c = value.charCodeAt(i);
             // symbol
@@ -21,7 +20,6 @@ function checkPassword(value) {
             }
             // digits
             else if (47 < c && c < 58) {
-                console.log(c + " " + value.charAt(i));
                 oneDigit = true;
             }
             // uppercase
@@ -32,8 +30,6 @@ function checkPassword(value) {
                 oneLower = true;
             }
         }
-        console.log(oneSymbol, oneDigit, oneLower, oneUpper);
-
         if (!oneSymbol) {
             throw new Error("Password must contain at least one special character.");
         }
@@ -49,7 +45,7 @@ function checkPassword(value) {
         if (!oneUpper) {
             throw new Error("Password must contain at least one uppercase character.");
         }
-        return false;
+        return true;
     }
     return false;
 }
