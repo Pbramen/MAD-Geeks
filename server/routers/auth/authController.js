@@ -1,10 +1,16 @@
 const saltAndHash = require('../../enbcrypt.js');
 const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../../mongoFunctions/query/postQuery.js");
+const { handleMissingFields } = require("../../errorHandling/connectionError.js");
 require("dotenv").config();
 
-function test1(req, res) { 
-    return res.status(200).json({ status: 200 });
+/**
+ * TODO: remove before production deploy 
+ * @returns 
+ */
+async function test1(req, res) { 
+    const response = await userModel.find();
+    return res.status(200).json(response);
 }
 
 /**
@@ -15,45 +21,98 @@ function test1(req, res) {
  */
 async function createNewUser(req, res) {
     const json = req.body;
-    try {
-        let hashed = await saltAndHash(json.password);
-        await createUser(json, hashed);
-        let result = {"msg": `${json.userLogin} successfully created!`}
-        return res.status(200).json(result); 
-    } catch (e) {
-        const err = handleError(e);
-        return res.status(400).json(err);
+    const { password, userLogin, email, DOB } = json;
+
+    // check for valid parameters
+    if (password != undefined && userLogin !== undefined && email !== undefined && DOB !== undefined) {
+        try {
+            let hashed = await saltAndHash(json.password);
+            await createUser(json, hashed);
+            let result = {
+                "status": 'ok',
+                "msg": `${json.userLogin} successfully created!`,
+                "action": '' // redirect user back to login screen.
+            }
+            return res.status(200).json(result);
+        } catch (e) {
+            let err = { errors: [] };
+            let status = { code: 200 };
+            handleError(e, err, status);
+            return res.status(status.code).json(err);
+        }
     }
+    // request client for missing params.
+    var param = []
+    if (password === undefined) {
+        param.push("password");
+    }
+    if (email === undefined) {
+        param.push("email");
+    }
+    if (userLogin === undefined) {
+        param.push("user login");
+    }
+    if (DOB === undefined) {
+        param.push("DOB")
+    }
+    const response = handleMissingFields(param);
+    return res.status(200).json(response);
 }
+
 
 async function isValidAuth(req, res) { 
-    var { username, password } = req.body;
-    try {
-        password = await saltAndHash(password);
-    } catch (e) { 
-        //TODO: LOG HERE
-        return res.status(400).json(e);
-    }
-    const result = await userModel.findOne({
-        and: ([
-            { userLogin: username },
-            { password: password }
-        ], (err, res) => { 
-            if (err) {
-                //TODO: LOG HERE
-                return res.status(400).json(err);
+    var { id, password } = req.body;
+    if (id !== undefined && password !== undefined) {
+        try {
+            password = await saltAndHash(password);
+        } catch (e) {
+            //TODO: LOG HERE
+            return res.status(400).json(e);
+        }
+        try {
+            const result = await userModel.exists({
+                _id: id,
+                password: password
+            });
+            
+            if(result){
+                return res.status(200).json({
+                    "status": "ok",
+                    "msg": "Authentication success.",
+                    "action": "" // link to homepage.
+                });
             }
-        })
-    });    
-    //TODO: replace this with jwt token!
-    console.log('returning ok')
-    res.status(200).json({"status": "ok"});
+            else {
+                return res.status(200).json({
+                    'status': "none found"
+                })
+            }
+        } catch (e) {
+            console.log(e);
+            return res.status(200).json({"status": e})
+        }
+    }
+    let params = [];
+    if (id === undefined) {
+        params.push("id");
+    }
+    if (password === undefined) {
+        params.push("password");
+    }
+    const response = handleMissingFields(params);
+    return res.status(200).json(response);
 }
 
+/**
+ * Handles errors POST/PUT database operations.
+ * @param {Error} error - error object being caught
+ * @returns {object} JSON object to be returned to client side.
+ */
+const handleError = (error, err, status) => {
 
-const handleError = (error) => {
-    var err = {errors: []};
+    // handle custom Validator errors:
     if (error.hasOwnProperty('errors')) {
+        
         Object.values(error.errors).forEach((el) => {
             let props = el.properties;
             err.errors.push(
@@ -64,10 +123,11 @@ const handleError = (error) => {
                     value: props.value
                 }
             )
+            // LOG ERROR HERE
             console.log(props);
         });
     
-        return err;
+        //return err;
     }
     // duplicate key found
     else if (error.hasOwnProperty('code') && error.code == 11000) {
@@ -79,11 +139,22 @@ const handleError = (error) => {
                     value: error.keyValue[el]
                 })
             })
+            //LOG ERROR HERE
         }
-        return err;
+       // return err;
     }
+    else {
+        // LOG ERROR
+        console.log(error);
 
-    return error;
+        status.code = 422;
+        err.errors.push({
+            code: error.code,
+            message: error.message,
+        })
+        err['action'] = 'Try again later';
+    }
+    //return err;
 }
 
 module.exports = {
