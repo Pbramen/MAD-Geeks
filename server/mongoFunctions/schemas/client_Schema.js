@@ -52,11 +52,11 @@ const user_Account_Schema = new Schema({
         maxLength: [16, "Max length of login username must be less than 16"],
         validate: [isAlphaNumeric, "Display name must be alphanumeric."]
     },
-    role: {
-        type: String,
-        enum: ["end_user", "webAdmin", "sysAdmin", "moderator"],
-        default: "end_user"
-    },
+    role: [{
+        name: String,
+        ref: mongoose.Schema.Types.ObjectId,
+        required: true
+    }],
     DOB: {
         type: String,
         validate: {
@@ -72,6 +72,14 @@ const user_Account_Schema = new Schema({
 
 }, {timestamps: true})
 user_Account_Schema.index({ userAuthId: 1, displayName: 1 })
+
+const role_Schema = new Schema({
+    name: {
+        type: String, 
+        required: true
+    }
+})
+
 
 
 const userModel = mongoose.model("UserAuth", user_Auth_Schema);
