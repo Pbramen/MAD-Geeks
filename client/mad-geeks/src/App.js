@@ -1,14 +1,18 @@
 import SignInForm from "./components/SignInForm";
-import HomeBanner from "./components/HomeBanner";
 import './assets/css/login.css';
-
+import { Footer } from './components/Footer';
+import { NavBar } from "./components/NavBar";
 function App() {
   return (
     // wraps the entire application with router component
-    <main className='grid-container'>
-      <HomeBanner/>  
-      <SignInForm />
-    </main>
+    <div className="flex-column full">
+      <NavBar />
+      <div className='mid'>
+      <div className='centered'>
+        <SignInForm />
+      </div></div>
+      <Footer className='footer'/>
+    </div>
   );
 }
 

@@ -1,77 +1,169 @@
-*{
+*, 
+::before, 
+::after {
     box-sizing: border-box;
+    margin: 0px;
+    padding: 0px;
 }
-body, html{
-    margin: 0;
-    padding: 0;
+
+.mid {
+    width: 100%;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0px 45px;
 }
-@media screen and (min-width: 768px){
+
+.form-card {
+    border: 2px solid rgb(8, 20, 53);
+    border-radius: 7px;
+    box-shadow: 15px 15px rgb(8, 20, 53);
+    margin: 15px;
+    width: 320px;
+    min-height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-image: linear-gradient(180deg, rgb(40, 33, 80), rgb(30, 117, 133));
+}
 
 
-    @keyframes swoopIn {
-        0% {bottom: -0.5em}
-        100% {bottom: 0em}
-    }
-    @keyframes fadeIn{
-        0% { opacity: 0.4}   
-        100% { opacity: 1}
-    }
+.form-group {
+    width: 200px;
+    font-size:1.25em;
+}
 
 
-    .grid-container{
-        display:grid;
-        grid-template-columns: 50% 50%;
-        height: 100vh;
-    }
-    .banner{
-        background-color: rgb(167, 145, 145);
-    }
-    .title-banner{
-        animation-name: swoopIn;
-        animation-duration: 0.45s;
-        animation-timing-function: cubic-bezier(.17,.67,.83,.67);
-        margin-left: 0.3em;
-        margin-bottom: 0.3em;
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        font-size: min(6vw, 72px);
-    }
-    .sign-in-title{
-        color: rgb(62, 62, 207)
-    }
+.card-banner {
+    position: absolute;
+    border: none;
+    border-radius: 5px 5px 0px 0px;
+    box-shadow: 2px -2px black, -2px -2px black, -2px 0px black, 2px 0px black;
+    background-color: black;
+    z-index:3;
+    width:100%;
+    height: 18%;
+   
+    align-self:stretch;
+    
+    padding: 10px;
+    font-size:0.9em;
+}
 
-    .form-label{
-        color:rgb(90, 90, 90);
+.sign-in-form{
+    display:flex;
+    flex-direction: column;
+    margin-bottom: 25px;
+    position: relative;
+    
+}
 
-    }
+.sign-in-title{
+    margin-bottom: 20px;
+    font-size: 2.1em;
+}
+.sign-in-form > input {
+    margin-bottom: 20px;
+}
 
-    .login-section{
-        animation-name: fadeIn;
-        animation-duration: 0.45s;
-        margin: auto;
-        background-color: whitesmoke;
-    }
+.sign-in-form > button {
+    margin-top: 10px;
+    width: 50%;
+    align-self: flex-end;
+    background-color: transparent;
+    padding: 2px;
+    color: whitesmoke;
+    border: 1px solid rgb(8, 20, 53);
+    border-radius: 5px;
+    box-shadow: 5px 5px rgb(8, 20, 53);
+}
+.sign-in-form > button:hover{
+    background-color: rgb(238, 134, 16);
+    cursor: pointer;
+}
+.border{
+    position: absolute;
+    border-right: 2px solid rgb(0, 0, 0);
+    border-top-right-radius: 5px;
+    top: 0%;
+    left: 2px;
+    height: 55%;
+    width: 100%;
+}
 
-    .sign-in-form > input, button.login {
-        display: block;
-    }
-    .sign-in-form> input{
-        margin-bottom:1em;
-    }
+form + a {
+    position: absolute;
+    bottom: 2%;
+    right: 5%;
+    font-size: 0.85em;
+    
+}
+form + a:hover{
+    color: rgb(255, 174, 0);
+    text-decoration: underline;
+    cursor: pointer;
+}
 
-    button.login{
-        padding: 0em 0.5em;
-        margin: 1em auto;
-    }
+.sign-in-form > label{
+    font-size: 0.8em;
+}
 
-    @media (prefers-reduced-motion){
-        .title-banner{
-            animation-name: none
-        }       
-        .login-section{
-            animation-name: none
-        }
-    }
+input {
+    background-color: whitesmoke;
+    border: 1px solid whitesmoke;
+    margin-top:2px;
 
+}
+/*portrait tablet*/ 
+@media only screen and (min-width: 48em){
+
+    .card-banner{
+        font-size: 1.8em;
+    }
+    
+    .form-card {
+        width: 450px;
+        height: 630px;
+    }
+    .border{
+        display:none;
+    }
+    .form-group{
+        width: 375px;
+        font-size: 1.75em;
+    }
+    input, button {
+        height: 30px;
+    }
+    button{
+        font-size: 0.65em;
+    }
+}
+/*landscape tablet*/
+
+/*Desktop*/
+@media only screen and (min-width: 992px){
+    .card-banner{
+        font-size: 1.8em;
+    }
+    
+    .form-card {
+        width: 500px;
+        height: 750px;
+    }
+    .border{
+        display:none;
+    }
+    .form-group{
+        width: 375px;
+        font-size: 2em;
+    }
+    input, button {
+        height: 30px;
+    }
+    button{
+        font-size: 0.65em;
+    }
 }

@@ -1,0 +1,53 @@
+/* nav bar overflows just above mobile phone breakpoint */
+.nav {
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    min-height: 75px;
+    overflow: scroll;
+    border:1px solid red;
+}
+.nav-list{
+    list-style: none;
+    overflow: hidden;
+    font-size: 1.25em;
+}
+
+li > a:hover {
+    cursor: pointer;
+    color:orange;
+}
+@media (min-width: 492px){
+    .nav{
+        flex-direction: row;
+    }
+
+    .nav-list > li {
+        float: left;
+        margin: 30px;
+    }
+    .nav-trigger {
+        display: none;
+    }
+}
+
+@media(max-width: 492px){
+    .nav{
+        max-height: 250px;
+        overflow: auto;
+    }
+    .nav-list{
+        display: none;
+    }
+    .nav-trigger{
+        display: block;
+    }
+    .is-open{
+        display:block;
+    }
+    .is-open > * {
+        margin: 5px 0px;
+    }
+}
