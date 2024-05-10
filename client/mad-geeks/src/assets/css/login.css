@@ -92,6 +92,11 @@
     height: 55%;
     width: 100%;
 }
+.alert {
+    color: rgb(255, 72, 39);
+    font-size: 0.5em;
+}
+
 
 form + a {
     position: absolute;
