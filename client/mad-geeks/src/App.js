@@ -1,4 +1,4 @@
-import SignInForm from "./components/SignInForm";
+import { Outlet } from 'react-router-dom';
 import './assets/css/login.css';
 import { Footer } from './components/Footer';
 import { NavBar } from "./components/NavBar";
@@ -9,7 +9,7 @@ function App() {
       <NavBar />
       <div className='mid'>
       <div className='centered'>
-        <SignInForm />
+        <Outlet />
       </div></div>
       <Footer className='footer'/>
     </div>
