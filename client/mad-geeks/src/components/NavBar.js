@@ -1,5 +1,6 @@
 import '../assets/css/nav.css';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export function NavBar() { 
     const [isOpen, setOpen] = useState(false);
@@ -13,10 +14,10 @@ export function NavBar() {
             <div className="flex-column">
             <div className={`nav-trigger`} onClick={toggleMenu}>Trigger </div>
             <ul className={`nav-list ${isOpen ? 'is-open' : ""}`} >
-                <li><a>Home</a></li>
-                <li><a>Campagins</a></li>
-                <li><a>Characters</a></li>
-                <li><a>Account</a></li>
+                <li><Link to={`/`}>Home</Link></li>
+                <li><Link to="/campagins">Campagins</Link></li>
+                <li><Link to="/characters">Characters</Link></li>
+                <li><Link to="/login">Account</Link></li>
                 </ul>
             </div>
         </nav>
