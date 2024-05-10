@@ -1,6 +1,7 @@
-const saltAndHash = require('../../enbcrypt.js');
+const {hashNewPassword, compareHash} = require('../../enbcrypt.js');
 const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../../mongoFunctions/query/postQuery.js");
+const { signToken } = require("./jwtokenHandler.js");
 const { handleMissingFields } = require("../../errorHandling/connectionError.js");
 require("dotenv").config();
 
@@ -26,7 +27,8 @@ async function createNewUser(req, res) {
     // check for valid parameters
     if (password != undefined && userLogin !== undefined && email !== undefined && DOB !== undefined) {
         try {
-            let hashed = await saltAndHash(json.password);
+            let hashed = await hashNewPassword(json.password);
+            console.log(`Set hashed to ${hashed}`);
             await createUser(json, hashed);
             let result = {
                 "status": 'ok',
@@ -61,40 +63,85 @@ async function createNewUser(req, res) {
 
 
 async function isValidAuth(req, res) { 
-    var { id, password } = req.body;
-    if (id !== undefined && password !== undefined) {
-        try {
-            password = await saltAndHash(password);
-        } catch (e) {
-            //TODO: LOG HERE
-            return res.status(400).json(e);
-        }
+    var { username, password } = req.body;
+    if (username !== undefined && password !== undefined) {
+    
         try {
             const result = await userModel.exists({
-                _id: id,
-                password: password
+                userLogin: username,
             });
             
-            if(result){
-                return res.status(200).json({
-                    "status": "ok",
-                    "msg": "Authentication success.",
-                    "action": "" // link to homepage.
-                });
+            if (result) {
+                const other = await userModel.aggregate([
+                    {
+                        $match: {userLogin: username}
+                    },
+                    {
+                        $lookup: {
+                            from: 'useraccounts',
+                            localField: '_id',
+                            foreignField: 'userAuthId',
+                            as: 'userDetail'
+                        }
+                    },
+                    {
+                        $limit: 1
+                    }
+                ]);
+
+
+                if (other) {
+
+                    if (other[0].activity.active !== true) {
+                        return res.status(200).json({
+                            'status': 'DENIED',
+                            'msg': 'ACC_DISABLED',
+                            'link': '/home'
+                        }
+                        )
+                    }
+                    var auth = await compareHash(password, other[0].password);
+                   
+                    if (auth) {
+                        //generate jwtoken here...
+                        const token = signToken('/api/clients/validAuth', username);
+                        res.setHeader("Set-Cookie", `token=${token}; domain: localhost:3000; `);
+                        
+                        return res.status(200).json({
+                            'status': 'SUCCESS',
+                            'msg': 'AUTH_OK',
+                            'link': '/home'
+                        })
+                    }
+                    // invalid password username combination.
+                    return res.status(200).json({
+                        'status': 'DENIED',
+                        'msg': "Invalid combination",
+                        'link': '/register'
+                    })
+                }
+                else {
+                    return res.status(400).json({ 
+                        'status': 'DB_ERR',
+                        'msg': 'DB_CON'
+                     });
+                }
             }
             else {
                 return res.status(200).json({
-                    'status': "none found"
+                    'status': 'DNE',
+                    'msg': `username ${username} not found.`,
+                    'link': '/register'
                 })
             }
         } catch (e) {
             console.log(e);
-            return res.status(200).json({"status": e})
+            return res.status(400).json({"status": e.message})
         }
-    }
+    } 
     let params = [];
-    if (id === undefined) {
-        params.push("id");
+    if (username === undefined) {
+        params.push("username");
     }
     if (password === undefined) {
         params.push("password");
