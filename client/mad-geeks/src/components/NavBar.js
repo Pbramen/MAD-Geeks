@@ -10,7 +10,7 @@ export function NavBar() {
     };
 
     return (
-        <nav className="nav">
+        <nav className="nav ">
             <div className="flex-column">
             <div className={`nav-trigger`} onClick={toggleMenu}>Trigger </div>
             <ul className={`nav-list ${isOpen ? 'is-open' : ""}`} >

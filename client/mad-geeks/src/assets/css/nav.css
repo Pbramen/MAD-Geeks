@@ -5,9 +5,9 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 75px;
-    overflow: scroll;
-    border:1px solid red;
+    max-height: 75px;
+    overflow: none;
+
 }
 .nav-list{
     list-style: none;

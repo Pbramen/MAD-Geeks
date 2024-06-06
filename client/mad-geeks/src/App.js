@@ -1,16 +1,35 @@
 import { Outlet } from 'react-router-dom';
 import './assets/css/login.css';
+import { NavBarComp } from './components/NavBarComp';
 import { Footer } from './components/Footer';
-import { NavBar } from "./components/NavBar";
+
 function App() {
+  const links = [
+    {
+      path: 'home',
+      name: 'Home'
+    },
+    {
+      path: 'campagins',
+      name: 'Campagins'
+    },
+    {
+      path: 'characters',
+      name: 'Characters'
+    },
+    {
+      path: 'login',
+      name: 'Account'
+    },
+  ]
+
   return (
     // wraps the entire application with router component
     <div className="flex-column full">
-      <NavBar />
-      <div className='mid'>
-      <div className='centered'>
+      <NavBarComp links={links} />
+      <div className='mid flex-tripod-main'>
         <Outlet />
-      </div></div>
+      </div>
       <Footer className='footer'/>
     </div>
   );

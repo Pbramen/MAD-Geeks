@@ -1,0 +1,3 @@
+function validateNumber(number) {
+    
+}

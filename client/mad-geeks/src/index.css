@@ -15,6 +15,32 @@ code {
     monospace;
 }
 
+.flex {
+  display:flex
+}
+.flex-row{
+  flex-direction: row;
+  gap: 20px;
+}
+
+.flex-full{
+  align-self: stretch;
+  width: 100%;
+}
+
+.centered{
+  align-items: center;
+  justify-content: center;
+}
+.flex-main{
+  flex: 3 300px;
+}
+
+
+.last-flex-item{
+  flex: 1 300px;
+}
+
 .flex-column{
   display:flex;
   flex-direction: column;
@@ -27,6 +53,7 @@ code {
   max-height: 75px;
   outline: 1px solid green;
   margin-top: auto;
+  flex-basis: 100px;
   flex-grow: 1;
   text-align: end;
 }
@@ -40,4 +67,37 @@ code {
     font-size: 1em;
     padding: 25px;
   }
+}
+
+.aside-menu{
+  background: rgb(218, 218, 226);
+  border-radius: 10px;
+  width: 400px;
+  margin-left:auto;
+  overflow: scroll;
+}
+
+.block-center{
+  display:block;
+  margin-right: auto;
+  margin-left: auto;
+  width:100%;
+}
+
+.tk-grid{
+  position: absolute;
+  top:auto;
+  right:auto;
+}
+
+div[draggable="true"]:hover {
+  cursor: grab;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
+
+div[draggable="true"]:active:hover{
+  cursor: grabbing;
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
 }

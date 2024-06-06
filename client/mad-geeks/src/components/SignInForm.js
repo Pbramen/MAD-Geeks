@@ -1,6 +1,6 @@
 import {useState} from "react";
 import { useNavigate } from "react-router-dom";
-import { setJWTCookie, decodeJWT } from "../assets/js/cookieHandler";
+import { Form, TextInput, Button } from "./prefabs/FormComponents"
 
 function SignInForm() {
     const nav = useNavigate();
@@ -26,7 +26,6 @@ function SignInForm() {
                 return json;
             })
             .then((json) => {
-                // need some other message....
                 if (json.status && json.status === 'SUCCESS' && json.msg && json.msg === "AUTH_OK" ) {
                     nav(json.link );
                 }
@@ -43,23 +42,17 @@ function SignInForm() {
 
     return (
         <section className="form-card">
-            <div className="border"></div>
+
             <div className="card-banner">MadGeeks</div>
             <div className="form-group">
                 {error && <div className='alert'>*Invalid username or password.</div>}
                 <h2 className="sign-in-title">Sign In</h2>
-                <form className="sign-in-form" onSubmit={validate} method="GET">
-                    <label htmlFor="username" className="form-label"><em>username/email:</em></label>
-                    <input type="text" id="username" name="username" className={error ? "invalid-field": ""} required></input>
+                <Form style={'sign-in-form'} handler={validate} autocomplete={"off"} >
+                    <TextInput name={'username'} label_style={"form-label"} required={true} />
+                    <TextInput name={'password'} label_style={"form-label"} required={true} type={"password"}/>
+                    <Button value={"login"} style={ "login"}  />
+                </Form>
 
-                    <label htmlFor="password" className="form-label" required><em>password:</em></label>
-                    <input type="password" id="password" name="password" className={error ? "invalid-field": ""}></input>
-
-                    <button type="submit" className="login">
-                        Login
-                    </button>
-                </form>
-        
                 <a>Register for new account</a>
             </div>
         </section>

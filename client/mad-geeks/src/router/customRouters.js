@@ -6,6 +6,8 @@ import { DashBoard } from '../components/DashBoard';
 import SignInForm from '../components/SignInForm';
 import { CampaginPage } from '../components/CampaignPage';
 import { CharacterPage } from '../components/CharacterPage';
+import { GridPage } from '../components/GridPage';
+
 
 export const router = createBrowserRouter([
   {
@@ -32,8 +34,14 @@ export const router = createBrowserRouter([
         path: 'characters',
         element: <CharacterPage />,
         errorElement: <ErrorPage />
+      },
+      {
+        path: 'test',
+        element: <GridPage />,
+        errorElement: <ErrorPage />
       }
       ] 
   }, 
+  
 ])
 
