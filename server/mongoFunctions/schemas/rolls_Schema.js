@@ -1,14 +1,64 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const assert = require('node:assert');
+const { roll_state, roll_type, dice } = require("../../config/rollConfig");
 
-const ranged = (e) => { 
-    return (e > 0 && e < 100);
-}
+// Type of die that was rolled.
+const die_roll = new Schema({
+    die_type: {
+        type: Number,
+        enum: [dice , "{Value} is an invalid die type."],
+        required: true
+    },
+    quantity: {
+        type: Number,
+        min: [0, "Number of rolls must be positive. Recieved {Value} instead"],
+        max: [100, "Limited to 100 die rolled at once. Recieved {Value} instead"],
+        required: true
+    },
+    state: {
+        type: Number,
+        enum: roll_state,
+        default: roll_state.NONE
+    },
+    objective: {
+        type: Number,
+        enum: roll_type,
+        default: roll_type.OTHER
+    }
+});
 
-const bonusRange = (e) => {
-    return (e >= -100 && e <= 100);
-}
+const roll_result = new Schema({
+    base_roll: {
+        type: [Number],
+        min: [1, "Illegal die value {VALUE}."],
+        validate:
+        {
+            validator: (arr) => { 
+                return arr.length <= 100 && arr.length > 0;
+            },
+            mesage: 'Array must be greater than 0 and less than 101.'
+        }
+    },
+    proficiency: {
+        type: Number,
+        min: 0,
+        max: 10,
+        required: true
+    },
+    stat_bonus: {
+        type: Number,
+        min: -15,
+        max: 15,
+        required: true
+    },
+    other_mods: {
+        type: [{
+            name: { type: String },
+            bonus: { type: Number },
+            source: { type: String }
+        }]
+    }
+})
 
 /**
  * History of rolls for each user (many-to-squillion)
@@ -21,60 +71,21 @@ const roll_history = new Schema({
         type: Schema.Types.ObjectId,
         required: true
     },
-    roll: {
-        // meta data about the roll
-        config : { 
-            type: {
-                type: String,
-                enum: {
-                    values: ['1d100', '1d20', '1d12', '1d10', '1d8', '1d6', '1d4', '1d2'],
-                    message: '{VALUE} is not a supported dice type.'
-                },
-                required: true
-            },
-            quantity: {
-                type: Number,
-                validate: {
-                    validator: ranged,
-                    message: props => `Requested ${props.value}. Must be between range 1-100` 
-                },
-                required: true
-            },
-            advantageState: {
-                type: String,
-                enum: {
-                    values: ["low", "high", "normal"],
-                    message: '{VALUE} is not a supported advantage state.'
-                },
-                default: "normal"
-            },
-            inspiration: {
-                type: Boolean,
-                default: false,
-                required: true
-            }
+    name: {
+        type: String
+    },
+    roll: die_roll,
+    result: {
+        first_roll: {
+            type: roll_result,
+            required: true
         },
-        // results of high and low.
-        results: { 
-            firstRoll: {
-                type: Number,
-                required: true
-            }, 
-            secondRoll: {
-                type: Number,
-                required: false
-            },
-            bonuses: [
-                {
-                    name: String, 
-                    amount: {
-                        type: Number,
-                        validator: ranged,
-                        message: `{VALUE} must be between -100 and 100`
-                    }
-                }
-            ]
+        second_roll: {
+            type: roll_result
         }
+    },
+    campaign_id: {
+        type: Schema.Types.ObjectId,
     },
     // creation date automatic TTL
     createdAt: { 
@@ -84,26 +95,6 @@ const roll_history = new Schema({
     }
 })
 
-const roll = mongoose.model("roll", roll_history);
-
-const r = new roll({
-    user: 0,
-    roll: {
-        config: {
-            type: '1d2',
-            quantity: -1
-        },
-        results: {
-            firstBase: 10,
-        }
-    }}
-);
-
-// let err = r.validateSync();
-// console.log(err.errors);
-
-// assert.equal(err.errors["roll.config.type"].properties.message, '1d1 is not a supported dice type.');
-// assert.equal(err.errors["roll.config.quantity"].properties.message, `Requested ${Number.MAX_VALUE - 1} number of die rolled. Must be a number greater than 0.`);
 const rollHistory = mongoose.model("roll_history", roll_history);
 module.exports = {
     rollHistory

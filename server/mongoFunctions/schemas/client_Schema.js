@@ -54,7 +54,8 @@ const user_Account_Schema = new Schema({
     },
     role: [{
         id: { type: String },
-        rel: { type: mongoose.Schema.Types.ObjectId }
+        enum: ['player', 'DM', 'sysAdmin', 'webAdmin'],
+        default: ['player']
     }],
     DOB: {
         type: String,

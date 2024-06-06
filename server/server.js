@@ -12,9 +12,12 @@ app.use(express.json());
 app.use('/', (req, res, next) => {
     console.log(req.method, req.url, req.protocol, req.httpVersion, req.body)
     //TODO: change 
-    res.setHeader("Access-Control-Allow-Origin", process.env.CLIENT_SIDE);
-    res.setHeader("Access-Control-Allow-Methods", "POST GET DELETE PATCH");
-    res.setHeader("Access-Control-Allow-Headers", "*");
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); 
+    // preflight -> need to accept req-method, Origin, req-headers
+    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
+    // options is used in preflight 
+    res.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PATCH, OPTIONS");
+    res.setHeader("Access-Control-Allow-Credentials", 'true');
     next();
 })
 mongoose.connect(process.env.URI_M)
@@ -25,3 +28,7 @@ mongoose.connect(process.env.URI_M)
 })
 app.use('/api/clients', authRouter);
 app.use('/api/sheet', sheetRouter);
+app.use('/api/set-cookie', (req, res) => {
+    res.setHeader("Set-Cookie", "name=value");
+    res.send("You got cookies!");
+})
