@@ -1,7 +1,7 @@
 export function Form({children, autocomplete="on", handler="", style=""}) {
     return (
         <>
-            <form className={style} onSubmit={handler} autocomplete={autocomplete}>
+            <form className={style} onSubmit={handler}>
                 {children}
             </form>
         </>
@@ -16,11 +16,12 @@ export function Button({ value, type="", style="", handler="" }) {
     )
 }
 
-export function TextInput({name, required, label_style="", input_style="", type="text"}) {
+export function TextInput({name, required, label_style="", input_style="", type="text",  autoComplete=false 
+}) {
     return (
         <>
             <label htmlFor={name} className={label_style}><em>{name}:</em></label>
-            <input type={type} className={input_style} id={name} name="username" required={required}></input>
+            <input type={type} className={input_style} id={name} name="username" autoComplete={autoComplete.toString()} required={required}></input>
         </>
     )
 }

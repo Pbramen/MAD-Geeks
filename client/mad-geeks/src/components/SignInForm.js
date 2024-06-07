@@ -47,9 +47,9 @@ function SignInForm() {
             <div className="form-group">
                 {error && <div className='alert'>*Invalid username or password.</div>}
                 <h2 className="sign-in-title">Sign In</h2>
-                <Form style={'sign-in-form'} handler={validate} autocomplete={"off"} >
-                    <TextInput name={'username'} label_style={"form-label"} required={true} />
-                    <TextInput name={'password'} label_style={"form-label"} required={true} type={"password"}/>
+                <Form style={'sign-in-form'} handler={validate} >
+                    <TextInput name={'username'} label_style={"form-label"} required={true} autoComplete={true} />
+                    <TextInput name={'password'} label_style={"form-label"} required={true} autoComplete={true} type={"password"}/>
                     <Button value={"login"} style={ "login"}  />
                 </Form>
 
