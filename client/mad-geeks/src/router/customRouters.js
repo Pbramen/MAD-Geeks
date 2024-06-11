@@ -7,6 +7,7 @@ import SignInForm from '../components/SignInForm';
 import { CampaginPage } from '../components/CampaignPage';
 import { CharacterPage } from '../components/CharacterPage';
 import { GridPage } from '../components/GridPage';
+import { RegistrationPage } from '../components/RegistrationPage';
 
 
 export const router = createBrowserRouter([
@@ -39,9 +40,12 @@ export const router = createBrowserRouter([
         path: 'test',
         element: <GridPage />,
         errorElement: <ErrorPage />
-      }
-      ] 
-  }, 
-  
+      },
+      {
+        path: 'register',
+        element: <RegistrationPage />,
+        errorElement: <ErrorPage />
+      }] 
+  }
 ])
 

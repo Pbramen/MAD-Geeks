@@ -101,3 +101,13 @@ div[draggable="true"]:active:hover{
   cursor: -moz-grabbing;
   cursor: -webkit-grabbing;
 }
+
+.hidden{
+  display: none;
+}
+
+.input_desc{
+  color: gray;
+  font-size:0.75em;
+  margin-bottom: 5px;
+}

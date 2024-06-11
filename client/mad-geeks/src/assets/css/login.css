@@ -22,8 +22,10 @@
     margin: 15px;
     width: 320px;
     min-height: 500px;
+    height: auto;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    flex-wrap: nowrap;
     align-items: center;
     position: relative;
     background-image: linear-gradient(180deg, rgb(40, 33, 80), rgb(30, 117, 133));
@@ -37,7 +39,6 @@
 
 
 .card-banner {
-    position: absolute;
     border: none;
     border-radius: 5px 5px 0px 0px;
     box-shadow: 2px -2px black, -2px -2px black, -2px 0px black, 2px 0px black;
@@ -156,7 +157,8 @@ input {
     
     .form-card {
         width: 500px;
-        height: 670px;
+        min-height: 670px;
+        height: auto;
     }
     .border{
         display:none;
