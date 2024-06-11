@@ -37,6 +37,12 @@
     font-size:1.25em;
 }
 
+.form-item{
+    margin-bottom:10px;
+    display:flex;
+    flex-direction:column;
+}
+
 
 .card-banner {
     border: none;
@@ -65,9 +71,6 @@
     margin-bottom: 20px;
     font-size: 2.1em;
 }
-.sign-in-form > input {
-    margin-bottom: 20px;
-}
 
 .sign-in-form > button {
     margin-top: 10px;
@@ -80,10 +83,16 @@
     border-radius: 5px;
     box-shadow: 5px 5px rgb(8, 20, 53);
 }
-.sign-in-form > button:hover{
+.sign-in-form > button.active-btn:hover{
     background-color: rgb(238, 134, 16);
     cursor: pointer;
 }
+
+.sign-in-form > button.disabled-btn{
+    border-color: gray;
+    color: gray;
+}
+
 .border{
     position: absolute;
     border-right: 2px solid rgb(0, 0, 0);

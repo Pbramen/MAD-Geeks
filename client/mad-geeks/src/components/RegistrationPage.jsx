@@ -9,16 +9,32 @@ export function RegistrationPage() {
     const [fields, setFields] = useState({
         username: '',
         password: '',
-        pass_check: false,
+        confirm: '',
         email: ''
     })
-    const [errors, setError] = useState(null);
+    const [otherErrMsg, setErrMsg] = useState("");
+    const [userErrMsg, setUserErrMsg] = useState("");
+    const [passErrMsg, setPassErrMsg] = useState("");
+    const [emailErrMsg, setEmailErrMsg] = useState("");
+    const [DOBErrMsg, setDOBErrMsg] = useState("");
+    const [confirmErrMsg, setConfirmErrMsg] = useState("");
+
+    const canSubmit = fields.password === fields.confirm && fields.password !== "";
+    // perform validators here....
+
 
     //input descriptions here
-    const user_desc = "Username must have at minimun length of 6. May contain letters or numbers.";
-    const pass_desc = "Password must have at minimun length of 6 and contains at least one lowercase letter, one lowercase number, one symbol, and one number";
-    const email = "Please enter a valid email address."
-    
+    // ⚪ 🔴 🟢
+
+    const user_def = ["⚪ Min length 6"];
+
+    const onBlurPass = (e) => {
+        console.log(e.target.value);
+        setFields({ ...fields, confirm: e.target.value });
+    }
+    const onBlurConfirm = (e) => {
+        setFields({...fields, password: e.target.value})
+    }
     const onSubmitForm = async (e) => {
         e.preventDefault();
         const data = JSON.stringify({
@@ -36,28 +52,76 @@ export function RegistrationPage() {
             var json = await result.json();
             console.log(json);
             if (json.status && json.stats === 'ok') {
-                nav('/regsiter?success');
+                nav('/');
             }
             else if (json.errors && json.errors[0]) {
-                console.log(json.errors[0].message);
-                setError(json.errors[0].message);
+                let n = json.errors.length;
+                let i;
+
+                //reset all errors
+                setUserErrMsg("");
+                setPassErrMsg("");
+                setDOBErrMsg("");
+                setEmailErrMsg("");
+                setConfirmErrMsg("");
+
+                setFields({
+                    username: e.target.username.value,
+                    password: e.target.password.value,
+                    confirm: "",
+                    email: e.target.email.value
+                })
+
+                json.errors.forEach(element => {
+                    if (element.path === null || element.message === null) {
+                        throw new Error("Unexpected Error. Please Try Again later.");
+                        // TODO: LOG ERROR HERE:
+                    }
+                    switch (element.path) {
+                        case "userLogin":
+                            setUserErrMsg(element.message);
+                            break;
+                        case "password":
+                            setPassErrMsg(element.message);
+                            break;
+                        case "email":
+                            setEmailErrMsg(element.message);
+                            break;
+                        case "DOB":
+                            setDOBErrMsg(element.message);
+                            break;
+                        default:
+                            setErrMsg(element.message);
+                            // set for unexpected error
+                            break;
+                    }
+                });
             }
         } catch (e) {
-            setError("Unexpected server error. Please try again later!");
+            //setError("Unexpected server error. Please try again later!");
             console.log(e);    
         }
     }
     return (
         <CardOne>
             <h2 className='sign-in-title'>Register</h2>
-            {errors && <p className='alert'>{errors}</p>}
+           
             <Form handler={onSubmitForm}>
-                <TextInput display_name='username' display_id='username' required={true} placeholder={fields.username} input_desc=""></TextInput>
-                <TextInput display_name='password' display_id='password' required={true} type='password' placeholder={fields.password}></TextInput>
-                <TextInput display_name='confirm password' display_id='confirm_pass' required={true} type='password'></TextInput>
-                <TextInput display_name='email' display_id='email' required={true} placeholder={fields.email}></TextInput>
+                <TextInput display_name='username' display_id='username' required={true} placeholder={fields.username} input_desc={userErrMsg} ></TextInput>
+                <TextInput inputHandler={ onBlurPass } display_name='password' display_id='password' required={true} type='password' placeholder={fields.password} input_desc={passErrMsg}></TextInput>
+                <TextInput inputHandler={ onBlurConfirm } display_name='confirm password' display_id='confirm_pass' required={true} type='password' placeholder={fields.confirm} input_desc={confirmErrMsg}></TextInput>
+                <TextInput display_name='email' display_id='email' required={true} placeholder={fields.email} input_desc={emailErrMsg}></TextInput>
                 <DateSelector legend="Date of Birth" id="date"/>
-                <Button type='submit' value='Register' handler={(e) => { e.preventDefault() }} />
+                {canSubmit &&
+                    <Button style="active-btn" type='submit' value='Register' handler={(e) => { e.preventDefault() }} disabled={false} >
+                        Register
+                    </Button>    
+                }
+                {!canSubmit && 
+                    <Button type="submit" disabled={true} style="disabled-btn">
+                        Register
+                    </Button>
+                }
             </Form>
         </CardOne>
     )

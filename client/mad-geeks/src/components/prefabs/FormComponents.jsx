@@ -1,7 +1,7 @@
 import { createContext, useContext, useState } from "react"
 import { generateNumberAsString } from "../../assets/js/generateString"
 
-export function Form({children, handler="", style="sign-in-form"}) {
+export function Form({children, handler, style="sign-in-form"}) {
     return (
         <>
             <form className={style} onSubmit={handler}>
@@ -11,21 +11,22 @@ export function Form({children, handler="", style="sign-in-form"}) {
     )
 }
 
-export function Button({ value, type="", style="", handler="", disabled=false }) { 
+export function Button({ children, type="", style="", disabled=false }) { 
+    if (disabled) {
+        return (
+            <button type={type} className={style} disabled>
+                {children}
+            </button>
+        )
+    }
     return (
         <button type={type} className={style} disabled={disabled}>
-            {value}
+            {children}
         </button>
     )
 }
 
-export function AriaDescribe({ id, style = 'hidden', msg ='', invalid="false"}) {
-    return (
-        <div id={id} role="alert" className={ style } aria-live="polite" aria-invalid={invalid}>
-            {msg}
-        </div>
-    )
-}
+
 // TODO: ADD TYPESCRIPT TO PROJECT
 /*
     obj:{
@@ -35,14 +36,27 @@ export function AriaDescribe({ id, style = 'hidden', msg ='', invalid="false"}) 
         display_style: <string>
     }
 */
-export function TextInput({ display_id, display_name, required,  placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, err_msg=null, input_desc=null}) {
+export function TextInput({ display_id, display_name, required, placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, desc = null, input_desc = '', inputHandler = () => { } }) {
+    const aria_label = `${display_id}_desc`;
+    const invalid = input_desc !== '';
+    const aria_style = !invalid ? 'hidden' : 'aria-err';
+    
+    if (input_desc) {
+        console.log(input_desc);
+    }
     return (
-        <>
-            {err_msg !== "" && <AriaDescribe id={`${display_id}_err` } className="">{err_msg}</AriaDescribe>}
+        <div className="form-item">
             <label aria-label={display_name}  htmlFor={display_id} className={label_style}><em>{display_name}:</em></label>
-            <input aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
-            {input_desc && <span className="input_desc" id={`${display_id}_desc`}>{input_desc}</span>}
-        </>
+            { input_desc &&
+                <input onBlur={ inputHandler } aria-invalid={invalid} aria-describedby={aria_label} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
+            }
+            { !input_desc &&
+                <input onBlur={ inputHandler } aria-invalid={invalid} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
+            }
+            <div role="alert" aria-live="polite" className={aria_style} id={aria_label}>{`* ${input_desc}`}</div>
+            
+            
+        </div>
     )
 }
 
