@@ -8,46 +8,64 @@ function checkPassword(value) {
     var oneSymbol = false;
     var oneDigit = false;
     var i;
+    var errs = [];
 
     //excludes ( ' " . $ )
     var symbols = new Set([32, 33, 35, 37, 38, 39, 40, 41, 42, 43, 44, 45, 47, 58, 59, 60, 61, 62, 63, 64, 91, ,92, 93, 94, 95, 96, 123, 124, 125, 126 ]);
-    if (n >= 8) {
-        for (i = 0; !(oneUpper && oneLower && oneSymbol && oneDigit) && (i < n); i++){
-            let c = value.charCodeAt(i);
-            // symbol
-            if (symbols.has(c)) {
-                oneSymbol = true;
-            }
-            // digits
-            else if (47 < c && c < 58) {
-                oneDigit = true;
-            }
-            // uppercase
-            else if(64 < c && c < 91){  
-                oneUpper = true;
-            } //lowercase
-            else if (96 < c && c < 123) {
-                oneLower = true;
-            }
+
+    for (i = 0; !(oneUpper && oneLower && oneSymbol && oneDigit) && (i < n); i++) {
+        let c = value.charCodeAt(i);
+        // symbol
+        if (symbols.has(c)) {
+            oneSymbol = true;
         }
-        if (!oneSymbol) {
-            throw new Error("Password must contain at least one special character.");
+        // digits
+        else if (47 < c && c < 58) {
+            oneDigit = true;
         }
-        
-        if (!oneDigit) {
-            throw new Error("Password must contain at least one digit.");
+        // uppercase
+        else if (64 < c && c < 91) {
+            oneUpper = true;
+        } //lowercase
+        else if (96 < c && c < 123) {
+            oneLower = true;
         }
-        
-        if (!oneLower) {
-            throw new Error("Password must contain at least one lowercase character.");
-        }
-        
-        if (!oneUpper) {
-            throw new Error("Password must contain at least one uppercase character.");
-        }
-        return true;
     }
-    return false;
+    if (!oneSymbol) {
+        errs.push("one symbol");
+    }
+    
+    if (!oneDigit) {
+        errs.push("one digit");
+    }
+    
+    if (!oneLower) {
+        errs.push("one lowercase letter");
+    }
+    
+    if (!oneUpper) {
+        errs.push("one uppercase letter");
+    }
+    if (n < 8) {
+        errs.push("min length of 8"); 
+    }
+    
+    let a = errs.length;
+    if (a !== 0) {
+        let i = 0;
+        var msg = "Password must contain:";
+
+        for (i = 0; i < a; i += 1) {
+            if (i !== a - 1) {
+                msg += ' ' + errs[i] + ',';
+            }
+            else {
+                msg += ' and ' + errs[i] + '.';
+            }
+        }
+        throw new Error(msg);
+    }
+    return true;
 }
 
 function checkEmail(value) {

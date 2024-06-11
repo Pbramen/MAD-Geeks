@@ -21,6 +21,7 @@ async function test1(req, res) {
  * @returns {JSON} Status
  */
 async function createNewUser(req, res) {
+    console.log("creating...");
     const json = req.body;
     const { password, userLogin, email, DOB } = json;
 
@@ -28,18 +29,19 @@ async function createNewUser(req, res) {
     if (password != undefined && userLogin !== undefined && email !== undefined && DOB !== undefined) {
         try {
             let hashed = await hashNewPassword(json.password);
-            console.log(`Set hashed to ${hashed}`);
             await createUser(json, hashed);
             let result = {
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
                 "action": '' // redirect user back to login screen.
             }
+            console.log(result);
             return res.status(200).json(result);
         } catch (e) {
+            console.log(e);
             let err = { errors: [] };
             let status = { code: 200 };
-            handleError(e, err, status);
+            err = handleError(e, err, status);
             return res.status(status.code).json(err);
         }
     }
@@ -135,7 +137,6 @@ async function isValidAuth(req, res) {
                 })
             }
         } catch (e) {
-            console.log(e);
             return res.status(400).json({"status": e.message})
         }
     } 
@@ -165,16 +166,14 @@ const handleError = (error, err, status) => {
             err.errors.push(
                 {
                     path: props.path,
-                    message: props.message,
-                    type: props.type,
-                    value: props.value
+                    message: props.message
                 }
             )
             // LOG ERROR HERE
-            console.log(props);
+            //console.log(props);
         });
     
-        //return err;
+        return err;
     }
     // duplicate key found
     else if (error.hasOwnProperty('code') && error.code == 11000) {
@@ -188,11 +187,10 @@ const handleError = (error, err, status) => {
             })
             //LOG ERROR HERE
         }
-       // return err;
+        return err;
     }
     else {
         // LOG ERROR
-        console.log(error);
 
         status.code = 422;
         err.errors.push({
@@ -201,7 +199,7 @@ const handleError = (error, err, status) => {
         })
         err['action'] = 'Try again later';
     }
-    //return err;
+    return err;
 }
 
 module.exports = {
