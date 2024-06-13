@@ -10,7 +10,9 @@ require("dotenv").config();
  * @returns 
  */
 async function test1(req, res) { 
-    const response = await userModel.find();
+    console.log("finding all users...");
+    const response = await userModel.find({}).select('userLogin');
+    console.log(response);
     return res.status(200).json(response);
 }
 
@@ -21,7 +23,6 @@ async function test1(req, res) {
  * @returns {JSON} Status
  */
 async function createNewUser(req, res) {
-    console.log("creating...");
     const json = req.body;
     const { password, userLogin, email, DOB } = json;
 
@@ -33,7 +34,7 @@ async function createNewUser(req, res) {
             let result = {
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
-                "action": '' // redirect user back to login screen.
+                "action": '/login' // redirect user back to login screen.
             }
             console.log(result);
             return res.status(200).json(result);
@@ -93,22 +94,30 @@ async function isValidAuth(req, res) {
 
 
                 if (other) {
+                    if (!other[0].userDetail[0].banned.value) {
+                        return res.status(200).json({
+                            'status': 'DENIED',
+                            'msg': 'ACC_BANNED',
+                            'link': '/accountBanned'
+                        })
+                    }
 
-                    if (other[0].activity.active !== true) {
+                    if (other[0].activity.active !== true ) {
                         return res.status(200).json({
                             'status': 'DENIED',
                             'msg': 'ACC_DISABLED',
-                            'link': '/home'
+                            'link': '/accountDisabled'
                         }
                         )
                     }
+                   
                     var auth = await compareHash(password, other[0].password);
                    
                     if (auth) {
                         //generate jwtoken here...
                         const token = signToken('/api/clients/validAuth', username);
-                        res.setHeader("Set-Cookie", `token=${token}; domain: localhost:3000; `);
-                        
+                        res.append("Set-Cookie", `token=${token}; domain: localhost:3000; httponly`);
+                        res.append("SameSite", "lax")
                         return res.status(200).json({
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',

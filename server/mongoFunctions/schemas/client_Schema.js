@@ -68,6 +68,20 @@ const user_Account_Schema = new Schema({
     location: {
         type: Boolean,
         default: false
+    },
+    banned: {
+        value: {
+            type: Boolean,
+            default: false
+        },
+        reason: {
+            type: String, 
+            maxLength: 256
+        },
+        date: {
+            type: Date,
+            default: Date.now()
+        }
     }
 
 }, {timestamps: true})
