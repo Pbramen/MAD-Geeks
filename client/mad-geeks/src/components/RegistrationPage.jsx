@@ -1,17 +1,13 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect} from 'react';
 import { Form, Button, TextInput, DateSelector } from './prefabs/FormComponents'
 import { CardOne } from './CardOne'
 import { formHeaderOptions, handleResponse } from '../assets/js/fetch';
-import { useNavigate } from 'react-router-dom';
+import { checkPassword } from '../assets/js/formValidator';
+import { ConfirmationCard } from './ConfirmationPage';
+import { usePrevInput } from '../hooks/usePrevInput';
 
+//todo: useReducer for reset instead of state?
 export function RegistrationPage() {
-    const nav = useNavigate();
-    const [fields, setFields] = useState({
-        username: '',
-        password: '',
-        confirm: '',
-        email: ''
-    })
     const [otherErrMsg, setErrMsg] = useState("");
     const [userErrMsg, setUserErrMsg] = useState("");
     const [passErrMsg, setPassErrMsg] = useState("");
@@ -19,24 +15,17 @@ export function RegistrationPage() {
     const [DOBErrMsg, setDOBErrMsg] = useState("");
     const [confirmErrMsg, setConfirmErrMsg] = useState("");
 
-    const canSubmit = fields.password === fields.confirm && fields.password !== "";
-    // perform validators here....
+    const {
+        inputRefs, 
+        addToRefs,
+        resetInput,
+        handleSetState,
+        canRegister,
+        setCanRegister } = usePrevInput({ 'username': '', 'email': '', 'year': ''}, [userErrMsg, emailErrMsg, DOBErrMsg]);
 
-
-    //input descriptions here
-    // ⚪ 🔴 🟢
-
-    const user_def = ["⚪ Min length 6"];
-
-    const onBlurPass = (e) => {
-        console.log(e.target.value);
-        setFields({ ...fields, confirm: e.target.value });
-    }
-    const onBlurConfirm = (e) => {
-        setFields({...fields, password: e.target.value})
-    }
     const onSubmitForm = async (e) => {
         e.preventDefault();
+
         const data = JSON.stringify({
             "userLogin": e.target.username.value,
             "password": e.target.password.value,
@@ -46,13 +35,14 @@ export function RegistrationPage() {
         
         const headers = formHeaderOptions(data);
 
-        try{
+        try {
+            // TODO: convert fetch to axios (auth purposes)
             var result = await fetch("http://localhost:4000/api/clients/newUser", headers);
-
             var json = await result.json();
-            console.log(json);
-            if (json.status && json.stats === 'ok') {
-                nav('/');
+
+            if (json.status && json.status === 'ok') {
+          
+                setCanRegister( () => {return json.action} );
             }
             else if (json.errors && json.errors[0]) {
                 let n = json.errors.length;
@@ -65,12 +55,6 @@ export function RegistrationPage() {
                 setEmailErrMsg("");
                 setConfirmErrMsg("");
 
-                setFields({
-                    username: e.target.username.value,
-                    password: e.target.password.value,
-                    confirm: "",
-                    email: e.target.email.value
-                })
 
                 json.errors.forEach(element => {
                     if (element.path === null || element.message === null) {
@@ -96,32 +80,34 @@ export function RegistrationPage() {
                             break;
                     }
                 });
+                setCanRegister(false);
             }
         } catch (e) {
             //setError("Unexpected server error. Please try again later!");
             console.log(e);    
         }
     }
+    if (canRegister !== null && canRegister !== false) {
+        return (
+            <ConfirmationCard title={"Account successfully createed!"} link={canRegister}>
+                Please sign in to continue!
+            </ConfirmationCard>
+        )
+    } 
     return (
         <CardOne>
             <h2 className='sign-in-title'>Register</h2>
            
-            <Form handler={onSubmitForm}>
-                <TextInput display_name='username' display_id='username' required={true} placeholder={fields.username} input_desc={userErrMsg} ></TextInput>
-                <TextInput inputHandler={ onBlurPass } display_name='password' display_id='password' required={true} type='password' placeholder={fields.password} input_desc={passErrMsg}></TextInput>
-                <TextInput inputHandler={ onBlurConfirm } display_name='confirm password' display_id='confirm_pass' required={true} type='password' placeholder={fields.confirm} input_desc={confirmErrMsg}></TextInput>
-                <TextInput display_name='email' display_id='email' required={true} placeholder={fields.email} input_desc={emailErrMsg}></TextInput>
-                <DateSelector legend="Date of Birth" id="date"/>
-                {canSubmit &&
-                    <Button style="active-btn" type='submit' value='Register' handler={(e) => { e.preventDefault() }} disabled={false} >
-                        Register
-                    </Button>    
-                }
-                {!canSubmit && 
-                    <Button type="submit" disabled={true} style="disabled-btn">
-                        Register
-                    </Button>
-                }
+            <Form handleOnSubmit={onSubmitForm} >
+                <TextInput inputHandler={handleSetState } _ref={addToRefs} display_name='username' display_id='username' required={true} input_desc={userErrMsg} ></TextInput>
+                <TextInput display_name='password' display_id='password' required={true} type='password' input_desc={passErrMsg}></TextInput>
+                <TextInput display_name='confirm password' display_id='confirm_pass' required={true} type='password' input_desc={confirmErrMsg}></TextInput>
+                <TextInput inputHandler={handleSetState } _ref={addToRefs} display_name='email' display_id='email' required={true} input_desc={emailErrMsg}></TextInput>
+                <DateSelector input_desc={DOBErrMsg} legend="Date of Birth" id="date" _ref={addToRefs} yearHandler={handleSetState} />
+                <Button style="active-btn btn-1" type='submit' value='Register' handler={(e) => { e.preventDefault() }} disabled={false} >
+                    Register
+                </Button>    
+  
             </Form>
         </CardOne>
     )

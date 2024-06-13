@@ -12,6 +12,17 @@ export const formHeaderOptions = (json) =>{
     };
 }
 
+export const getHeaderOptions = {    
+    method: 'GET',
+    mode: 'cors',
+    credentials: 'include',
+    headers: {
+        "Content-Type": 'application/json',
+        "Origin": "http://localhost:3000",
+    }
+}
+
+
 export const handleResponse = (json_response) => {
     return isValidJSON(json_response);
 }

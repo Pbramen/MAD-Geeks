@@ -116,3 +116,8 @@ div[draggable="true"]:active:hover{
 .disabled{
   color: gray;
 }
+
+.confirm-page{
+  border: 1px solid black;
+  
+}

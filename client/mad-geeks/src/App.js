@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import './assets/css/login.css';
 import { NavBarComp } from './components/NavBarComp';
 import { Footer } from './components/Footer';
+import { AuthProvider } from './components/context/AuthProvider';
 
 function App() {
   const links = [
@@ -24,14 +25,16 @@ function App() {
   ]
 
   return (
-    // wraps the entire application with router component
-    <div className="flex-column full">
-      <NavBarComp links={links} />
-      <div className='mid flex-tripod-main'>
-        <Outlet />
-      </div>
-      <Footer className='footer'/>
-    </div>
+    <AuthProvider>
+      <div className="flex-column full">
+        <NavBarComp links={links} />
+        <div className='mid flex-tripod-main'>
+          <Outlet />
+        </div>
+        <Footer className='footer'/>
+        </div>
+      </AuthProvider>
+
   );
 }
 

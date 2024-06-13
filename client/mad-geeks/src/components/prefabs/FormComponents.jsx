@@ -1,10 +1,12 @@
-import { createContext, useContext, useState } from "react"
+import { createContext, useContext, useState, fowardRef } from "react"
 import { generateNumberAsString } from "../../assets/js/generateString"
 
-export function Form({children, handler, style="sign-in-form"}) {
+
+
+export function Form({children, handleOnSubmit, handleOnChange, style="sign-in-form", formRef}) {
     return (
         <>
-            <form className={style} onSubmit={handler}>
+            <form ref={formRef} className={style} onSubmit={handleOnSubmit} onChange={handleOnChange}>
                 {children}
             </form>
         </>
@@ -36,59 +38,53 @@ export function Button({ children, type="", style="", disabled=false }) {
         display_style: <string>
     }
 */
-export function TextInput({ display_id, display_name, required, placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, desc = null, input_desc = '', inputHandler = () => { } }) {
+export function TextInput({ display_id, display_name, required, _ref=null, placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, desc = null, input_desc = '', inputHandler = () => { } }) {
+
     const aria_label = `${display_id}_desc`;
     const invalid = input_desc !== '';
     const aria_style = !invalid ? 'hidden' : 'aria-err';
     
-    if (input_desc) {
-        console.log(input_desc);
-    }
     return (
         <div className="form-item">
             <label aria-label={display_name}  htmlFor={display_id} className={label_style}><em>{display_name}:</em></label>
             { input_desc &&
-                <input onBlur={ inputHandler } aria-invalid={invalid} aria-describedby={aria_label} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
+                <input onChange={inputHandler} ref={_ref} aria-invalid={invalid} aria-describedby={aria_label} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
             }
             { !input_desc &&
-                <input onBlur={ inputHandler } aria-invalid={invalid} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
+                <input onChange={inputHandler} ref={_ref} aria-invalid={invalid} aria-required={required} type={type} className={input_style} id={display_id} name={display_name} autoComplete={autoComplete.toString()} required={required} placeholder={placeholder}></input>
             }
             <div role="alert" aria-live="polite" className={aria_style} id={aria_label}>{`* ${input_desc}`}</div>
-            
-            
         </div>
     )
 }
 
-const ParentSelect = createContext({});
-
+const ParentConext = createContext({});
 export function Selector({ id, name, label, children }) {
-    const [activeOption, setActiveOption] = useState("");
+    const [activeItem, setActiveItem] = useState("");
 
     const handleChange = (e) => {
-        setActiveOption(e.target.options[e.target.selectedIndex].value);
+        const active_item = e.target.options[e.target.selectedIndex].value;
+        setActiveItem(active_item)
     }
 
     return (
-        <ParentSelect.Provider value={[ activeOption, setActiveOption ]}>
+        <ParentConext.Provider value={[activeItem, setActiveItem]}>
             <label htmlFor={id} label_style="">{label}</label>
-            <select onChange={handleChange} name={name} id={id}>
+            <select onChange={handleChange} name={name} id={id} value={activeItem}>
                 {children}
             </select>
-        </ParentSelect.Provider>
+        </ParentConext.Provider>
     )
 }
 
-export function Options({value, id}){
-    const [activeOption, _] = useValidContext(ParentSelect);
+/**
+ * TODO: fixe useValidContext for Options to be useable in only Selector, NOT DatContext.
+ */
 
-    if (activeOption === id) {
-        return (
-            <option selected key={id} value={value}> {value} </option>
-        )
-    }
+export function Options({value, id}){
+    useValidContext(ParentConext);
     return (
-        <option key={id}  value={value}>{value}</option>
+        <option key={id} value={value}>{value}</option>
     )
 }
 
@@ -102,9 +98,12 @@ function useValidContext(contextProvider) {
 
 Selector.Options = Options;
 
-export function DateSelector({ legend }) {
+export function DateSelector({ legend , _ref, input_desc, yearHandler}) {
+
+
     const month = generateNumberAsString(12, 1);
     const day = generateNumberAsString(31, 1);
+
     return (
         <fieldset>
             <legend>{legend}</legend>
@@ -131,8 +130,7 @@ export function DateSelector({ legend }) {
                 })}
             </Selector>
 
-
-            <TextInput id="year" display_id="year" display_name="Year" placeholder="YYYY" type='number'></TextInput>
+            <TextInput input_desc={input_desc} inputHandler={yearHandler} _ref={_ref} id="year" display_id="year" display_name="Year" placeholder="YYYY" type='number'></TextInput>
         </fieldset>
     )
 }

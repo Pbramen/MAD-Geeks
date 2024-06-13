@@ -1,9 +1,10 @@
-import {useState} from "react";
+import {useState, useContext} from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, TextInput, Button } from "./prefabs/FormComponents"
 import { CardOne } from "./CardOne";
 import { formHeaderOptions } from "../assets/js/fetch";
-
+import { AuthProvider } from './context/AuthProvider';
+import { Link } from "react-router-dom";
 
 function SignInForm() {
     const nav = useNavigate();
@@ -44,6 +45,7 @@ function SignInForm() {
             {error && <div className='alert'>*{error}</div>}
                 <h2 className="sign-in-title">Sign In</h2>
                 {loading && 
+                    // TODO: REPLACE(GRAY OUT ELEMENTS INSTEAD) 
                     <div>Loading...</div>
                 }
                 {!loading &&
@@ -51,9 +53,9 @@ function SignInForm() {
                         <Form style={'sign-in-form'} handler={validate} >
                         <TextInput display_name={'username'} display_id={'username'} label_style={"form-label"} required={true} autoComplete={true} />
                             <TextInput display_name={'password'} display_id={'password'} label_style={"form-label"} required={true} autoComplete={true} type={"password"}/>
-                            <Button value={"login"} style={loading ? 'login disabled': 'loading'} disabled={loading} />
+                            <Button value={"login"} style="btn-1">Login </Button>
                         </Form>
-                        <a href="/register">Register for new account</a>
+                        <Link to="/register">Register for new account</Link>
                     </>
                 }
                 

@@ -8,7 +8,7 @@ import { CampaginPage } from '../components/CampaignPage';
 import { CharacterPage } from '../components/CharacterPage';
 import { GridPage } from '../components/GridPage';
 import { RegistrationPage } from '../components/RegistrationPage';
-
+import { AuthUsers } from '../components/AuthUser';
 
 export const router = createBrowserRouter([
   {
@@ -44,6 +44,11 @@ export const router = createBrowserRouter([
       {
         path: 'register',
         element: <RegistrationPage />,
+        errorElement: <ErrorPage />
+      },
+      {
+        path: 'users',
+        element: <AuthUsers />,
         errorElement: <ErrorPage />
       }] 
   }
