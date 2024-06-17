@@ -1,7 +1,7 @@
 const {hashNewPassword, compareHash} = require('../../enbcrypt.js');
 const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../../mongoFunctions/query/postQuery.js");
-const { signToken } = require("./jwtokenHandler.js");
+const { signAccessToken, signRefreshToken } = require("./jwtokenHandler.js");
 const { handleMissingFields } = require("../../errorHandling/connectionError.js");
 require("dotenv").config();
 
@@ -14,6 +14,11 @@ async function test1(req, res) {
     const response = await userModel.find({}).select('userLogin');
     console.log(response);
     return res.status(200).json(response);
+}
+
+
+async function handleRefreshToken(req, res) {
+
 }
 
 /**
@@ -94,7 +99,8 @@ async function isValidAuth(req, res) {
 
 
                 if (other) {
-                    if (!other[0].userDetail[0].banned.value) {
+
+                    if (other[0].userDetail[0].banned.value) {
                         return res.status(200).json({
                             'status': 'DENIED',
                             'msg': 'ACC_BANNED',
@@ -114,25 +120,38 @@ async function isValidAuth(req, res) {
                     var auth = await compareHash(password, other[0].password);
                    
                     if (auth) {
-                        //generate jwtoken here...
-                        const token = signToken('/api/clients/validAuth', username);
-                        res.append("Set-Cookie", `token=${token}; domain: localhost:3000; httponly`);
-                        res.append("SameSite", "lax")
+                        const roles = other[0].userDetail[0].role;
+                
+                        const accessToken = signAccessToken(other.userLogin);
+                        const refreshToken = signRefreshToken(other.userLogin);
+           
+                        // save refreshToken here
+                        try {
+                            userModel.updateOne(
+                                { _id: other._id },
+                                { $push: { refreshToken: refreshToken } }
+                            )
+                        } catch (e) {
+                            console.log(e);
+                        }
+
                         return res.status(200).json({
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',
-                            'link': '/home'
+                            'link': '/home',
+                            'roles': roles,
+                            'accessToken': accessToken
                         })
                     }
                     // invalid password username combination.
-                    return res.status(200).json({
+                    return res.status(401).json({
                         'status': 'DENIED',
                         'msg': "Invalid combination",
                         'link': '/register'
                     })
                 }
                 else {
-                    return res.status(400).json({ 
+                    return res.status(500).json({ 
                         'status': 'DB_ERR',
                         'msg': 'DB_CON'
                      });
@@ -146,7 +165,7 @@ async function isValidAuth(req, res) {
                 })
             }
         } catch (e) {
-            return res.status(400).json({"status": e.message})
+            return res.status(500).json({"status": e.message})
         }
     } 
     let params = [];

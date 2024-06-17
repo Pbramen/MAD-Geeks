@@ -37,7 +37,8 @@ const user_Auth_Schema = new Schema({
             type: Date,
             default: Date.now()
         }
-    }
+    },
+    refreshToken: [String]
 }, {timestamps: true});
 
 const user_Account_Schema = new Schema({
