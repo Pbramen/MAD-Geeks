@@ -1,41 +1,34 @@
-import { Outlet } from 'react-router-dom';
-import './assets/css/login.css';
-import { NavBarComp } from './components/NavBarComp';
-import { Footer } from './components/Footer';
-import { AuthProvider } from './components/context/AuthProvider';
+import { Routes, Route } from 'react-router-dom';
+import { ErrorPage } from './components/ErrorPage';
+import { DashBoard } from './components/DashBoard';
+import SignInForm from './components/SignInForm';
+import { CampaginPage } from './components/CampaignPage';
+import { CharacterPage } from './components/CharacterPage';
+import { GridPage } from './components/GridPage';
+import { RegistrationPage } from './components/RegistrationPage';
+import { AuthUsers } from './components/AuthUser';
+import { useEffect } from 'react';
+import { Layout } from './Layout';
 
-function App() {
-  const links = [
-    {
-      path: 'home',
-      name: 'Home'
-    },
-    {
-      path: 'campagins',
-      name: 'Campagins'
-    },
-    {
-      path: 'characters',
-      name: 'Characters'
-    },
-    {
-      path: 'login',
-      name: 'Account'
-    },
-  ]
+export function App({ }) {
+    useEffect(() => {
+        console.log("App mounted");
+    }, []);
 
-  return (
-    <AuthProvider>
-      <div className="flex-column full">
-        <NavBarComp links={links} />
-        <div className='mid flex-tripod-main'>
-          <Outlet />
-        </div>
-        <Footer className='footer'/>
-        </div>
-      </AuthProvider>
-
-  );
+    return (
+        <Routes>
+            <Route path='/' element={<Layout/>}>
+                <Route index path="home" element={<DashBoard/>} />
+                <Route path="campagins" element={<CampaginPage/>} />
+                <Route path="login" element={ <SignInForm/>} />
+                <Route path="register" element={<RegistrationPage/> } />
+                <Route path="characters" element={<CharacterPage />} />
+                
+                {/* Testing pages */}
+                <Route path="user" element={<AuthUsers/> } />
+                <Route path="test" element={<GridPage/> } />
+            </Route>
+        </Routes>
+    )
 }
 
-export default App;

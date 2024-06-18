@@ -1,5 +1,4 @@
 import '../assets/css/nav.css';
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 export function NavBarComp({ baseUrl='/', links, parent_style='nav', child_style='nav-list' }) { 

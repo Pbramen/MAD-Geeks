@@ -18,7 +18,6 @@ export function RegistrationPage() {
     const {
         inputRefs, 
         addToRefs,
-        resetInput,
         handleSetState,
         canRegister,
         setCanRegister } = usePrevInput({ 'username': '', 'email': '', 'year': ''}, [userErrMsg, emailErrMsg, DOBErrMsg]);
@@ -36,7 +35,7 @@ export function RegistrationPage() {
         const headers = formHeaderOptions(data);
 
         try {
-            // TODO: convert fetch to axios (auth purposes)
+            // jwts are NOT created/checked on register. User must login after registering
             var result = await fetch("http://localhost:4000/api/clients/newUser", headers);
             var json = await result.json();
 
