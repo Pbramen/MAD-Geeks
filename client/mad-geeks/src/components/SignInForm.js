@@ -15,25 +15,25 @@ function SignInForm() {
     
     const validate = async function (e) {
         e.preventDefault();
-        const headers = formHeaderOptions();
-    
+       
         try {
-            const response = await axios.post("http://localhost:4000/api/clients/validateAuth", JSON.stringify({ username: e.target.username.value, password: e.target.password.value }), headers);
+            const response = await axios.post("http://localhost:4000/api/clients/validateAuth",{username: e.target.username.value, password: e.target.password.value}, {withCredentials: true});
             if (response.status === 200 && response.data) {
                 if (response.data.status === "SUCCESS" && response.data.msg === "AUTH_OK") {
-                    console.log(response.data);
                     const user = e.target.username.value;
                     const pass = e.target.password.value;
                     const role = response.data?.role;
                     const accessToken = response.data?.accessToken;
-                    setAuth({user, pass, role, accessToken});
-                    nav(response.data.link);
+                    setAuth({ username: user, password: pass, role: role, accessToken: accessToken });
+                    nav('/');
                 }
                 else if (response.status === 401) {
                     console.log("TODO: make unauthorized page...");
                 }
-                else
+                else{
+                    console.log(response);
                     setError(response.data.msg)
+                }
             }
         } catch (e) {
             setError("Unexpected Server Error. Please try again later.");

@@ -18,7 +18,7 @@ export function App({ }) {
     return (
         <Routes>
             <Route path='/' element={<Layout/>}>
-                <Route index path="home" element={<DashBoard/>} />
+                <Route index path="home" element={<AuthUsers/>} />
                 <Route path="campagins" element={<CampaginPage/>} />
                 <Route path="login" element={ <SignInForm/>} />
                 <Route path="register" element={<RegistrationPage/> } />

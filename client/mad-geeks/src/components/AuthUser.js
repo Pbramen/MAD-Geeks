@@ -1,22 +1,29 @@
-import {useEffect, useState} from 'react';
-import axios from '../api/axios';
+import { useEffect, useState } from 'react';
+import { useAxiosP } from '../hooks/useAxiosP';
+import { useRefresh } from '../hooks/useRefresh';
 
-export const AuthUsers = ({})=> {
+/**
+ * @returns {JSX.Element} Admin user page list
+ */
+export const AuthUsers = ({ }) => {
     const [users, setUsers] = useState([]);
-
+    const axios = useAxiosP(); 
+    const refresh = useRefresh();
 
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
 
         const getUser = async () => {
+            console.log('attempting to grab...')
             try {
                 const response = await axios.get('/api/clients/', {
                     signal: controller.signal
                 });
                 isMounted && setUsers(response.data)
             } catch (e) {
-                console.log(e);
+                console.log("Unepected error: " +  e.message);
+                //redirect to login screen.
             }
         }
 
@@ -39,6 +46,7 @@ export const AuthUsers = ({})=> {
                 </ul>
                 : <p>No Users to display</p>
             }
+            <button onClick={()=>{refresh()}}>Refresh</button>
         </article>
     )
 }

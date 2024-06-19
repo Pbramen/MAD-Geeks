@@ -7,6 +7,11 @@ import { ConfirmationCard } from './ConfirmationPage';
 import { usePrevInput } from '../hooks/usePrevInput';
 
 //todo: useReducer for reset instead of state?
+
+/**
+ * Handles UI/UX of registration. Remembers user's previous input if invalid form submitted.
+ * @returns {JSX.Element} Registration page 
+*/
 export function RegistrationPage() {
     const [otherErrMsg, setErrMsg] = useState("");
     const [userErrMsg, setUserErrMsg] = useState("");
@@ -41,7 +46,8 @@ export function RegistrationPage() {
 
             if (json.status && json.status === 'ok') {
           
-                setCanRegister( () => {return json.action} );
+                setCanRegister(() => { return json.action });
+                // navgiate to previous area...
             }
             else if (json.errors && json.errors[0]) {
                 let n = json.errors.length;
