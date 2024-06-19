@@ -21,10 +21,9 @@ function SignInForm() {
             if (response.status === 200 && response.data) {
                 if (response.data.status === "SUCCESS" && response.data.msg === "AUTH_OK") {
                     const user = e.target.username.value;
-                    const pass = e.target.password.value;
                     const role = response.data?.role;
                     const accessToken = response.data?.accessToken;
-                    setAuth({ username: user, password: pass, role: role, accessToken: accessToken });
+                    setAuth({ username: user, role: role, accessToken: accessToken });
                     nav('/');
                 }
                 else if (response.status === 401) {

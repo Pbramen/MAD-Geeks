@@ -5,6 +5,8 @@ import { useRefresh } from "./useRefresh";
 
 /**
  * Complete Mediation using axios interceptors for JWT. 
+ * Handles auth State based on response. 
+ * (verfiy auth middleware MUST be handled on the server when using this hook)
  * @return {impoty(axios).AxiosInstance} New private axios instance used for auth JWT 
  */
 export function useAxiosP() {
@@ -29,6 +31,7 @@ export function useAxiosP() {
                     const newToken = await refresh();
                     if (newToken === null) {
                         console.log("User must login again.")
+                        // set auth here...
                         return Promise.reject(error);
                     }
                     req.headers['Authorization'] = `Bearer ${newToken}`
