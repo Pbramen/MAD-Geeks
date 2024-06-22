@@ -1,7 +1,8 @@
 const {hashNewPassword, compareHash} = require('../../enbcrypt.js');
 const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
 const { createUser } = require("../../mongoFunctions/query/postQuery.js");
-const { signAccessToken, signRefreshToken } = require("./jwtokenHandler.js");
+const { signAccessToken, signRefreshToken } = require("../../jwt/jwtokenHandler.js");
+const jwtConfig = require('../../jwt/jwtCookieConfig.js');
 const { handleMissingFields } = require("../../errorHandling/connectionError.js");
 require("dotenv").config();
 
@@ -12,14 +13,9 @@ require("dotenv").config();
 async function test1(req, res) { 
     console.log("finding all users...");
     const response = await userModel.find({}).select('userLogin');
-    console.log(response);
     return res.status(200).json(response);
 }
 
-
-async function handleRefreshToken(req, res) {
-
-}
 
 /**
  * Creates a new user and auth info
@@ -39,7 +35,7 @@ async function createNewUser(req, res) {
             let result = {
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
-                "action": '/login' // redirect user back to login screen.
+                "link": '/login' // redirect user back to login screen.
             }
             console.log(result);
             return res.status(200).json(result);
@@ -66,7 +62,7 @@ async function createNewUser(req, res) {
         param.push("DOB")
     }
     const response = handleMissingFields(param);
-    return res.status(200).json(response);
+    return res.status(422).json(response);
 }
 
 
@@ -101,7 +97,7 @@ async function isValidAuth(req, res) {
                 if (other) {
 
                     if (other[0].userDetail[0].banned.value) {
-                        return res.status(200).json({
+                        return res.status(403).json({
                             'status': 'DENIED',
                             'msg': 'ACC_BANNED',
                             'link': '/accountBanned'
@@ -109,7 +105,7 @@ async function isValidAuth(req, res) {
                     }
 
                     if (other[0].activity.active !== true ) {
-                        return res.status(200).json({
+                        return res.status(403).json({
                             'status': 'DENIED',
                             'msg': 'ACC_DISABLED',
                             'link': '/accountDisabled'
@@ -121,20 +117,17 @@ async function isValidAuth(req, res) {
                    
                     if (auth) {
                         const roles = other[0].userDetail[0].role;
-                
-                        const accessToken = signAccessToken(other.userLogin);
-                        const refreshToken = signRefreshToken(other.userLogin);
+                        const accessToken = signAccessToken(other[0].userLogin);
+                        const refreshToken = signRefreshToken(other[0].userLogin);
            
                         // save refreshToken here
                         try {
-                            userModel.updateOne(
-                                { _id: other._id },
-                                { $push: { refreshToken: refreshToken } }
-                            )
+                            userModel.findOneAndUpdate({_id: other._id}, {refreshToken: refreshToken});
                         } catch (e) {
                             console.log(e);
                         }
 
+                        res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
                         return res.status(200).json({
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',
@@ -147,7 +140,7 @@ async function isValidAuth(req, res) {
                     return res.status(401).json({
                         'status': 'DENIED',
                         'msg': "Invalid combination",
-                        'link': '/register'
+                        'link': '/login'
                     })
                 }
                 else {
@@ -158,9 +151,9 @@ async function isValidAuth(req, res) {
                 }
             }
             else {
-                return res.status(200).json({
+                return res.status(404).json({
                     'status': 'DNE',
-                    'msg': `username ${username} not found.`,
+                    'msg': `Not registered`,
                     'link': '/register'
                 })
             }
@@ -176,7 +169,7 @@ async function isValidAuth(req, res) {
         params.push("password");
     }
     const response = handleMissingFields(params);
-    return res.status(200).json(response);
+    return res.status(422).json(response);
 }
 
 /**
@@ -203,8 +196,9 @@ const handleError = (error, err, status) => {
     
         return err;
     }
-    // duplicate key found
+    // Conflict => attempted to insert a duplicate key for unique index.
     else if (error.hasOwnProperty('code') && error.code == 11000) {
+        status.code = 409
         if (error.hasOwnProperty("keyPattern") && error.hasOwnProperty("keyValue")) {
             Object.getOwnPropertyNames(error.keyPattern).forEach((el) => {
                 err.errors.push({
@@ -219,7 +213,6 @@ const handleError = (error, err, status) => {
     }
     else {
         // LOG ERROR
-
         status.code = 422;
         err.errors.push({
             code: error.code,
