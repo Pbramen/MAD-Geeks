@@ -1,0 +1,76 @@
+definitions:
+  level:
+    description: Range of all valid levels
+    schema:
+      type: integer
+      minimun: 0
+      maximun: 20
+
+  level_obtained:
+    description: Object that defines when a feature/ability/spell/etc was obtained 
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            level: 
+              $ref: '#/definitions/level'      
+
+paths:
+  /user/sheet/create_new_sheet:
+    summary: Creates a new character sheet for given user
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              queryBy:
+                type: object
+                properties:
+                  username:
+                    type: object
+                  campagin:
+                    type: object
+              data:
+                type: object
+                description: payload that contains all the info required for the character sheet itself.
+                properties:
+                  fname:
+                    type: string
+                    description: first name of the character
+                  lname:
+                    type: string
+                    descriptioN: last name of the character
+                  mName: 
+                    type: string
+                    description: middle name of the character
+                  spells:
+                    type: array
+                    description: List of all spells the character has prepared
+                    items:
+                      type: string
+                      description: Name of the spell
+                  classes:
+                    type: array
+                    description: List of all classes and their respective resources/features
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          description: Name of each MAIN class
+                          enums:
+                            - fighter
+                            - rouge
+                            - ranger
+                            - monk
+                            - paladin
+                            - artificer
+                            - warlock
+                            - druid
+                            - sorceror
+                            - wizard
+                        obtained: 
+                          $ref: '#/definitions/level_obtained'
