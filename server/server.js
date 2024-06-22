@@ -2,30 +2,47 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRouter = require('./routers/auth/authModel.js');
 const sheetRouter = require('./routers/characterSheet/characterModel.js');
+const cors = require('cors');
+const swaggerjsdoc = require("swagger-jsdoc");
+const swaggerConfig = require("./config/swagger.json");
+const swaggerUI = require("swagger-ui-express");
+
+const logout = require('./routers/auth/logoutController.js')
+const cookieParser = require("cookie-parser");
+const {handleRefreshToken} = require("./routers/auth/jwtController.js");
 require("dotenv").config();
 const app = express();
+
 
 // access to req.body json
 app.use(express.json());
 
-// allow ONLY client to access 
-app.use('/', (req, res, next) => {
-    console.log(req.method, req.url, req.protocol, req.httpVersion, req.body)
-    //TODO: change 
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); 
-    // preflight -> need to accept req-method, Origin, req-headers
-    res.setHeader("Access-Control-Allow-Headers", "Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers");
-    // options is used in preflight 
-    res.setHeader("Access-Control-Allow-Methods", "POST, GET, DELETE, PATCH, OPTIONS");
-    res.setHeader("Access-Control-Allow-Credentials", 'true');
-    next();
-})
+app.use(cookieParser());
+
+const options = {
+    origin: process.env.CLIENT_SIDE,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT']
+}
+
+app.use(cors(options));
+
 mongoose.connect(process.env.URI_M)
     .then(() => { 
     app.listen(process.env.PORT, () => { 
         console.log(`Sucessfully listining on port ${process.env.PORT}`);
     })
 })
+
+
+const swg = swaggerjsdoc(swaggerConfig);
+
+app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swg, {
+    swaggerOptions: {
+        requestCredentials: 'include'
+    }
+}));
+
 app.use('/api/clients', authRouter);
 app.use('/api/sheet', sheetRouter);
 app.use('/api/set-cookie', (req, res) => {
