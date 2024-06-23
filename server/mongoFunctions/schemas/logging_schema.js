@@ -27,22 +27,25 @@ const error = new Schema({
     type: String,
     msg: String,
     location: {
-        file: String,
-        line: Number,
-        column: Number
+        stack: String, 
+        line: Number
     },
     stack_trace: [String]
 })
 
 // Record system errors (usually returns 500+ status codes)
-const system_error = new Schema({
+const sys_err = new Schema({
     endpoint: String,
     method: String,
+    protocol: String,
     payload: Object,
-    errors: [{
-        error
-    }],
+    err: error,
     action: String, 
     user_agent: String,
     version: String,
-})
+    origin: String
+}, {timestamps: true})
+
+const sys_err_model = mongoose.model("sys_err", sys_err);
+
+module.exports =  { sys_err_model }

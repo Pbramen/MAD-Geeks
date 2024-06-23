@@ -9,7 +9,7 @@ const swaggerUI = require("swagger-ui-express");
 
 const logout = require('./routers/auth/logoutController.js')
 const cookieParser = require("cookie-parser");
-const {handleRefreshToken} = require("./routers/auth/jwtController.js");
+const errorHandler = require("./middleware/logAccess.js");
 require("dotenv").config();
 const app = express();
 
@@ -49,3 +49,8 @@ app.use('/api/set-cookie', (req, res) => {
     res.setHeader("Set-Cookie", "name=value");
     res.send("You got cookies!");
 })
+
+app.get('/error', (req, res) => {
+    throw new Error("Broken");
+})
+app.use(errorHandler);

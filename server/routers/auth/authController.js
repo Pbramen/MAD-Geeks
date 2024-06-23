@@ -23,7 +23,7 @@ async function test1(req, res) {
  * @param {Object} res 
  * @returns {JSON} Status
  */
-async function createNewUser(req, res) {
+async function createNewUser(req, res, next) {
     const json = req.body;
     const { password, userLogin, email, DOB } = json;
 
@@ -40,29 +40,32 @@ async function createNewUser(req, res) {
             console.log(result);
             return res.status(200).json(result);
         } catch (e) {
-            console.log(e);
+            //console.log(e);
             let err = { errors: [] };
             let status = { code: 200 };
             err = handleError(e, err, status);
-            return res.status(status.code).json(err);
+            res.status(status.code).json(err);
+            next(e);
         }
     }
     // request client for missing params.
-    var param = []
-    if (password === undefined) {
-        param.push("password");
+    else {
+        var param = []
+        if (password === undefined) {
+            param.push("password");
+        }
+        if (email === undefined) {
+            param.push("email");
+        }
+        if (userLogin === undefined) {
+            param.push("user login");
+        }
+        if (DOB === undefined) {
+            param.push("DOB")
+        }
+        const response = handleMissingFields(param);
+        return res.status(422).json(response);
     }
-    if (email === undefined) {
-        param.push("email");
-    }
-    if (userLogin === undefined) {
-        param.push("user login");
-    }
-    if (DOB === undefined) {
-        param.push("DOB")
-    }
-    const response = handleMissingFields(param);
-    return res.status(422).json(response);
 }
 
 
