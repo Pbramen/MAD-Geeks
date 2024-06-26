@@ -6,7 +6,7 @@ const user_Auth_Schema = new Schema({
     userLogin: {
         type: String,
         unique: true,
-        minLength: [6, "Min length of login username must be greater than 8."],
+        minLength: [6, "Min length of login username must be greater than 6."],
         maxLength: [16, "Max length of login username must be less than 16"],
         required: [true, "Username is required to sign up!"],
         validator: [isAlphaNumeric, "Username must be alpha-numeric. No symbols allowed."]

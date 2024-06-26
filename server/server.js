@@ -1,18 +1,18 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const authRouter = require('./routers/auth/authModel.js');
 const sheetRouter = require('./routers/characterSheet/characterModel.js');
 const cors = require('cors');
+
 const swaggerjsdoc = require("swagger-jsdoc");
 const swaggerConfig = require("./config/swagger.json");
 const swaggerUI = require("swagger-ui-express");
 
-const logout = require('./routers/auth/logoutController.js')
 const cookieParser = require("cookie-parser");
 const errorHandler = require("./middleware/logAccess.js");
-require("dotenv").config();
-const app = express();
 
+const { mongoose_connect } = require('./mongoFunctions/mongoDB.js');
+
+const app = express();
 
 // access to req.body json
 app.use(express.json());
@@ -27,12 +27,11 @@ const options = {
 
 app.use(cors(options));
 
-mongoose.connect(process.env.URI_M)
-    .then(() => { 
-    app.listen(process.env.PORT, () => { 
-        console.log(`Sucessfully listining on port ${process.env.PORT}`);
-    })
-})
+mongoose_connect();
+app.listen(process.env.PORT, () => {
+    console.log("Node.js backend env listening on port ", process.env.PORT);
+
+});
 
 
 const swg = swaggerjsdoc(swaggerConfig);

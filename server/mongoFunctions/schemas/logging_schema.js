@@ -21,25 +21,24 @@ const api_access = new Schema({
     timestamp: Date
 })
 
-const error = new Schema({
-    source: String,
-    status: Number,
+const err_obj = new Schema({
     type: String,
-    msg: String,
-    location: {
-        stack: String, 
-        line: Number
-    },
-    stack_trace: [String]
-})
+    value: String,
+    msg: String, 
+    path: String,
+    location: String,
+    err_code: Number
+});
+
 
 // Record system errors (usually returns 500+ status codes)
 const sys_err = new Schema({
     endpoint: String,
     method: String,
     protocol: String,
-    payload: Object,
-    err: error,
+    src: String,
+    status_code: Number,
+    err_s: [err_obj],
     action: String, 
     user_agent: String,
     version: String,

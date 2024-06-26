@@ -1,66 +1,39 @@
 const mongoose = require('mongoose');
 const {sys_err_model} = require("../mongoFunctions/schemas/logging_schema");
-//const { ValidationError, PropertyNullError, PropertyNullError } = require('../errorHandling/ValidationError');
 const { MongoError } = require('mongodb');
 const mongooseError = require('mongoose').Error;
+const ExpressValidatorError = require("../errorHandling/ValidationError");
 require('dotenv').config();
 /**
  * Centralized error handling. 
  * Does NOT return a response (Must be handled in actual route)
  */
 const errorHandler = async (err, req, res, next) => {
-    console.log("Inside custom error handler...")
-    // handle mongodb errors
-    if (err instanceof MongoError) {
+    const data = {
+        endpoint: req.originalUrl,
+        method: req.method,
+        protocol: req.protocol,
+        err_s: err.data?.errors,
+        version: process.env.VERSION,
+        origin: req.hostname,
+        status_code: req.statusCode
+    };
+
+    
+    if (err instanceof MongoError || err instanceof mongooseError) {
+        // propogate the error to event listener.
+        mongoose.connection.emit('error', err, data, skip = true);
+    }
+    else if (err instanceof ExpressValidatorError) {
+        const sys_err = new sys_err_model(data)
         try {
-            console.log(err.cause);
+            await sys_err.save()
+        } catch (err) {
+            // forced propropgation
+            mongoose.connection.emit('error', err, data);
         }
-        catch (e) {
-            console.log(e);
-            // log to file instead...
-        }
-    }
-    // handle mongoose errors here..
-    else if (err instanceof mongooseError.MongooseError) {
-        console.log(err);
-    }
 
-    else {
-        switch (err.constructor) {
-            case "ValidationError":
-                console.log("Validation error found");
-                break;
-            case 'PropertyNullError':
-                console.log("Property Null Error");
-                break;
-            case 'PropertyTypeError':
-                console.log("Property Type Error");
-                break;
-            default:
-                console.log(err.constructor);
-                break;
-        }
     }
 }
-
-const handleMongoError = (err, req) => {
-    const code = err.code;
-    const obj = {};
-
-    switch (code) {
-        case 11000:
-            obj = {
-                status: 11000,
-                type: "Duplicate key",
-                msg: err.message,
-                stack: err.stack
-            }
-            break;
-
-    }
-
-    obj['source'] = err.name;
-}
-
 
 module.exports = errorHandler;
