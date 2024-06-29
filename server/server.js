@@ -11,6 +11,8 @@ const cookieParser = require("cookie-parser");
 const errorHandler = require("./middleware/logAccess.js");
 
 const { mongoose_connect } = require('./mongoFunctions/mongoDB.js');
+const { decodeTest } = require("./routers/dev/decodeJWT.js");
+require('dotenv').config();
 
 const app = express();
 
@@ -52,4 +54,13 @@ app.use('/api/set-cookie', (req, res) => {
 app.get('/error', (req, res) => {
     throw new Error("Broken");
 })
-app.use(errorHandler);
+
+app.get('/decode', decodeTest);
+
+var mode = process.env.NODE_ENV;
+console.log(mode);
+if (process.env.NODE_ENV === 'development') {
+    console.log('dev cycle');
+    app.use(errorHandler);
+}
+
