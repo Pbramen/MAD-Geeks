@@ -4,9 +4,10 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "test": "jest",
     "start": "node server.js",
-    "dev": "nodemon NODE_ENV=development server.js"
+    "dev": "NODE_ENV=development nodemon server.js",
+    "dev--w": "set NODE_ENV=development && nodemon server.js",
+    "test": "mocha 'tests/**/*.test.js' --recursive --timeout 60000"
   },
   "author": "",
   "license": "ISC",
@@ -29,6 +30,8 @@
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
-    "jest": "^29.7.0"
+    "mocha": "^10.5.2",
+    "mongodb-memory-server": "^9.4.0",
+    "typescript": "^5.5.2"
   }
 }
