@@ -53,11 +53,12 @@ const user_Account_Schema = new Schema({
         maxLength: [16, "Max length of login username must be less than 16"],
         validate: [isAlphaNumeric, "Display name must be alphanumeric."]
     },
-    role: [{
-        id: { type: String },
-        enum: ['player', 'DM', 'sysAdmin', 'webAdmin'],
-        default: ['player']
-    }],
+    role: {
+        type: [Number],
+        required: true,
+        enum: [100, 2000, 3000],
+        default: [100]
+    },
     DOB: {
         type: String,
         validate: {

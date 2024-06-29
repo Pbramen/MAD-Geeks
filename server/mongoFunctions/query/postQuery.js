@@ -23,7 +23,7 @@ async function createNewRoll(user_id, config, results) {
     return doc;
 }
 
-async function createUser(json, hashed) {
+async function createUser(json, hashed, role) {
     try {
         const session = await mongoose.startSession({causalConsistency: true});
         await session.withTransaction(async () => {
@@ -40,7 +40,8 @@ async function createUser(json, hashed) {
             const acct = new accountModel({
                 userAuthId: a._id,
                 displayName: json.userLogin,
-                DOB: json.DOB
+                DOB: json.DOB,
+                role: role
             })
         
             await acct.save({session});

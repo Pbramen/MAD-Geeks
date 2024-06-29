@@ -1,38 +1,30 @@
 const mongoose = require('mongoose');
-const {sys_err_model} = require("../mongoFunctions/schemas/logging_schema");
-const { MongoError } = require('mongodb');
-const mongooseError = require('mongoose').Error;
-const ExpressValidatorError = require("../errorHandling/ValidationError");
+const {ExpressValidatorError, InvaildAuthError} = require("../errorHandling/ValidationError");
+const { sys_err_model } = require('../mongoFunctions/schemas/logging_schema');
 require('dotenv').config();
+
 /**
- * Centralized error handling. 
- * Does NOT return a response (Must be handled in actual route)
+ * Global error handling for validators ONLY. 
+ * (if db error occurs -> mongoose.connection.emit('error') instead)
  */
 const errorHandler = async (err, req, res, next) => {
-    const data = {
-        endpoint: req.originalUrl,
-        method: req.method,
-        protocol: req.protocol,
-        err_s: err.data?.errors,
-        version: process.env.VERSION,
-        origin: req.hostname,
-        status_code: req.statusCode
-    };
 
-    
-    if (err instanceof MongoError || err instanceof mongooseError) {
-        // propogate the error to event listener.
-        mongoose.connection.emit('error', err, data, skip = true);
+    // error occured during validation state
+    if (err instanceof ExpressValidatorError ||
+        err instanceof InvaildAuthError) {
+        
+        const log_entry = sys_err_model(err.getData());
+        log_entry.save().then(() => {
+                console.log("log successful.")
+            }
+        ).catch((e) => {
+            mongoose.connection.emit("error", e, err.data, true);    
+        })
     }
-    else if (err instanceof ExpressValidatorError) {
-        const sys_err = new sys_err_model(data)
-        try {
-            await sys_err.save()
-        } catch (err) {
-            // forced propropgation
-            mongoose.connection.emit('error', err, data);
-        }
-
+    else {
+        console.log("Unhandled error has occured:");
+        console.log(err);
+        process.exit(-1);
     }
 }
 

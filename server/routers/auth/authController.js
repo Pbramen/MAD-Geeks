@@ -4,6 +4,10 @@ const { createUser } = require("../../mongoFunctions/query/postQuery.js");
 const { signAccessToken, signRefreshToken } = require("../../jwt/jwtokenHandler.js");
 const jwtConfig = require('../../jwt/jwtCookieConfig.js');
 const { handleMissingFields } = require("../../errorHandling/connectionError.js");
+const { validationResult } = require('express-validator');
+const {ExpressValidatorError, InvaildAuthError} = require("../../errorHandling/ValidationError.js");
+
+
 require("dotenv").config();
 
 /**
@@ -31,7 +35,7 @@ async function createNewUser(req, res, next) {
     if (password != undefined && userLogin !== undefined && email !== undefined && DOB !== undefined) {
         try {
             let hashed = await hashNewPassword(json.password);
-            await createUser(json, hashed);
+            await createUser(json, hashed, [100]);
             let result = {
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
@@ -69,10 +73,10 @@ async function createNewUser(req, res, next) {
 }
 
 
-async function isValidAuth(req, res) { 
-    var { username, password } = req.body;
-    if (username !== undefined && password !== undefined) {
-    
+async function isValidAuth(req, res, next) { 
+    const result = validationResult(req);
+    if (result && Object.keys(result.errors).length === 0) {
+        const { username, password } = req.body;
         try {
             const result = await userModel.exists({
                 userLogin: username,
@@ -97,7 +101,7 @@ async function isValidAuth(req, res) {
                 ]);
 
 
-                if (other) {
+                if (other.length !== 0) {
 
                     if (other[0].userDetail[0].banned.value) {
                         return res.status(403).json({
@@ -139,18 +143,24 @@ async function isValidAuth(req, res) {
                             'accessToken': accessToken
                         })
                     }
-                    // invalid password username combination.
-                    return res.status(401).json({
-                        'status': 'DENIED',
-                        'msg': "Invalid combination",
-                        'link': '/login'
-                    })
+                    else {
+                        const response_obj = {
+                            'status': 'DENIED',
+                            'msg': "Invalid combination",
+                            'link': '/login'
+                        } 
+                        res.status(401).json(response_obj)
+                        const err = new InvaildAuthError("invalid user/password combination", response_obj, req);
+                        next(err);
+                    }
                 }
                 else {
-                    return res.status(500).json({ 
-                        'status': 'DB_ERR',
-                        'msg': 'DB_CON'
-                     });
+                    // this should not run....
+                    return res.status(404).json({
+                        'status': 'DNE',
+                        'msg': `Not registered`,
+                        'link': '/register'
+                    })
                 }
             }
             else {
@@ -159,20 +169,22 @@ async function isValidAuth(req, res) {
                     'msg': `Not registered`,
                     'link': '/register'
                 })
+                // log here...
             }
         } catch (e) {
-            return res.status(500).json({"status": e.message})
+            res.status(500).json({ "status": 'DB_ERR', 'msg': e.message })
+            next(e);
         }
     } 
-    let params = [];
-    if (username === undefined) {
-        params.push("username");
+
+    else {
+        res.status(422).json(result);
+        console.log("Missing parameters...");
+        console.log(result.errors);
+        const err = new ExpressValidatorError("Express Validator error", result.errors, req);
+        console.log(err.getData());
+        next(err);
     }
-    if (password === undefined) {
-        params.push("password");
-    }
-    const response = handleMissingFields(params);
-    return res.status(422).json(response);
 }
 
 /**
@@ -182,25 +194,8 @@ async function isValidAuth(req, res) {
  */
 const handleError = (error, err, status) => {
 
-    // handle custom Validator errors:
-    if (error.hasOwnProperty('errors')) {
-        
-        Object.values(error.errors).forEach((el) => {
-            let props = el.properties;
-            err.errors.push(
-                {
-                    path: props.path,
-                    message: props.message
-                }
-            )
-            // LOG ERROR HERE
-            //console.log(props);
-        });
-    
-        return err;
-    }
     // Conflict => attempted to insert a duplicate key for unique index.
-    else if (error.hasOwnProperty('code') && error.code == 11000) {
+    if (error.hasOwnProperty('code') && error.code == 11000) {
         status.code = 409
         if (error.hasOwnProperty("keyPattern") && error.hasOwnProperty("keyValue")) {
             Object.getOwnPropertyNames(error.keyPattern).forEach((el) => {
@@ -212,6 +207,31 @@ const handleError = (error, err, status) => {
             })
             //LOG ERROR HERE
         }
+        return err;
+    }
+    else if (err instanceof mongoose.Error.CastError) {
+        console.log(err);
+        err = {
+            'errors': [{
+                message: 'Cast Error'
+            }]
+        }
+    }
+    // handle custom Validator errors:
+    else if (error.hasOwnProperty('errors')) {
+        
+        Object.values(error.errors).forEach((el) => {
+            let props = el.properties;
+            err.errors.push(
+                {
+                    path: props?.path,
+                    message: props?.message
+                }
+            )
+            // LOG ERROR HERE
+            //console.log(props);
+        });
+    
         return err;
     }
     else {

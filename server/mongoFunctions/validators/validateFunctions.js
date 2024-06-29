@@ -56,17 +56,17 @@ function _passwordHelper(value) {
 function checkPassword(value) { 
 
     const err = _passwordHelper(value);
-    let a = errs.length;
+    let a = err.length;
     if (a !== 0) {
         let i = 0;
         var msg = "Password must contain:";
 
         for (i = 0; i < a; i += 1) {
             if (i !== a - 1) {
-                msg += ' ' + errs[i] + ',';
+                msg += ' ' + err[i] + ',';
             }
             else {
-                msg += ' and ' + errs[i] + '.';
+                msg += ' and ' + err[i] + '.';
             }
         }
         throw new Error(msg);
