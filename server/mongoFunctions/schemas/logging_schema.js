@@ -64,6 +64,9 @@ const api_access = new Schema({
         type: String,
         required: true
     },
+    duration: {
+        type: Number
+    },
     timestamp: Date
 })
 
@@ -99,9 +102,16 @@ const sys_err = new Schema({
     origin: {
         type: String,
         required: true
-    }
+    },
+    reqBody: {
+        type: Object,
+        required: false
+    },
+    duration: {
+        type: Number
+    },
 }, {timestamps: true})
 
 const sys_err_model = mongoose.model("sys_err", sys_err);
-
-module.exports =  { sys_err_model }
+const api_model = mongoose.model("api_access", api_access);
+module.exports =  { sys_err_model, api_model }
