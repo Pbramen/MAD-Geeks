@@ -44,7 +44,7 @@ const checkUsername = () => {
 }
 
 const checkPassword = () => {
-    // console.log("checking password...")
+     console.log("checking password...")
     return body('password')
         .notEmpty().withMessage("Password is required.").bail()
         .isStrongPassword().withMessage((value) => {

@@ -1,6 +1,7 @@
 const rollHistory = require("../schemas/rolls_Schema");
 const mongoose = require('mongoose');
 const {userModel, accountModel} = require("../schemas/client_Schema");
+const { sys_err_model } = require("../schemas/logging_schema");
 
 /**
  * Initializes a new roll_history item 
@@ -21,6 +22,55 @@ async function createNewRoll(user_id, config, results) {
         //exit();
     }
     return doc;
+}
+
+async function checkDuplicates(json) {
+    try {
+        const response = await userModel.aggregate([{
+            $match: {
+                $or: [
+                    { userLogin: json.userLogin },
+                    { email: json.email }
+                ]
+            }
+        }, { $limit: 2 }
+        ])
+        const data = []
+        // account maybe already registered
+        if (response.length === 1) {
+            if (json.userLogin === response[0].userLogin) {
+                data.push({
+                    'path': "username",
+                    'value': json.userLogin
+                });
+            }
+            if (json.email === response[0].email) {
+                data.push({
+                    'path': 'email',
+                    'value': json.email
+                });
+            }
+        }
+    
+        if (response.length === 2) {
+            // both responses are guarneeted
+            data.push({
+                'path': username,
+                'value': json.userLogin
+            });
+            data.push({
+                'path': 'email',
+                'value': json.email
+            });
+        }
+
+        else if (response.length === 0) {
+            return 0;
+        }
+        return data;
+    } catch (e) {
+        throw e;
+    }
 }
 
 async function createUser(json, hashed, role) {
@@ -81,5 +131,6 @@ async function handleTransaction(json, session, hashed) {
 
 module.exports = {
     createNewRoll,
-    createUser
+    createUser,
+    checkDuplicates
 }

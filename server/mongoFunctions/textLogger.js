@@ -36,7 +36,7 @@ var logger = createLogger({
 
 console.log("set up complete");
 
-const logError = (data, dbERR) => {
+const logError = (dbERR, data) => {
     access(logDirectory, constants.R_OK | constants.W_OK, (err) => {
         if (err) {
             console.log(err);
