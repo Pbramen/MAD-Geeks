@@ -1,12 +1,12 @@
 const {hashNewPassword, compareHash} = require('../../enbcrypt.js');
 const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
-const { createUser } = require("../../mongoFunctions/query/postQuery.js");
+const { createUser, checkDuplicates } = require("../../mongoFunctions/query/postQuery.js");
 const { signAccessToken, signRefreshToken } = require("../../jwt/jwtokenHandler.js");
 const jwtConfig = require('../../jwt/jwtCookieConfig.js');
-const { handleMissingFields } = require("../../errorHandling/connectionError.js");
 const { validationResult } = require('express-validator');
-const {ExpressValidatorError, InvaildAuthError} = require("../../errorHandling/ValidationError.js");
-
+const {ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require("../../errorHandling/ValidationError.js");
+const { generateErrorResponse, setContext } = require("../../errorHandling/customError.js");
+const { logAPIAccess } = require("../../middleware/logSuccessAPI.js");
 
 require("dotenv").config();
 
@@ -23,17 +23,22 @@ async function test1(req, res) {
 
 /**
  * Creates a new user and auth info
- * @param {Object} req 
- * @param {Object} res 
- * @returns {JSON} Status
+ * Validation/sanitation occurs before this function is called!
  */
-async function createNewUser(req, res, next) {
-    const json = req.body;
-    const { password, userLogin, email, DOB } = json;
 
-    // check for valid parameters
-    if (password != undefined && userLogin !== undefined && email !== undefined && DOB !== undefined) {
-        try {
+async function createNewUser(req, res, next) {
+    
+    const json = req.body;
+    try {
+        let response = await checkDuplicates(json);
+        if (response !== 0) {
+            const err = new MongoDuplicateError("Duplicate user found", response);
+            res.status(409).json(err.data);
+            next(err);
+        }
+        else {
+            console.log("Setting up new user...")
+          
             let hashed = await hashNewPassword(json.password);
             await createUser(json, hashed, [100]);
             let result = {
@@ -41,36 +46,18 @@ async function createNewUser(req, res, next) {
                 "msg": `${json.userLogin} successfully created!`,
                 "link": '/login' // redirect user back to login screen.
             }
-            console.log(result);
             return res.status(200).json(result);
-        } catch (e) {
-            //console.log(e);
-            let err = { errors: [] };
-            let status = { code: 200 };
-            err = handleError(e, err, status);
-            res.status(status.code).json(err);
-            next(e);
+
         }
-    }
-    // request client for missing params.
-    else {
-        var param = []
-        if (password === undefined) {
-            param.push("password");
-        }
-        if (email === undefined) {
-            param.push("email");
-        }
-        if (userLogin === undefined) {
-            param.push("user login");
-        }
-        if (DOB === undefined) {
-            param.push("DOB")
-        }
-        const response = handleMissingFields(param);
-        return res.status(422).json(response);
+    } catch (e) {
+        // unknown error type is thrown.
+        const err = generateErrorResponse(e);
+        res.locals.response = err;
+        res.status(err.status).json(err);
+        next(e);
     }
 }
+
 
 
 async function isValidAuth(req, res, next) { 
@@ -102,24 +89,29 @@ async function isValidAuth(req, res, next) {
 
 
                 if (other.length !== 0) {
-
+                    // reject banned/disabled users
                     if (other[0].userDetail[0].banned.value) {
-                        return res.status(403).json({
+                        const res_obj = {
                             'status': 'DENIED',
                             'msg': 'ACC_BANNED',
                             'link': '/accountBanned'
-                        })
+                        }
+                        res.status(403).json(res_obj)
+                        const err = new InvaildAuthError("User banned", res_obj, req);
+                        next(err);
                     }
 
-                    if (other[0].activity.active !== true ) {
-                        return res.status(403).json({
+                    if (other[0].activity.active !== true) {
+                        const res_obj = {
                             'status': 'DENIED',
                             'msg': 'ACC_DISABLED',
                             'link': '/accountDisabled'
                         }
-                        )
+                        res.status(403).json(res_obj)
+                        const err = new InvaildAuthError("User account disabled", res_obj, req);
+                        next(err);
                     }
-                   
+                    
                     var auth = await compareHash(password, other[0].password);
                    
                     if (auth) {
@@ -135,13 +127,15 @@ async function isValidAuth(req, res, next) {
                         }
 
                         res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
-                        return res.status(200).json({
+                        const res_obj = {
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',
                             'link': '/home',
                             'roles': roles,
                             'accessToken': accessToken
-                        })
+                        };
+                        logAPIAccess(req, res, response = res_obj);
+                        return res.status(200).json(res_obj)
                     }
                     else {
                         const response_obj = {
@@ -164,12 +158,14 @@ async function isValidAuth(req, res, next) {
                 }
             }
             else {
-                return res.status(404).json({
+                const res_obj = {
                     'status': 'DNE',
                     'msg': `Not registered`,
                     'link': '/register'
-                })
-                // log here...
+                }
+                res.status(404).json(res_obj);
+                const err = new InvaildAuthError("User not registered", res_obj, req);
+                next(err);
             }
         } catch (e) {
             res.status(500).json({ "status": 'DB_ERR', 'msg': e.message })
@@ -182,7 +178,6 @@ async function isValidAuth(req, res, next) {
         console.log("Missing parameters...");
         console.log(result.errors);
         const err = new ExpressValidatorError("Express Validator error", result.errors, req);
-        console.log(err.getData());
         next(err);
     }
 }

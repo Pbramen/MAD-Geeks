@@ -1,14 +1,14 @@
-class CustomError extends Error{
+class CustomLogger extends Error{
     data = {}
     response = {}
     constructor(message, data, req) {
         super(message);
-        if (new.target === CustomError) {
+        if (new.target === CustomLogger) {
             throw new Error('Cannot instanciate this class. Use child classes instead.');
         }
     }
 
-    formatRes(req) {
+    static formatRes(req) {
         return {
             endpoint: req.originalUrl,
             method: req.method,
@@ -34,7 +34,7 @@ class CustomError extends Error{
 }
 
 
-class ExpressValidatorError extends CustomError{
+class ExpressValidatorError extends CustomLogger{
     data = {};
     constructor(message, data, req){
         super(message);
@@ -51,7 +51,7 @@ class ExpressValidatorError extends CustomError{
     }
 }
 
-class InvaildAuthError extends CustomError{
+class InvaildAuthError extends CustomLogger{
     
     constructor(message, data, req){
         super(message);
@@ -69,7 +69,7 @@ class InvaildAuthError extends CustomError{
 }
 
 
-class MongoDuplicateError extends CustomError{
+class MongoDuplicateError extends CustomLogger{
     constructor(message, data) {
         super(message);
         this.name = "MongoDuplicateError";
@@ -94,5 +94,6 @@ class MongoDuplicateError extends CustomError{
 module.exports = {
     ExpressValidatorError,
     InvaildAuthError,
-    MongoDuplicateError
+    MongoDuplicateError,
+    CustomLogger
 };

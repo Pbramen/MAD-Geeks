@@ -48,7 +48,7 @@ const logError = (dbERR, data) => {
 
     logger.log({
         level: 'error',
-        err_payload: JSON.stringify(data),
+        err_payload: data,
         database_err: dbERR
     })
 }

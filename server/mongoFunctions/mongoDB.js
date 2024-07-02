@@ -16,11 +16,11 @@ const errHandler = (err, data, skip=false) => {
             log.save();
             console.log("Data being saved.")
         } catch (e) {
-            logError(data, err.name)       
+            logError(data, err)       
         }
     }
     else {
-        logError(data, err.name);
+        logError(data, err);
     }
 }
 
