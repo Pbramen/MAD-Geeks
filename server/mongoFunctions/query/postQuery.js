@@ -55,7 +55,7 @@ async function checkDuplicates(json) {
         if (response.length === 2) {
             // both responses are guarneeted
             data.push({
-                'path': username,
+                'path': 'userLogin',
                 'value': json.userLogin
             });
             data.push({

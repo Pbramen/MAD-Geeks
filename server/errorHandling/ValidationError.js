@@ -1,3 +1,13 @@
+const formatData = (req) => {
+    return {
+        endpoint: req.originalUrl,
+        method: req.method,
+        protocol: req.protocol,
+        version: process.env.VERSION,
+        origin: req.hostname
+    }
+}
+
 class CustomLogger extends Error{
     data = {}
     response = {}
@@ -8,14 +18,8 @@ class CustomLogger extends Error{
         }
     }
 
-    static formatRes(req) {
-        return {
-            endpoint: req.originalUrl,
-            method: req.method,
-            protocol: req.protocol,
-            version: process.env.VERSION,
-            origin: req.hostname
-        }
+    formatRes(req) {
+        return formatData(req);
     }
 
     printData() {
@@ -70,23 +74,28 @@ class InvaildAuthError extends CustomLogger{
 
 
 class MongoDuplicateError extends CustomLogger{
-    constructor(message, data) {
+    constructor(message, data, req) {
         super(message);
         this.name = "MongoDuplicateError";
-        this.data = this.formatData(data);
+        this.data = data; 
+        this.response = this.formatRes(data, req);
         this.code = 11000;
     }
 
-    formatData(data, req) {
+    formatRes(data, req) {
+        const obj = super.formatRes(req);
+        
         var msg = data.reduce((accum, curr) => {
             return accum + `${curr.path}, `;
         }, "").slice(0, -2) + ' must be unique';
         
-        const obj = {
+        const res = {
             status: "DUP_ERR",
             msg: msg, 
             errors: data
         }
+        obj['response'] = res;
+        obj['reqBody'] = req.body;
         return obj;    
     }
 }
@@ -95,5 +104,5 @@ module.exports = {
     ExpressValidatorError,
     InvaildAuthError,
     MongoDuplicateError,
-    CustomLogger
+    formatData
 };

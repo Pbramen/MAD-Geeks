@@ -3,10 +3,8 @@ const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
 const { createUser, checkDuplicates } = require("../../mongoFunctions/query/postQuery.js");
 const { signAccessToken, signRefreshToken } = require("../../jwt/jwtokenHandler.js");
 const jwtConfig = require('../../jwt/jwtCookieConfig.js');
-const { validationResult } = require('express-validator');
-const {ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require("../../errorHandling/ValidationError.js");
+const { InvaildAuthError, MongoDuplicateError} = require("../../errorHandling/ValidationError.js");
 const { generateErrorResponse, setContext } = require("../../errorHandling/customError.js");
-const { logAPIAccess } = require("../../middleware/logSuccessAPI.js");
 
 require("dotenv").config();
 
@@ -20,34 +18,33 @@ async function test1(req, res) {
     return res.status(200).json(response);
 }
 
-
 /**
  * Creates a new user and auth info
- * Validation/sanitation occurs before this function is called!
- */
-
+ * validation -> faster response than ORM 
+*/
 async function createNewUser(req, res, next) {
-    
     const json = req.body;
     try {
         let response = await checkDuplicates(json);
         if (response !== 0) {
-            const err = new MongoDuplicateError("Duplicate user found", response);
-            res.status(409).json(err.data);
+            res.locals.response = response;
+            const err = new MongoDuplicateError("Duplicate user found", response, req);
+
+            res.status(409).json(err.getRes().response);
             next(err);
         }
         else {
             console.log("Setting up new user...")
-          
             let hashed = await hashNewPassword(json.password);
             await createUser(json, hashed, [100]);
-            let result = {
+            
+            res.locals.result = {
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
                 "link": '/login' // redirect user back to login screen.
             }
-            return res.status(200).json(result);
-
+            res.status(200).json(res.locals.result);
+            next();
         }
     } catch (e) {
         // unknown error type is thrown.
@@ -59,11 +56,9 @@ async function createNewUser(req, res, next) {
 }
 
 
-
-async function isValidAuth(req, res, next) { 
-    const result = validationResult(req);
-    if (result && Object.keys(result.errors).length === 0) {
-        const { username, password } = req.body;
+async function isValidAuth(req, res, next) {
+    const username = req.body.userLogin;
+    const password = req.body.password;
         try {
             const result = await userModel.exists({
                 userLogin: username,
@@ -120,22 +115,18 @@ async function isValidAuth(req, res, next) {
                         const refreshToken = signRefreshToken(other[0].userLogin);
            
                         // save refreshToken here
-                        try {
-                            userModel.findOneAndUpdate({_id: other._id}, {refreshToken: refreshToken});
-                        } catch (e) {
-                            console.log(e);
-                        }
-
+                        userModel.findOneAndUpdate({_id: other._id}, {refreshToken: refreshToken});
+                        
                         res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
-                        const res_obj = {
+                        res.locals.res_obj = {
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',
                             'link': '/home',
                             'roles': roles,
                             'accessToken': accessToken
                         };
-                        logAPIAccess(req, res, response = res_obj);
-                        return res.status(200).json(res_obj)
+                        res.status(200).json(res_obj);
+                        next();
                     }
                     else {
                         const response_obj = {
@@ -150,11 +141,14 @@ async function isValidAuth(req, res, next) {
                 }
                 else {
                     // this should not run....
-                    return res.status(404).json({
+                    res.local.response = {
                         'status': 'DNE',
-                        'msg': `Not registered`,
+                        'msg': `Interrupted.`,
                         'link': '/register'
-                    })
+                    }
+                    res.status(404).json(res.local.response)
+                    const err = new Error(`User (${username}) updated/deleted or process interrupted before authenticating`);
+                    next()
                 }
             }
             else {
@@ -168,77 +162,11 @@ async function isValidAuth(req, res, next) {
                 next(err);
             }
         } catch (e) {
-            res.status(500).json({ "status": 'DB_ERR', 'msg': e.message })
+            const err = generateErrorResponse(e);
+            res.locals.response = err;
+            res.status(err.status).json(err)
             next(e);
-        }
-    } 
-
-    else {
-        res.status(422).json(result);
-        console.log("Missing parameters...");
-        console.log(result.errors);
-        const err = new ExpressValidatorError("Express Validator error", result.errors, req);
-        next(err);
-    }
-}
-
-/**
- * Handles errors POST/PUT database operations.
- * @param {Error} error - error object being caught
- * @returns {object} JSON object to be returned to client side.
- */
-const handleError = (error, err, status) => {
-
-    // Conflict => attempted to insert a duplicate key for unique index.
-    if (error.hasOwnProperty('code') && error.code == 11000) {
-        status.code = 409
-        if (error.hasOwnProperty("keyPattern") && error.hasOwnProperty("keyValue")) {
-            Object.getOwnPropertyNames(error.keyPattern).forEach((el) => {
-                err.errors.push({
-                    path: el,
-                    message: `${el} must be unique.`,
-                    value: error.keyValue[el]
-                })
-            })
-            //LOG ERROR HERE
-        }
-        return err;
-    }
-    else if (err instanceof mongoose.Error.CastError) {
-        console.log(err);
-        err = {
-            'errors': [{
-                message: 'Cast Error'
-            }]
-        }
-    }
-    // handle custom Validator errors:
-    else if (error.hasOwnProperty('errors')) {
-        
-        Object.values(error.errors).forEach((el) => {
-            let props = el.properties;
-            err.errors.push(
-                {
-                    path: props?.path,
-                    message: props?.message
-                }
-            )
-            // LOG ERROR HERE
-            //console.log(props);
-        });
-    
-        return err;
-    }
-    else {
-        // LOG ERROR
-        status.code = 422;
-        err.errors.push({
-            code: error.code,
-            message: error.message,
-        })
-        err['action'] = 'Try again later';
-    }
-    return err;
+        } 
 }
 
 module.exports = {

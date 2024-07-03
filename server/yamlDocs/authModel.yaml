@@ -56,7 +56,66 @@ definitions:
                   items: 
                     type: string
                     description: List of all missing parameter required for this endpoint.
-
+  ValidationError:
+    type: object
+    description: Parameters has invalid input
+    content: 
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string,
+              example: "VS_FAILURE"
+            errors: 
+              type: array
+              items:
+                type: object
+                properties:
+                  'type':
+                    type: string
+                    description: Type of validation error that occured
+                  value:
+                    type: string
+                    desciption: value that failed validation test
+                  msg:
+                    type: string
+                    msg: Reason for failure
+                  path: 
+                    type: string
+                    msg: endpoint called
+                  location:
+                    type: string
+                    msg: Where this value was sent (header, body, cookie, params, etc)
+  UniqueError: 
+    description: Parameter must be unique
+    content: 
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "DUP_ERR"
+            msg:
+              type: string
+              example: "userLogin, email must be unquie"
+            errors: 
+              type: array
+              description: array of all items that must be unique
+              items:
+                type: object
+                properties:
+                  path: 
+                    type: string
+                    description: name of the field 
+                    example: "userLogin"
+                  value:
+                    type: string
+                    description: value recieved 
+                    example: "somebody"
+                  
+    
 paths:
 
   /api/clients/:
@@ -124,26 +183,7 @@ paths:
                     type: string
                     description: /login
         '409':
-          description: Username/ Email already taken.
-          content: 
-            application/json:
-              schema:
-                type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        path: 
-                          type: string
-                          description: email | username
-                        message: 
-                          type: string
-                          description: Error message
-                        value:
-                          type: string
-                          description: duplicate value
+          $ref: '#/definitions/UniqueError'
         '422':
           $ref: '#/definitions/MissingParams'
         '500':
@@ -338,6 +378,8 @@ paths:
                   link: 
                     type: string
                     example: /login
+        '422':
+          $ref: "#/definitions/ValidationError"
         '500':
           description: Failed to access database
           content:

@@ -4,7 +4,7 @@ const { MongoError } = require("mongodb");
 const generateErrorResponse = (err) => {
     // handle validation errors here...
     let res_json = {status: 500 ,errors: []}
-   
+    
     if (err instanceof mongoose.Error) {
         // can be validation or cast error
         if (err instanceof mongoose.Error.ValidationError && err['errors']) {

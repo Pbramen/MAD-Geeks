@@ -1,8 +1,12 @@
 const mongoose = require('mongoose');
 const { api_model } = require('../mongoFunctions/schemas/logging_schema');
-const { ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require('../errorHandling/ValidationError');
 
-const logAPIAccess = async (req, res, err_s = null, response = null) => {
+const logAPIAccess = async (req, res) => {
+    
+    if (res.headersSent === false) {
+        throw new Error("Headers must be sent BEFORE logger")    
+    }
+
     const data = {
         duration: Date.now() - res.locals.startTime,
         endpoint: req.originalUrl,
@@ -11,11 +15,9 @@ const logAPIAccess = async (req, res, err_s = null, response = null) => {
         version: process.env.VERSION,
         origin: req.hostname
     }
-    if (err_s) {
-        data.err_s = err_s;
-    }
-    if (response) {
-        data.response = response;
+    
+    if (res.locals?.response) {
+        data.response = res.locals?.err_s;
     }
     if (res.locals?.user) {
         data.user = res.locals.user;

@@ -12,6 +12,7 @@ const errorHandler = require("./middleware/logAccess.js");
 
 const { mongoose_connect } = require('./mongoFunctions/mongoDB.js');
 const { decodeTest } = require("./routers/dev/decodeJWT.js");
+const { logAPIAccess } = require("./middleware/logSuccessAPI.js");
 require('dotenv').config();
 
 
@@ -19,13 +20,10 @@ const app = express();
 
 if (process.env.NODE_ENV === 'development') {
     console.log('dev cycle');
-
 }
-
 
 // access to req.body json
 app.use(express.json());
-
 app.use(cookieParser());
 
 const options = {
@@ -57,6 +55,7 @@ app.all('*', (req, res, next) => {
     next();
 });
 
+
 app.use('/api/clients', authRouter);
 app.use('/api/sheet', sheetRouter);
 app.use('/api/set-cookie', (req, res) => {
@@ -65,4 +64,5 @@ app.use('/api/set-cookie', (req, res) => {
 })
 
 app.get('/decode', decodeTest);
+app.use('*', logAPIAccess);
 app.use(errorHandler);

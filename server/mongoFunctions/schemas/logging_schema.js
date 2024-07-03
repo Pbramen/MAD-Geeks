@@ -23,7 +23,8 @@ const resposne = new Schema({
     accessToken: {
         type: String, 
         required: false
-    }
+    },
+    link: String
 })
 
 // records 100 - 499 status codes
@@ -46,10 +47,6 @@ const api_access = new Schema({
     protocol:{
         type: String,
         required: true
-    },
-    err_s: {
-        type: [err_obj],
-        required: false
     },
     response: {
         type: resposne,
