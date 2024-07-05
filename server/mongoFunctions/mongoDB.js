@@ -1,7 +1,9 @@
 const { mongoose } = require("mongoose");
-const { logError } = require("../mongoFunctions/textLogger");
+const path = require('path')
+const root = process.cwd();
+const { logError } = require(path.join(root, 'mongoFunctions','textLogger'));
 require('dotenv').config();
-const {sys_err_model} = require("../mongoFunctions/schemas/logging_schema");
+const { sys_err_model } = require(path.join(root, 'mongoFunctions','schemas','logging_schema'));
 mongoose.connection.on("connected", () => {})
 const {EventEmitter} = require('events');
 

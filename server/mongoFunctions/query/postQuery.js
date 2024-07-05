@@ -1,7 +1,7 @@
-const rollHistory = require("../schemas/rolls_Schema");
+const path = require("path")
+const rollHistory = require(path.resolve(__dirname,"../schemas/rolls_Schema"));
 const mongoose = require('mongoose');
-const {userModel, accountModel} = require("../schemas/client_Schema");
-const { sys_err_model } = require("../schemas/logging_schema");
+const {userModel, accountModel} = require(path.resolve(__dirname, "../schemas/client_Schema"));
 
 /**
  * Initializes a new roll_history item 
@@ -12,9 +12,7 @@ const { sys_err_model } = require("../schemas/logging_schema");
  */
 async function createNewRoll(user_id, config, results) {
     try {
-        await doc.create({
-
-        });
+        await doc.create({});
     } catch (e) {
         console.log("creation failed");
         console.log(e);
@@ -25,11 +23,13 @@ async function createNewRoll(user_id, config, results) {
 }
 
 async function checkDuplicates(json) {
+    console.log("checking for duplicates...")
     try {
+        console.log(json.username);
         const response = await userModel.aggregate([{
             $match: {
                 $or: [
-                    { userLogin: json.userLogin },
+                    { userLogin: json.username },
                     { email: json.email }
                 ]
             }
@@ -38,10 +38,10 @@ async function checkDuplicates(json) {
         const data = []
         // account maybe already registered
         if (response.length === 1) {
-            if (json.userLogin === response[0].userLogin) {
+            if (json.username === response[0].userLogin) {
                 data.push({
                     'path': "username",
-                    'value': json.userLogin
+                    'value': json.username
                 });
             }
             if (json.email === response[0].email) {
@@ -56,7 +56,7 @@ async function checkDuplicates(json) {
             // both responses are guarneeted
             data.push({
                 'path': 'userLogin',
-                'value': json.userLogin
+                'value': json.username
             });
             data.push({
                 'path': 'email',
@@ -67,8 +67,15 @@ async function checkDuplicates(json) {
         else if (response.length === 0) {
             return 0;
         }
-        return data;
+        
+        return {
+            status: "DUP_ERR",
+            msg: "Username/email is already taken.",
+            err_obj: data
+        };
+
     } catch (e) {
+        console.error(e.name);
         throw e;
     }
 }
@@ -78,7 +85,7 @@ async function createUser(json, hashed, role) {
         const session = await mongoose.startSession({causalConsistency: true});
         await session.withTransaction(async () => {
             const user = new userModel({
-                userLogin: json.userLogin,
+                userLogin: json.username,
                 email: json.email,
                 password: json.password
             })
@@ -89,7 +96,7 @@ async function createUser(json, hashed, role) {
            
             const acct = new accountModel({
                 userAuthId: a._id,
-                displayName: json.userLogin,
+                displayName: json.username,
                 DOB: json.DOB,
                 role: role
             })
@@ -100,33 +107,6 @@ async function createUser(json, hashed, role) {
     } catch (e) {
         throw e;
     }
-}
-
-/**
- * callback function used by createUser() to generate atomically userAuth and userAccount.
- * @param {String} hashed - hashed password to insert.
- * @param {JSON} json - JSON containing all user information sent by the login form.
- * @param {Session} session - mongoose session object
- */
-async function handleTransaction(json, session, hashed) {
-    var err = "";
-    const user = new userModel({
-        userLogin: json.userLogin,
-        email: json.email,
-        password: json.password
-    })
-    
-    await user.validate();
-    user.password = hashed;
-    const a = await user.save({ session , validateBeforeSave : false});
-   
-    const acct = new accountModel({
-        userAuthId: a._id,
-        displayName: json.userLogin,
-        DOB: json.DOB
-    })
-
-    await acct.save({session});
 }
 
 module.exports = {

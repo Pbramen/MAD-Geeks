@@ -1,7 +1,8 @@
-const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
+const path = require("path");
+const { userModel } = require(path.resolve(__dirname, '../../mongoFunctions/schemas/client_Schema.js'));
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
-const { jwtName, jwtOption } = require('../../jwt/jwtCookieConfig.js');
+const { jwtName, jwtOption } = require(path.resolve(__dirname, '../../jwt/jwtCookieConfig.js'));
 
  function logOut (req, res) {
     const cookies = req.cookies;

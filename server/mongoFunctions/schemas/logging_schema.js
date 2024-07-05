@@ -1,4 +1,4 @@
-const { ResultWithContextImpl } = require('express-validator/lib/chain');
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -24,7 +24,8 @@ const resposne = new Schema({
         type: String, 
         required: false
     },
-    link: String
+    link: String,
+    err_obj: Object
 })
 
 // records 100 - 499 status codes

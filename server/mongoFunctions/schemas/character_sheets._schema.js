@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const { dice } = require('../../config/rollConfig');
+const path = require('path')
+const { dice } = require(path.resolve(__dirname, '../../config/rollConfig'));
 //subdocuments
 
 const damage_type = new Schema({

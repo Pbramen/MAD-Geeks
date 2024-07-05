@@ -1,4 +1,4 @@
-const { sys_err_model } = require("../mongoFunctions/schemas/logging_schema");
+const { sys_err_model } = require(path.resolve(__dirname, "../mongoFunctions/schemas/logging_schema"));
 require("dotenv").config();
 
 /**

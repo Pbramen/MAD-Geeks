@@ -17,7 +17,7 @@ const logAPIAccess = async (req, res) => {
     }
     
     if (res.locals?.response) {
-        data.response = res.locals?.err_s;
+        data.response = res.locals.response;
     }
     if (res.locals?.user) {
         data.user = res.locals.user;

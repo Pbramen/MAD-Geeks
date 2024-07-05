@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const formatData = (req) => {
     return {
         endpoint: req.originalUrl,
@@ -9,94 +11,99 @@ const formatData = (req) => {
 }
 
 class CustomLogger extends Error{
-    data = {}
-    response = {}
-    constructor(message, data, req) {
+    data = {} // data that will be stored in the db.
+    // json that was sent back to the client side
+    constructor(message, resJSON, req) {
         super(message);
+        this.resJSON = resJSON;
         if (new.target === CustomLogger) {
             throw new Error('Cannot instanciate this class. Use child classes instead.');
         }
     }
 
-    formatRes(req) {
-        return formatData(req);
+    formatLog(req) {
+        const obj = formatData(req);
+        obj['reqBody'] = this.formatReqBody(req.body);
+        return obj;
     }
 
+    formatReqBody(body) {
+        const blackList = new Set(['password', 'accessToken', 'jwt', 'refreshToken'])
+        const obj = {};
+        
+        Object.keys(body).forEach(key => {
+            if (!blackList.has(key)) {
+                obj[key] = body[key];
+            } else { 
+                obj[key] = 'REDACTED'
+            }
+        })
+        return obj;
+    }
+
+    
     printData() {
-        console.log("");
+        console.log("----       LOGGED DATA          ----");
         console.log(JSON.stringify(this.data));
-        console.log("");
+        console.log("----           END              ----");
     }
 
 
     getData() {
         return this.data;
     }
+
     getRes() {
-        return this.response;
+        return this.resJSON;
     }
 }
 
 
 class ExpressValidatorError extends CustomLogger{
     data = {};
-    constructor(message, data, req){
-        super(message);
-        this.response = this.formatRes(data, req);
-        this.data = data;
+    constructor(message, resJSON, req){
+        super(message, resJSON, req);
+        this.data = this.formatLog(data);
+        this.name = "ExpressValidatorError";
         Error.captureStackTrace(this, this.constructor);
     }
 
-    formatRes(data, req) {
-        const obj = super.formatRes(req);
+    formatLog(data) {
+        super.this.formatLog(data)
         obj['err_s'] = data;
-        obj['reqBody'] = req.body;
         return obj;
     }
 }
 
 class InvaildAuthError extends CustomLogger{
     
-    constructor(message, data, req){
-        super(message);
-        this.data = data;
-        this.response = this.formatRes(data, req);
+    constructor(message, resJSON, req){
+        super(message, resJSON, req);
+        this.data = this.formatLog(data);
+        this.name = "InvalidAuthError";
         Error.captureStackTrace(this, this.constructor);
     }
 
-    formatRes(data, req) {
-        const obj = super.formatRes(req);
-        obj['response'] = data;
-        obj['reqBody'] = req.body;
+    formatLog(json) {
+        const obj = super.formatLog(json);
+        obj['response'] = json;
         return obj;
     }
 }
 
 
 class MongoDuplicateError extends CustomLogger{
-    constructor(message, data, req) {
-        super(message);
+    constructor(message, resJSON, req) {
+        super(message, resJSON, req);
+        this.data = this.formatLog(req);
         this.name = "MongoDuplicateError";
-        this.data = data; 
-        this.response = this.formatRes(data, req);
         this.code = 11000;
+        Error.captureStackTrace(this, this.constructor);
     }
-
-    formatRes(data, req) {
-        const obj = super.formatRes(req);
-        
-        var msg = data.reduce((accum, curr) => {
-            return accum + `${curr.path}, `;
-        }, "").slice(0, -2) + ' must be unique';
-        
-        const res = {
-            status: "DUP_ERR",
-            msg: msg, 
-            errors: data
-        }
-        obj['response'] = res;
-        obj['reqBody'] = req.body;
-        return obj;    
+    formatLog(json) {
+        var obj = super.formatLog(json);
+        obj['response'] = this.resJSON;
+        return obj;
     }
 }
 

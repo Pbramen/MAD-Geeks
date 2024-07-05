@@ -1,5 +1,6 @@
-const InvalidParam = require("../errorHandling/customError");
-const { dice } = require("../config/rollConfig");
+const path = require("path")
+const InvalidParam = require(path.resolve(__dirname, "../errorHandling/customError"));
+const { dice } = require(path.resolve(__dirname, "../config/rollConfig"));
 
 function _rollDie(type, min){
     let n = Math.floor(Math.random() * type) + 1;

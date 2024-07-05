@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { roll_state, roll_type, dice } = require("../../config/rollConfig");
+const path = require("path")
+const { roll_state, roll_type, dice } = require(path.resolve(__dirname,"../../config/rollConfig"));
 
 // Type of die that was rolled.
 const die_roll = new Schema({

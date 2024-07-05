@@ -1,11 +1,10 @@
-const {hashNewPassword, compareHash} = require('../../enbcrypt.js');
-const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
-const { createUser, checkDuplicates } = require("../../mongoFunctions/query/postQuery.js");
-const { signAccessToken, signRefreshToken } = require("../../jwt/jwtokenHandler.js");
-const jwtConfig = require('../../jwt/jwtCookieConfig.js');
-const { InvaildAuthError, MongoDuplicateError} = require("../../errorHandling/ValidationError.js");
-const { generateErrorResponse, setContext } = require("../../errorHandling/customError.js");
-
+const path = require('path')
+const { hashNewPassword, compareHash } = require(path.join(__dirname, '..','..','enbcrypt.js'));
+const { userModel } = require(path.join( __dirname, '..','..','mongoFunctions','schemas','client_Schema.js'));
+const { createUser, checkDuplicates } = require(path.join(__dirname, '..','..','mongoFunctions','query','postQuery.js'));
+const { signAccessToken, signRefreshToken } = require(path.join(__dirname, '..','..','jwt','jwtokenHandler.js'));
+const jwtConfig = require(path.join(__dirname, '..','..','jwt','jwtCookieConfig.js'));
+const { InvaildAuthError, MongoDuplicateError} = require(path.join(__dirname,'..','..','errorHandling','ValidationError.js'));
 require("dotenv").config();
 
 /**
@@ -27,42 +26,38 @@ async function createNewUser(req, res, next) {
     try {
         let response = await checkDuplicates(json);
         if (response !== 0) {
-            res.locals.response = response;
-            const err = new MongoDuplicateError("Duplicate user found", response, req);
-
-            res.status(409).json(err.getRes().response);
+            res.status(409).json(response);
+            const err = new MongoDuplicateError("Duplicate user found",  res.locals.response, req);
             next(err);
         }
         else {
             console.log("Setting up new user...")
             let hashed = await hashNewPassword(json.password);
             await createUser(json, hashed, [100]);
-            
-            res.locals.result = {
+
+            res.status(200).json({
                 "status": 'ok',
                 "msg": `${json.userLogin} successfully created!`,
                 "link": '/login' // redirect user back to login screen.
-            }
-            res.status(200).json(res.locals.result);
+            });
             next();
         }
     } catch (e) {
-        // unknown error type is thrown.
-        const err = generateErrorResponse(e);
-        res.locals.response = err;
-        res.status(err.status).json(err);
         next(e);
     }
 }
 
 
 async function isValidAuth(req, res, next) {
-    const username = req.body.userLogin;
+    const username = req.body.username;
     const password = req.body.password;
+    //console.log(Date.now() - res.locals?.startTime);
         try {
             const result = await userModel.exists({
                 userLogin: username,
             });
+            
+            console.log(Date.now() - res.locals?.startTime);
             
             if (result) {
                 const other = await userModel.aggregate([
@@ -81,29 +76,31 @@ async function isValidAuth(req, res, next) {
                         $limit: 1
                     }
                 ]);
-
+                
+                //console.log(Date.now() - res.locals?.startTime);    
 
                 if (other.length !== 0) {
                     // reject banned/disabled users
                     if (other[0].userDetail[0].banned.value) {
-                        const res_obj = {
+                        //console.log(Date.now() - res.locals?.startTime);
+                        res.status(403).json({
                             'status': 'DENIED',
                             'msg': 'ACC_BANNED',
                             'link': '/accountBanned'
-                        }
-                        res.status(403).json(res_obj)
-                        const err = new InvaildAuthError("User banned", res_obj, req);
+                        })
+
+                        const err = new InvaildAuthError("User banned",  res.locals.response, req);
                         next(err);
                     }
 
                     if (other[0].activity.active !== true) {
-                        const res_obj = {
+
+                        res.status(403).json({
                             'status': 'DENIED',
-                            'msg': 'ACC_DISABLED',
-                            'link': '/accountDisabled'
-                        }
-                        res.status(403).json(res_obj)
-                        const err = new InvaildAuthError("User account disabled", res_obj, req);
+                            'msg': 'ACC_BANNED',
+                            'link': '/accountBanned'
+                        })
+                        const err = new InvaildAuthError("User account disabled",  res.locals.response, req);
                         next(err);
                     }
                     
@@ -118,56 +115,51 @@ async function isValidAuth(req, res, next) {
                         userModel.findOneAndUpdate({_id: other._id}, {refreshToken: refreshToken});
                         
                         res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
-                        res.locals.res_obj = {
+                        res.status(200).json({
                             'status': 'SUCCESS',
                             'msg': 'AUTH_OK',
                             'link': '/home',
                             'roles': roles,
                             'accessToken': accessToken
-                        };
-                        res.status(200).json(res_obj);
+                        });
                         next();
                     }
                     else {
-                        const response_obj = {
+                        
+                        res.status(401).json({
                             'status': 'DENIED',
                             'msg': "Invalid combination",
                             'link': '/login'
-                        } 
-                        res.status(401).json(response_obj)
-                        const err = new InvaildAuthError("invalid user/password combination", response_obj, req);
+                        } )
+                        const err = new InvaildAuthError("invalid user/password combination",  res.locals.response, req);
                         next(err);
                     }
                 }
                 else {
                     // this should not run....
-                    res.local.response = {
+                    res.status(404).json({
                         'status': 'DNE',
                         'msg': `Interrupted.`,
                         'link': '/register'
-                    }
-                    res.status(404).json(res.local.response)
+                    })
                     const err = new Error(`User (${username}) updated/deleted or process interrupted before authenticating`);
                     next()
                 }
             }
             else {
-                const res_obj = {
+                res.status(404).json( {
                     'status': 'DNE',
                     'msg': `Not registered`,
                     'link': '/register'
-                }
-                res.status(404).json(res_obj);
-                const err = new InvaildAuthError("User not registered", res_obj, req);
+                });
+                const err = new InvaildAuthError("User not registered", res.locals.response, req);
                 next(err);
             }
         } catch (e) {
-            const err = generateErrorResponse(e);
-            res.locals.response = err;
-            res.status(err.status).json(err)
             next(e);
         } 
 }
+
 
 module.exports = {
     test1, createNewUser, isValidAuth

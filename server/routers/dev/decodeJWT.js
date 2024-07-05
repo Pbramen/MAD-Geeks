@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
-const { userModel } = require('../../mongoFunctions/schemas/client_Schema');
+const path = require('path');
+const { userModel } = require(path.resolve(__dirname, '../../mongoFunctions/schemas/client_Schema'));
 
-const decodeTest = (req, res) => {
+const decodeTest = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     if (!authHeader)
         return res.status(401).json({ 'msg': "Invalid headers sent"});
@@ -15,9 +16,11 @@ const decodeTest = (req, res) => {
         token, process.env.ACCESS_TK_S,
         async (err, decode) => {
             if (err) {
-                return res.status(403).json({ 'msg': err.message })
+                res.locals.response = {'status': 403, 'msg': err.message}
+                res.status(403).json(res.locals.response)
+                next(err);
             }
-            if (decode.username) {
+            if (decode?.username) {
                 const result = await userModel.aggregate([
                     {
                         $match: { userLogin: decode.username }

@@ -1,8 +1,14 @@
-const { userModel } = require('../../mongoFunctions/schemas/client_Schema.js');
+const path = require("path")
+const { userModel } = require(path.resolve(__dirname, '../../mongoFunctions/schemas/client_Schema.js'));
 require('dotenv').config();
-const { signAccessToken } = require("../../jwt/jwtokenHandler.js");
+const { signAccessToken } = require(path.resolve(__dirname, "../../jwt/jwtokenHandler.js"));
 const jwt = require('jsonwebtoken');
-const jwtConfig = require('../../jwt/jwtCookieConfig.js');
+const jwtConfig = require(path.resolve(__dirname, '../../jwt/jwtCookieConfig.js'));
+
+// check if user is already logged in -> ( must have a jwt cookie AND valid refresh token stored)
+
+
+
 
 // refresh if not expired.
 const handleRefreshToken = (req, res) => {
@@ -50,7 +56,8 @@ const verifyJWT = (req, res, next) => {
         (err, decode) => {
             if (err) {
                 console.log(err);
-                return res.sendStatus(403);
+                res.sendStatus(403);
+                next(err);
             }
             req.user = decode.username; // for passport.js
             next();

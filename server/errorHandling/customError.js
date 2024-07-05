@@ -1,17 +1,18 @@
 const mongoose = require('mongoose');
-const { MongoError } = require("mongodb");
 
 const generateErrorResponse = (err) => {
     // handle validation errors here...
     let res_json = {status: 500 ,errors: []}
-    
+    console.log("generating error resposne...")
+
+    // uncaught mongoose error (fallback)
     if (err instanceof mongoose.Error) {
         // can be validation or cast error
         if (err instanceof mongoose.Error.ValidationError && err['errors']) {
             // push all error paths and their messages
             // convert errors object into an array:
             res_json.status = 406;
-
+            res_json.name = "VS_ERR";
             Object.values(err.errors).forEach((obj, key) => {
                 if (obj.name === "CastError") {
                     res_json.errors.push({
@@ -30,10 +31,12 @@ const generateErrorResponse = (err) => {
             })
         }
     }
-    else if (err['code'] !== undefined) {
+    else if (err.code !== undefined && typeof err.code === 'number' ) {
+        
         // check for duplicate key
         if (err.code === 11000) {
             res_json.status = 409;
+            res_json.name = "DUP_ERR";
             Object.getOwnPropertyNames(err?.keyPattern).forEach((el) => {
                 res_json.errors.push({
                     path: el,
@@ -43,17 +46,17 @@ const generateErrorResponse = (err) => {
             })
         }
         else if (err.code === 2) { 
-            res_json.status = 507
-            // need to send signal for db overload!
-            res_json.errors.push({
+            res_json = {
+                status: 507,
+                name: "OUT_OF_MEMORY",
                 msg: err?.errorResponse.errmsg
-            })
+            }
         }
         else {
             // other server related issue here...
             res_json.errors.push({
-                status: "DB_ERR",
-                type: err?.name,
+                status: 503,
+                name: err?.name,
                 msg: err?.message
             })
         }
@@ -61,26 +64,13 @@ const generateErrorResponse = (err) => {
     else {
         // other unexpected error occured.
         res_json.errors.push({
-            status: "OTHER_ERR",
-            type: err?.name,
+            status: 500,
+            name: err?.name,
             msg: err?.message
         })
     }
     return res_json;
 }
 
-/**
- * 
- * @param {Object} err - Response generated from generateErrorResponse 
- * @param {String} user - userID (if applicable) 
- * @returns 
- */
-const setContext = (err, user = null) => {
-    const data = {err: err}
-    if (user !== undefined) {
-        data['user'] = user
-    }
-    return data;
-}
 
-module.exports = {generateErrorResponse, setContext}
+module.exports = {generateErrorResponse}

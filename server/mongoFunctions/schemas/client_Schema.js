@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const { checkIfValidAge, checkPassword, isAlphaNumeric, checkEmail } = require("../validators/validateFunctions.js");
+const path = require('path')
+const { checkIfValidAge, checkPassword, isAlphaNumeric, checkEmail } = require(path.resolve(__dirname, '../validators/validateFunctions.js'));
 
 const user_Auth_Schema = new Schema({
     userLogin: {

@@ -1,5 +1,6 @@
+const path = require('path')
 const { validationResult } = require('express-validator');
-const { ExpressValidatorError } = require("../errorHandling/ValidationError.js");
+const { ExpressValidatorError } = require(path.resolve(__dirname, "../errorHandling/ValidationError.js"));
 
 const validation = (req, res, next) => {
     const result = validationResult(req);

@@ -1,6 +1,7 @@
-const { body, cookie,  validationResults } = require("express-validator");
-const { userModel } = require("../schemas/client_Schema")
-const { _passwordHelper } = require('../validators/validateFunctions');
+const { body } = require("express-validator");
+const path = require("path")
+const { userModel } = require(path.resolve(__dirname, "../schemas/client_Schema"));
+const { _passwordHelper } = require(path.resolve(__dirname, '../validators/validateFunctions'));
 
 const paths = userModel.schema.paths;
 
@@ -19,14 +20,13 @@ const isJson = () => {
 }
 
 const checkUsername = () => {
-    return body('userLogin')
+    return body('username')
         .trim().notEmpty().withMessage("Username is required").bail()
         .isLength({ min: userMin, max: userMax }).withMessage(`Out of range: ${userMin}-${userMax}`)
         .matches(/[^$. ]/).withMessage("Username cannot contain '$', '.', or ' '")
 }
 
 const checkPassword = () => {
-     console.log("checking password...")
     return body('password')
         .notEmpty().withMessage("Password is required.").bail()
         .isStrongPassword(passwordConfig).withMessage(_passwordHelper);
