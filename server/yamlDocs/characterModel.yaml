@@ -1,76 +1,225 @@
-definitions:
-  level:
-    description: Range of all valid levels
-    schema:
-      type: integer
-      minimun: 0
-      maximun: 20
+tags: 
+  - name: Character Sheets
+    description: "Retrieves, updates, deletes, or creates a new single character sheet for a single user"
 
-  level_obtained:
-    description: Object that defines when a feature/ability/spell/etc was obtained 
-    content:
-      application/json:
-        schema:
+definitions:
+  array_of_Strings: 
+    type: array
+    items: 
+      type: string
+  bonuses: 
+    type: object
+    properties:
+      name: 
+        type: string
+        description: optional
+      description:
+        type: string
+        description: optional
+      value: 
+        type: number
+        example: 3
+  cost: 
+    type: object
+    properties:
+      default_currency:
+        type: object
+        description: default dnd 5.e currency system (per item)
+        properties:
+          copper:
+            type: number
+          silver:
+            type: number
+          electrum:
+            type: number
+          gold:
+            type: number
+          platinum:
+            type: number
+      custom_currency:
+        type: array 
+        item: 
           type: object
           properties:
-            level: 
-              $ref: '#/definitions/level'      
-
+            name:
+              type: string
+            description:
+              type: string
+            ammount: 
+              type: number
+  weight:
+    type: object
+    properties:
+      value: 
+        type: number
+        description: 'weight per single item'
+      units:
+        type: string
+  item_measures:
+    type: object
+    properties:
+      cost: 
+        $ref: '#/definitions/cost'
+      weight:
+        $ref: '#/definitions/weight'
+      quantity:
+        type: number
+      magic_lvl:
+        type: number
+        description: "0 = non-magic item, 1 = common, 2 = rare, 3 = legendary"
+      descript:
+        type: number
+        description: optional field for users to take notes on item in inventory
+  expertise_possible:
+    type: object
+    properties: 
+      name: 
+        type: string
+      expertise: 
+        type: boolean
+  stat_block:
+    type: array
+    items:
+      type: object
+      properties:
+        name: 
+          type: string
+        base_value:
+          type: number
+          example: 10
+        bonuses:
+          $ref: '#/definitions/bonuses'
+  spell_list:
+    type: array
+    items:
+      type: object
+      properties:
+        name: 
+          type: string
+        description: 
+          type: string
+        components:
+          type: string
+        school:
+          type: string
+        level: 
+          type: number
+  resource_pool:
+      current_value: 
+        type: number
+      max_value:
+        type: number
+          
 paths:
-  /user/sheet/create_new_sheet:
-    summary: Creates a new character sheet for given user
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              queryBy:
+  /api/characterSheet/:
+    get: 
+      description: "Retrieves all data stored for a single character!"
+      requestBody:
+        required: true
+        description: Basic user info needed for registration
+        content:
+          application/json:
+            schema: 
+              type: object
+              properties:
+                accessToken:
+                  type: string
+                  description: valid JWT token with role, permissions and username/identifier attached. 
+                sheet_id: 
+                  type: string
+                  description: ObjectID of the character sheet
+      responses:
+        '200':
+          content: 
+            application/json:
+              schema:
                 type: object
                 properties:
-                  username:
+                  status: 
+                    type: string,
+                    example: "OK"
+                  msg: 
+                    type: string,
+                    example: "Data sucessfully retrieved"
+                  payload: 
                     type: object
-                  campagin:
-                    type: object
-              data:
-                type: object
-                description: payload that contains all the info required for the character sheet itself.
-                properties:
-                  fname:
-                    type: string
-                    description: first name of the character
-                  lname:
-                    type: string
-                    descriptioN: last name of the character
-                  mName: 
-                    type: string
-                    description: middle name of the character
-                  spells:
-                    type: array
-                    description: List of all spells the character has prepared
-                    items:
-                      type: string
-                      description: Name of the spell
-                  classes:
-                    type: array
-                    description: List of all classes and their respective resources/features
-                    items:
-                      type: object
-                      properties:
-                        name:
+                    properties: 
+                      first_name: 
+                        type: string
+                      last_name:
+                        type: string
+                      middle_name: 
+                        type: string
+                      aliases: 
+                        type: array
+                        items:
                           type: string
-                          description: Name of each MAIN class
-                          enums:
-                            - fighter
-                            - rouge
-                            - ranger
-                            - monk
-                            - paladin
-                            - artificer
-                            - warlock
-                            - druid
-                            - sorceror
-                            - wizard
-                        obtained: 
-                          $ref: '#/definitions/level_obtained'
+                      proficiency:
+                        type: object
+                        properties:
+                          bonus: 
+                            type: number
+                            example: 1
+                            description: current player's proficiency bonus
+                          stats: 
+                            $ref: '#/definitions/array_of_Strings'
+                          weapons:
+                            $ref: '#/definitions/array_of_Strings'
+                          skills:
+                            $ref: '#/definitions/expertise_possible'
+                          saving_throws:
+                            $ref: '#/definitions/expertise_possible'
+                      AC: 
+                        type: number
+                        description: Armor class of the unit
+                      base_saving_throw:
+                        type: number
+                        description: Unit's base saving throw (if applicable) for spells
+                      movement:
+                        type: object
+                        properties: 
+                          value: 
+                            type: number
+                          units:
+                            type: string
+                      items:
+                        type: array
+                        items:
+                          $ref: '#/definitions/item_measures'
+                      spells:
+                        $ref: '#/definitions/spell_list'
+                      class_resources:
+                        type: object
+                        description: Spells, class features, level features, and anything that requires resource tracking (except items) will fall under here.
+                        properties: 
+                          <resource_name_here>:
+                            type: object
+                            properties:
+                              name: 
+                                type: string
+                              descript: 
+                                type: string
+                              cur_value:
+                                type: number
+                                description: "Number of times this resource can be used before long/short rest is required"
+                              max_value:
+                                type: number
+                                description: "Maximun quantity stored for this resource per long/short rest"
+                      stats: 
+                        type: object
+                        properties:
+                          stat_block: 
+                            $ref: '#/definitions/stat_block'
+                          others:
+                            type: array
+                            items: 
+                              type: object
+                              properties:
+                                name: 
+                                  type: string
+                                  description: name of the custom stat block
+                                value: 
+                                  type: number 
+                        
+                                    
+

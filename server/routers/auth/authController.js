@@ -3,8 +3,10 @@ const { hashNewPassword, compareHash } = require(path.join(__dirname, '..','..',
 const { userModel } = require(path.join( __dirname, '..','..','mongoFunctions','schemas','client_Schema.js'));
 const { createUser, checkDuplicates } = require(path.join(__dirname, '..','..','mongoFunctions','query','postQuery.js'));
 const { signAccessToken, signRefreshToken } = require(path.join(__dirname, '..','..','jwt','jwtokenHandler.js'));
-const jwtConfig = require(path.join(__dirname, '..','..','jwt','jwtCookieConfig.js'));
-const { InvaildAuthError, MongoDuplicateError} = require(path.join(__dirname,'..','..','errorHandling','ValidationError.js'));
+const jwtConfig = require(path.join(__dirname, '..', '..', 'jwt', 'jwtCookieConfig.js'));
+const jwt = require('jsonwebtoken');
+const { set } = require('mongoose');
+const { InvaildAuthError, MongoDuplicateError } = require(path.join(__dirname, '..', '..', 'errorHandling', 'ValidationError.js'));
 require("dotenv").config();
 
 /**
@@ -51,6 +53,7 @@ async function createNewUser(req, res, next) {
 async function isValidAuth(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
+
     //console.log(Date.now() - res.locals?.startTime);
         try {
             const result = await userModel.exists({
@@ -77,7 +80,6 @@ async function isValidAuth(req, res, next) {
                     }
                 ]);
                 
-                //console.log(Date.now() - res.locals?.startTime);    
 
                 if (other.length !== 0) {
                     // reject banned/disabled users
@@ -108,21 +110,35 @@ async function isValidAuth(req, res, next) {
                    
                     if (auth) {
                         const roles = other[0].userDetail[0].role;
-                        const accessToken = signAccessToken(other[0].userLogin);
-                        const refreshToken = signRefreshToken(other[0].userLogin);
-           
-                        // save refreshToken here
-                        userModel.findOneAndUpdate({_id: other._id}, {refreshToken: refreshToken});
+                        const tk = other[0]['refreshToken'];
+                        console.log(tk);
+
+                        jwt.verify(tk, process.env.REFRESH_TK_S, async (err, decoded) => { 
+                            const accessToken = signAccessToken(other[0].userLogin);
+                            if (err || decoded?.username !== username) {
+                                
+                                console.log("<------ User session started ----->")
+                                // user has not signed in or refresh token has expired...
+                                const refreshToken = signRefreshToken(other[0].userLogin);
+                                res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
+                                // save refreshToken here
+                                await userModel.findOneAndUpdate({ _id: other[0]._id }, { refreshToken: refreshToken });
+                            }
+                            else {
+                                console.log("<------ User session continued ----->")
+                                res.cookie(jwtConfig.name, tk, jwtConfig.options);
+                            }
+                            
+                            res.status(200).json({
+                                'status': 'SUCCESS',
+                                'msg': 'AUTH_OK',
+                                'link': '/home',
+                                'roles': roles,
+                                'accessToken': accessToken
+                            });
+                            next();
+                        })
                         
-                        res.cookie(jwtConfig.name, refreshToken, jwtConfig.options);
-                        res.status(200).json({
-                            'status': 'SUCCESS',
-                            'msg': 'AUTH_OK',
-                            'link': '/home',
-                            'roles': roles,
-                            'accessToken': accessToken
-                        });
-                        next();
                     }
                     else {
                         

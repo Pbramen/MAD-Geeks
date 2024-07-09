@@ -1,10 +1,25 @@
 const mongoose = require('mongoose');
 const { api_model } = require('../mongoFunctions/schemas/logging_schema');
 
-const logAPIAccess = async (req, res) => {
-    
+const logAPIAccess = async (req, res, next) => {
+    // endpoint not found
+    if (!req.route) {
+        console.log("<------------------------------------>")
+        console.log(" Endpoint not found")
+        const err = new Error("Attempt to access non-existant endpoint");
+        res.status(404).json({
+            status: 404,
+            msg: "Resource not found."
+        });
+        next(err);
+    }
     if (res.headersSent === false) {
-        throw new Error("Headers must be sent BEFORE logger")    
+        return res.status(500).json({
+            status: "USAGE_ERR",
+            msg: "Operation succesful, but no response body was sent.",
+            endpoint: req.originalUrl
+        })
+        //throw new Error("Headers must be sent BEFORE logger")    
     }
 
     const data = {

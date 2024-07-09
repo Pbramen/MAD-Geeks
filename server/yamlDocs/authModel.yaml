@@ -314,6 +314,9 @@ paths:
               schema:
                 type: object
                 properties:
+                  status: 
+                    type: string
+                    example: INVALID_JWT
                   msg:
                     type: string
                     example: Unauthorized request
@@ -321,6 +324,8 @@ paths:
           description: Refresh token found, but not valid/expired.
   /api/clients/logout:
     delete:
+      tags: 
+        - Auth
       description: Handles user logout
       parameters:
         - in: cookie

@@ -3,9 +3,8 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { test1, createNewUser, isValidAuth } = require('./authController.js');
-const verifyJWT  = require(path.resolve(__dirname, '../../middleware/verifyJWT.js'));
-const {handleRefreshToken} = require(path.resolve(__dirname,'./jwtController'));
+const { test1, createNewUser, isValidAuth } = require(path.resolve(__dirname, './authController.js'));
+const {handleRefreshToken, verifyJWT} = require(path.resolve(__dirname,'./jwtController'));
 const { logOut } = require(path.resolve(__dirname,'./logoutController.js'));
 const { checkPassword, checkUsername, email, checkDOB} = require(path.resolve(__dirname,'../../mongoFunctions/validators/express-validators.js'));
 const { validation } = require(path.resolve(__dirname,'../../middleware/validationResult.js'))

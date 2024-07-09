@@ -53,11 +53,12 @@ app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swg, {
 }));
 
 // set timer for logging purposes.
-app.all('*', (req, res, next) => {
+app.use( (req, res, next) => {
     res.locals.startTime = Date.now();
     next();
 });
-app.all('*', saveJSONResponse);
+
+app.use(saveJSONResponse);
 
 app.use('/api/clients', authRouter);
 app.use('/api/characterSheet', singleCharRouter);
@@ -68,5 +69,11 @@ app.use('/api/set-cookie', (req, res) => {
 })
 
 app.get('/decode', decodeTest);
-app.use('*', logAPIAccess);
+app.use(logAPIAccess);
+app.use("*", (req, res) => {
+    res.status(404).json({
+        status: "NOT_FOUND",
+        msg: "Resource does not exist."
+    })
+})
 app.use(errorHandler);
