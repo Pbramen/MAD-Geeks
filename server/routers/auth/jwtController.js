@@ -7,7 +7,7 @@ const jwtConfig = require(path.resolve(__dirname, '../../jwt/jwtCookieConfig.js'
 
 
 // refresh if not expired.
-const handleRefreshToken = (req, res) => {
+const handleRefreshToken = (req, res, next) => {
     console.log('refreshing...');
     const cookies = req.cookies;
 
@@ -68,7 +68,10 @@ const verifyJWT = (req, res, next) => {
         token, process.env.ACCESS_TK_S,
         (err, decode) => {
             if (err) {
-                res.status(403).json({ 'msg': err.message })
+                res.status(403).json({
+                    'status': "EXPIR",
+                    'msg': err.message
+                })
                 next(err);
             }
             res.locals.jwt_D = decode;
@@ -76,7 +79,6 @@ const verifyJWT = (req, res, next) => {
             next();
         }
     )
-    
 }
 
 // return a new access token if user is already logged in (non-route)

@@ -10,6 +10,11 @@
     "servers": [{
         "url": "http://localhost:4000"
     }],
-    "apis": ["./routers/auth/authModel.js", "./yamlDocs/authModel.yaml", "./yamlDocs/characterModel.yaml"]
-    
+    "apis": [
+        "./routers/auth/authModel.js",
+        "./yamlDocs/authModel.yaml",
+        "./yamlDocs/characterModel.yaml",
+        "./yamlDocs/campaginModel.yaml",
+        "./yamlDocs/searchBy.yaml"
+    ]
 }

@@ -4,6 +4,10 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+    cookieJWT:
+      type: apiKey
+      in: cookie
+      name: jwt
 
 tags:
   - name: Auth
@@ -114,10 +118,9 @@ definitions:
                     type: string
                     description: value recieved 
                     example: "somebody"
-                  
-    
-paths:
 
+
+paths:
   /api/clients/:
     get:
       security:
@@ -282,15 +285,11 @@ paths:
   /api/clients/refresh:
     get:
       summary: Refreshes the access token
+      description: Middleware endpoint that is used only when user attempts to access protected data. Returns a new access token if jwt is still valid. 
       tags:
         - Auth
-      parameters:
-        - in: cookie
-          name: jwt
-          required: true
-          schema: 
-            type: string
-            example: jwt=abcdef012345
+      security:
+        - cookieJWT: []
       responses:
         '200':
           description: Successful response

@@ -39,7 +39,7 @@ async function createNewUser(req, res, next) {
 
             res.status(200).json({
                 "status": 'ok',
-                "msg": `${json.userLogin} successfully created!`,
+                "msg": `${json.username} successfully created!`,
                 "link": '/login' // redirect user back to login screen.
             });
             next();
@@ -53,8 +53,6 @@ async function createNewUser(req, res, next) {
 async function isValidAuth(req, res, next) {
     const username = req.body.username;
     const password = req.body.password;
-
-    //console.log(Date.now() - res.locals?.startTime);
         try {
             const result = await userModel.exists({
                 userLogin: username,

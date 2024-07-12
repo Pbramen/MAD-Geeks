@@ -80,13 +80,8 @@ function checkEmail(value) {
 
 function checkIfValidAge(value) { 
     const date = new Date();
-    const year = date.getFullYear();
-    const month = date.getMonth()
-    const day = date.getDay()
-
-    var splitValue = value.split("-")
-    var validAge = true
     
+    var splitValue = value.split("-")
     if (splitValue.length !== 3) {
         return false;
     }
@@ -94,13 +89,18 @@ function checkIfValidAge(value) {
         splitValue = splitValue.map((el)=>{
             return parseInt(el, 10)
         })
-        if (year - splitValue[0] < 13)
-            validAge = false
-        else if (month - splitValue[1] < 0)
-            validAge = false
-        else if (month - splitValue[1] == 0 && day - splitValue[2] < 0)
-            validAge = false
-        return validAge;
+    
+        const year = date.getFullYear() - splitValue[0]
+        const month = date.getMonth() + 1 - splitValue[1] // 0-indexed for some ungodly reason
+        const day = date.getDate() - splitValue[2]
+
+        console.log(date.getFullYear(), date.getMonth(), date.getDate())
+        console.log(day)
+        if (year <= 13)
+            if (month <= 0)
+                if (day < 0)
+                    return false
+        return true;
     }
 }
 
