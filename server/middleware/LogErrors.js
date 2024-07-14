@@ -3,7 +3,7 @@ const path = require("path");
 const root = process.cwd();
 const { sys_err_model } = require(path.join(root, 'mongoFunctions','schemas','logging_schema'));
 const { formatData, ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require(path.join(root, 'errorHandling','ValidationError'));
-const { generateErrorResponse } = require(path.join(root, 'errorhandling', 'customError'));
+const { generateErrorResponse } = require(path.join(root, 'errorHandling', 'customError'));
 require('dotenv').config();
 /**
  * Global error handling for validators ONLY. 
