@@ -1,11 +1,13 @@
-import { useState } from 'react';
+import { useState, createContext } from 'react';
 import { IdentityForm } from './CharacterSheet/IdentityForm';
-
 import '../assets/css/form.css';
+
+const MultiPageContext = createContext({});
 
 export function CampaginPage() {
     const [error, setError] = useState(false);
-    const [tab, setTab] = useState(4);
+    const [tab, setTab] = useState(0);
+    const [fields, setFields] = useState({});
 
     const doAction = (e) => { 
         e.preventDefault();
@@ -13,6 +15,8 @@ export function CampaginPage() {
     }
 
     return (
-        <IdentityForm/>
+        <MultiPageContext.Provider value={{tab, setTab, fields, setFields}}>
+            <IdentityForm />
+        </MultiPageContext.Provider>
     )
 }

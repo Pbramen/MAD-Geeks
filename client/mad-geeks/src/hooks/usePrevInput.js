@@ -36,7 +36,6 @@ export const usePrevInput = (list, dependency) =>{
     return {
         inputRefs, 
         addToRefs,
-        resetInput,
         handleSetState,
         canRegister,
         setCanRegister

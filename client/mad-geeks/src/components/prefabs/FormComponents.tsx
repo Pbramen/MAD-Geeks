@@ -1,23 +1,35 @@
-import { createContext, useContext, useState, fowardRef } from "react"
+import React, {createContext, ReactNode, useContext, useState } from "react"
 import { generateNumberAsString } from "../../assets/js/generateString"
 
-
-
-export function Form({children, handleOnSubmit, handleOnChange, style="sign-in-form", formRef}) {
+interface FormType{
+    children: ReactNode,
+    handleOnSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>,
+    handleOnChange?: (e: React.FormEvent<HTMLFormElement>) => Promise<void>,
+    style: string
+}   
+export function Form({children, handleOnSubmit, handleOnChange, style="sign-in-form"}: FormType) {
     return (
-        <>
-            <form ref={formRef} className={style} onSubmit={handleOnSubmit} onChange={handleOnChange}>
+        <React.Fragment>
+            <form className={style} onSubmit={handleOnSubmit} onChange={handleOnChange}>
                 {children}
             </form>
-        </>
+        </React.Fragment>
     )
 }
 
-export function Button({ children, type="", style="", disabled=false }) { 
+
+interface Button{
+    children?: ReactNode,
+    type: 'submit' | 'reset' | 'button',
+    style: string,
+    disabled?: boolean
+}
+
+export function Button({ children, type, style="", disabled=false } : Button) { 
     if (disabled) {
         return (
             <button type={type} className={style} disabled>
-                {children}
+                {children }
             </button>
         )
     }
@@ -29,16 +41,22 @@ export function Button({ children, type="", style="", disabled=false }) {
 }
 
 
-// TODO: ADD TYPESCRIPT TO PROJECT
-/*
-    obj:{
-        label_style: <string>,
-        display_id: <string>,
-        display_name: <string>,
-        display_style: <string>
-    }
-*/
-export function TextInput({ display_id, display_name, required, _ref=null, placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, desc = null, input_desc = '', inputHandler = () => { } }) {
+interface TextInputTypes {
+    display_id: string,
+    display_name: string,
+    required?: boolean,
+    _ref?: string,
+    placeholder?: string,
+    label_style?: string,
+    id?: string,
+    input_style?: string,
+    type?: "text" | "number" | "password" ,
+    autoComplete?: boolean,
+    desc?: string,
+    input_desc?: string,
+    inputHandler?: (e)=> Promise<void>
+}
+export function TextInput({ display_id, display_name, required, _ref=null, placeholder = "", label_style = "form-label", input_style = "", type = "text", autoComplete = false, desc = null, input_desc = '', inputHandler = null }: TextInputTypes) {
 
     const aria_label = `${display_id}_desc`;
     const invalid = input_desc !== '';
@@ -58,9 +76,27 @@ export function TextInput({ display_id, display_name, required, _ref=null, place
     )
 }
 
-const ParentConext = createContext({});
-export function Selector({ id, name, label, children }) {
-    const [activeItem, setActiveItem] = useState("");
+// edit this to extend available options.
+type single_option = string
+
+interface OptionsType  {
+    value: single_option,
+    id: string,
+    children: ReactNode
+}
+
+interface SelectorTypes  {
+    id: string,
+    name: string, 
+    label: string,
+    children: ReactNode,
+    Options?: OptionsType
+}
+
+
+const ParentConext = createContext<{}>({});
+export function Selector({ id, name, label, children }: SelectorTypes)  {
+    const [activeItem, setActiveItem] : [single_option, React.Dispatch<single_option>] = useState('');
 
     const handleChange = (e) => {
         const active_item = e.target.options[e.target.selectedIndex].value;
@@ -69,7 +105,7 @@ export function Selector({ id, name, label, children }) {
 
     return (
         <ParentConext.Provider value={[activeItem, setActiveItem]}>
-            <label htmlFor={id} label_style="">{label}</label>
+            <label htmlFor={id} >{label}</label>
             <select onChange={handleChange} name={name} id={id} value={activeItem}>
                 {children}
             </select>
@@ -81,7 +117,7 @@ export function Selector({ id, name, label, children }) {
  * TODO: fixe useValidContext for Options to be useable in only Selector, NOT DatContext.
  */
 
-export function Options({value, id}){
+export function Options({children, value, id}: OptionsType){
     useValidContext(ParentConext);
     return (
         <option key={id} value={value}>{value}</option>
@@ -98,7 +134,13 @@ function useValidContext(contextProvider) {
 
 Selector.Options = Options;
 
-export function DateSelector({ legend , _ref, input_desc, yearHandler}) {
+interface DateSelectorTypes{
+    legend: string, 
+    _ref: any
+    input_desc?: string,
+    yearHandler: (e) =>  Promise<void>
+}
+export function DateSelector({ legend , _ref, input_desc, yearHandler}: DateSelectorTypes) {
 
 
     const month = generateNumberAsString(12, 1);
@@ -130,7 +172,7 @@ export function DateSelector({ legend , _ref, input_desc, yearHandler}) {
                 })}
             </Selector>
 
-            <TextInput input_desc={input_desc} inputHandler={yearHandler} _ref={_ref} id="year" display_id="year" display_name="Year" placeholder="YYYY" type='number'></TextInput>
+            <TextInput id="year" display_id="year" display_name="Year" placeholder="YYYY" type='number' input_desc={input_desc} inputHandler={yearHandler} _ref={_ref} ></TextInput>
         </fieldset>
     )
 }
