@@ -16,7 +16,8 @@ const errorHandler = require(path.join(__dirname, "middleware", "LogErrors" ));
 const { mongoose_connect } = require(path.join(__dirname, 'mongoFunctions', 'mongoDB.js'));
 const { decodeTest } = require(path.join(__dirname, 'routers', 'dev', 'decodeJWT'));
 const { logAPIAccess } = require(path.join(__dirname, 'middleware','logSuccessAPI'));
-const saveJSONResponse = require(path.join(__dirname, 'middleware','saveResponse'));
+const saveJSONResponse = require(path.join(__dirname, 'middleware', 'saveResponse'));
+const {ui_config} = require(path.resolve(__dirname, "./config/swagger_css"))
 require('dotenv').config();
 
 const app = express();
@@ -49,7 +50,8 @@ const swg = swaggerjsdoc(swaggerConfig);
 app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swg, {
     swaggerOptions: {
         requestCredentials: 'include'
-    }
+    },
+    customCss: ui_config
 }));
 
 // set timer for logging purposes.

@@ -57,7 +57,7 @@ getQuota(client).then(async (res) => {
     if (res === false || res?.Identities === undefined) {
         return;
     }
-    console.log(res.Identities);
+    console.log(JSON.stringify(res, null, " "));
     process.exit();
     const input = {
         "Destination": {
