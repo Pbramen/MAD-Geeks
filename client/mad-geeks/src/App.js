@@ -23,15 +23,16 @@ export function App({ }) {
                 <Route path="register" element={<RegistrationPage />} />
                 
                 <Route element={<PerisitLogin/>}>
-                <Route index path="home" element={<DashBoard/>} />
-                <Route path="characters" element={<CharacterPage />} />
-                <Route path="campagins" element={<CampaginPage/>} />
+                    {/*<Route index path="home" element={<DashBoard />} /> */}
+                    <Route path="characters" element={<CharacterPage />} />
+                    <Route path="campagins" element={<CampaginPage />} />
+                    {/*Testing page here..*/}
+                    <Route path="home" element={<AuthUsers/> } />
                 </Route>
 
 
                 {/* Testing pages */}
                
-                <Route path="user" element={<AuthUsers/> } />
                 <Route path="test" element={<GridPage/> } />
                 
             </Route>

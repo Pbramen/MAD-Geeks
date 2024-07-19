@@ -7,13 +7,13 @@ export interface AuthState {
 }
 
 export interface AuthDispatch {
-    setAuth: React.Dispatch<AuthState>
+    setAuth:  React.Dispatch<SetStateAction<AuthState>>;
 }
 
 export interface AuthContextType {
     auth: AuthState,
-    setAuth: AuthDispatch
+    setAuth: AuthDispatch['setAuth']
 }
 
-export const AuthContext = createContext<AuthContextType | {}>({});
+export const AuthContext = createContext < AuthContextType | {}>({ auth: {}, setAuth: {} });
 

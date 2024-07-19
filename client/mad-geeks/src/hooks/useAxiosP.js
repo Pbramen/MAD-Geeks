@@ -2,18 +2,18 @@ import { useAuth } from "./useAuth";
 import { axiosPrivate } from "../api/axios";
 import { useEffect } from 'react'
 import { useRefresh } from "./useRefresh";
-
+import { useNetworkChecker } from "./useNetworkChecker";
 /**
  * Complete Mediation using axios interceptors for JWT. 
  * Handles auth State based on response. 
  * (verfiy auth middleware MUST be handled on the server when using this hook)
- * @return {impoty(axios).AxiosInstance} New private axios instance used for auth JWT 
+ * @return {import(axios).AxiosInstance} New private axios instance used for auth JWT 
  */
 export function useAxiosP() {
-
-    const { auth } = useAuth();     // get auth state
-    const refresh = useRefresh();
-
+    const { auth, setAuth } = useAuth();     // get auth state
+    const refresh = useRefresh() 
+    const networkChecker = useNetworkChecker();
+    
     useEffect(() => {
         console.log("useAxiosP is mounted!")
 
@@ -22,14 +22,13 @@ export function useAxiosP() {
                 return response;
             },
             async (error) => {
+                
                 console.log('RESPONSE');
                 const req = error?.config;
-
                 // check if previous request, if not, then reject!
                 if (error?.response.status === 403 && !req?.sent) {
-                    console.log("status...")
                     const newToken = await refresh();
-                    if (newToken === null) {
+                    if (newToken === "AUTH_REQ") {
                         console.log("User must login again.")
                         // set auth here...
                         return Promise.reject(error);
@@ -52,7 +51,6 @@ export function useAxiosP() {
                 console.log("REQUEST")
                 // if request already exists....
                 if (!config.headers["Authorization"]) {
-                    console.log('set header to ',  auth.accessToken);
                     config.headers['Authorization'] = `Bearer ${auth?.accessToken}`
                 }
                 return config;

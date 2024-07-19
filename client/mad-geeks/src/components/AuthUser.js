@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useAxiosP } from '../hooks/useAxiosP';
 import { useRefresh } from '../hooks/useRefresh';
-
+import { useAuth } from 'hooks/useAuth';
 /**
  * @returns {JSX.Element} Admin user page list
  */
@@ -9,6 +9,7 @@ export const AuthUsers = ({ }) => {
     const [users, setUsers] = useState([]);
     const axios = useAxiosP(); 
     const refresh = useRefresh();
+    const { auth } = useAuth();
 
     useEffect(() => {
         let isMounted = true;
@@ -17,10 +18,11 @@ export const AuthUsers = ({ }) => {
         const getUser = async () => {
             console.log('attempting to grab...')
             try {
+                console.log("auth is set to ", auth?.accessToken);
                 const response = await axios.get('/api/clients/', {
                     signal: controller.signal
                 });
-                isMounted && setUsers(response.data)
+                isMounted && response?.data && setUsers(response.data)
             } catch (e) {
                 console.log("Unepected error: " +  e.message);
                 //redirect to login screen.
@@ -33,6 +35,7 @@ export const AuthUsers = ({ }) => {
             controller.abort()
         })
     }, [])
+
     return (
         <article>
             <h2>Logged in Users</h2>

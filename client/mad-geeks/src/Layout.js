@@ -3,6 +3,7 @@ import './assets/css/login.css';
 import { NavBarComp } from './components/NavBarComp';
 import { Footer } from './components/Footer';
 import { useEffect } from 'react';
+import { AuthProvider } from 'components/context/AuthProvider';
 
 export const Layout = () =>{
   useEffect(() => {
@@ -32,7 +33,9 @@ export const Layout = () =>{
     <div className="flex-column full">
       <NavBarComp links={links} />
       <div className='mid flex-tripod-main'>
-      <Outlet/>
+      <AuthProvider>
+          <Outlet />
+      </AuthProvider>
       </div>
       <Footer className='footer'/>
       </div>

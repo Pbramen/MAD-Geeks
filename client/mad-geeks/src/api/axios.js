@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const base_URL = 'http://localhost:4000';
+
 export default axios.create({
     baseURL: base_URL,
     method: 'cors',
@@ -10,7 +11,7 @@ export default axios.create({
     }
 })
 
-
+// axios instance used only for protected routes
 export const axiosPrivate = axios.create({
     baseURL: base_URL,
     method: 'cors',

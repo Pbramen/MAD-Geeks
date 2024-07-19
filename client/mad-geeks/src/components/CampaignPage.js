@@ -2,6 +2,7 @@ import { useState, createContext } from 'react';
 import { IdentityForm } from './CharacterSheet/IdentityForm';
 import '../assets/css/form.css';
 
+
 const MultiPageContext = createContext({});
 
 export function CampaginPage() {
