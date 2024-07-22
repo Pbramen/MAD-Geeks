@@ -4,7 +4,7 @@ import { Form, TextInput, Button } from "./prefabs/FormComponents"
 import { CardOne } from "./CardOne";
 import { AuthContext, AuthContextType } from "./context/AuthContext";
 import { Link } from "react-router-dom";
-import { useNetworkChecker } from '../hooks/useNetworkChecker';
+import axios from '../api/axios'
 
 interface err_object {
     status: string | number,
@@ -18,7 +18,6 @@ function SignInForm() {
     const {auth, setAuth } = useContext(AuthContext) as AuthContextType;
     const [error, setError] = useState(null);
     const [loading, setLoading] = useState(false);
-    const axios = useNetworkChecker();    
 
     const validate = async function (e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -46,6 +45,7 @@ function SignInForm() {
                         accessToken: res.data.accessToken
                     }
                 });
+                nav('/')
             }).catch(err => {
                 if (err.response !== undefined) {
                     if (err.response.data && "status" in err.response.data && "msg" in err.response.data) {

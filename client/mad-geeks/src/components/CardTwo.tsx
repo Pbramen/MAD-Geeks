@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 
-export const CardTwo = ({ empty  }: {empty?: boolean}) => {
+export const CardTwo = ({ empty, children }: {empty?: boolean, children?: ReactNode}) => {
     return (
         <li className={`landscape-card ${empty && 'empty'}`}>
-        
+            {children}
         </li>
     )
 }

@@ -10,6 +10,7 @@ import { AuthUsers } from './components/AuthUser';
 import { useEffect } from 'react';
 import { Layout } from './Layout';
 import {PerisitLogin} from './components/PersistLogin';
+import { AddSheet } from 'components/AddSheet';
 
 export function App({ }) {
     useEffect(() => {
@@ -26,6 +27,7 @@ export function App({ }) {
                     {/*<Route index path="home" element={<DashBoard />} /> */}
                     <Route path="characters" element={<CharacterPage />} />
                     <Route path="campagins" element={<CampaginPage />} />
+                    <Route path="new-character" element={<AddSheet/>}/>
                     {/*Testing page here..*/}
                     <Route path="home" element={<AuthUsers/> } />
                 </Route>

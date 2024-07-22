@@ -12,7 +12,6 @@ import { useNetworkChecker } from "./useNetworkChecker";
 export function useAxiosP() {
     const { auth, setAuth } = useAuth();     // get auth state
     const refresh = useRefresh() 
-    const networkChecker = useNetworkChecker();
     
     useEffect(() => {
         console.log("useAxiosP is mounted!")

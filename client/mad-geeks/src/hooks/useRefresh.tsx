@@ -1,7 +1,6 @@
 import axios  from '../api/axios';
 import { useAuth } from '../hooks/useAuth';
 import { useCallback } from 'react';
-import { useNetworkChecker } from './useNetworkChecker';
 
 /**
  * Custom Hook to refresh access token using the refresh token. 
@@ -10,7 +9,6 @@ import { useNetworkChecker } from './useNetworkChecker';
 */
 export const useRefresh = () => {
     const { auth, setAuth } = useAuth();
-    const networkChecker = useNetworkChecker();
     // cache results... 
     const refresh = useCallback(async () => {
         try {
@@ -23,9 +21,10 @@ export const useRefresh = () => {
             return response.data.access_token;
         } catch (error) {
             // if server was down...
-            networkChecker(error);
-            
             console.log("Refresh token has expired or invalid.")
+            if (error?.code == "ERR_NETWORK") {
+                return error.code;
+            }
             //refresh token has expired! 
             setAuth((prev) => {
                 return null;

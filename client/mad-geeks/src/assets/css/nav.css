@@ -1,6 +1,5 @@
 /* nav bar overflows just above mobile phone breakpoint */
 .nav {
-    background-color: black;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -13,6 +12,21 @@
     list-style: none;
     overflow: hidden;
     font-size: 1.25em;
+}
+
+.main-nav {
+    background-color: black;
+}
+.sub-menu{
+    justify-content: space-evenly;
+    margin: 10px;
+}
+.sub-menu > li {
+    margin-left: 25px;
+}
+.sub-menu > li:first-child, .sub-menu > li:nth-child(2){
+    margin-right: auto;    
+    border: 1px solid red;
 }
 
 li > a {

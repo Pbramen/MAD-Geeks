@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useRefresh } from "../hooks/useRefresh";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { verify } from "crypto";
 
 export function PerisitLogin(){
     const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -22,10 +23,11 @@ export function PerisitLogin(){
                     nav("/login")
                 }
                 else if (res === "AUTH_REQ") {
-                    nav('/register');
+                    
+                    nav('/login');
                 }
-            }).catch ( e => 
-                console.error(e)
+            }).catch(e => 
+                console.log("uhu uwu")
             ).finally(() => {
                 setIsLoading(false);
             })

@@ -1,7 +1,7 @@
 import '../assets/css/nav.css';
 import { Link } from 'react-router-dom';
 
-export function NavBarComp({ baseUrl='/', links, parent_style='nav', child_style='nav-list' }) { 
+export function NavBarComp({ baseUrl='/', links, parent_style='nav main-nav', child_style='nav-list' }) { 
     if (!links) {
         return (<></>)
     }

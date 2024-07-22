@@ -3,13 +3,14 @@ import {AxiosError} from 'axios';
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react"
 
-export const useNetworkChecker = () => {
+export const useNetworkChecker = ({e}) => {
     const nav = useNavigate();
     useEffect(() => {
         const handleAxiosError = (e: AxiosError) => {
             if (e?.code === 'ERR_NETWORK') {
                 // TODO : add specific server is down page!
-                nav("/login");
+                console.log("uwuw");
+                //nav("/login");
             }
             else
                 return e;
