@@ -1,9 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import axios from '../api/axios';
-import { CardTwo } from './CardTwo';
+import axios from '../../api/axios';
+import { CardTwo } from '../CardTwo';
 import { AxiosResponse } from 'axios';
-import { TitleHeader } from './TitleHeader';
-import { BannerMenu, listObject } from './BannerMenu';
+import { TitleHeader } from '../TitleHeader';
+import { BannerMenu, listObject } from '../BannerMenu';
 
 export function CharacterPage() {
     const [sheets, setSheets] = useState<any[]>([0, 0, 0, 0, 0, 0, 0, 0, 0,]);
