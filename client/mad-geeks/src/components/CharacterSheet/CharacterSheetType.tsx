@@ -88,31 +88,22 @@ interface items {
 
 // actual resposne body
 export interface CharacterSheetType {
-"payload": {
+    // biography
     "first_name": string,
     "last_name"?: string,
     "middle_name"?: string,
-    "aliases"?: string[],
-    "proficiency": proficiency,
-    "hit_die": {
-        "current_value": number,
-        "max_value": number
-    },
-    "AC": number,
-    "base_saving_throw": number,
-    "movement": {
-        "value": number,
-        "units": 'ft' | 'm' 
-    },
-    level: classLevel,
-    "items": items[],
-    "spells": spells[],
-    "class_resources": class_resources[],
-    "stats": {
-        "stat_block": stat_block[],
-    "others": other_info[]
-    },
+    "dob"? : string,
+    "aliases"?: string[],    
+    "background"?: {
+        "name": string,
+        "descript"?: string
+        },
+    "archetype"?: string, // TODO: add to schema;
+    "species": string, // TOOD: add to schema
+
+    // classes & subclasses
     // TODO: Addjust this in yaml
+    level: classLevel,
     "classes": { // at least one exists...
         "barbarian"?: a_class,
         "bard"?: a_class,
@@ -127,12 +118,35 @@ export interface CharacterSheetType {
         "warlock"?: a_class,
         "wizard"?: a_class,
     },
-    "background"?: {
-        "name": string,
-        "descript"?: string
+    "hit_die": {
+        "current_value": number,
+        "max_value": number
     },
+
+    // skills and stats
+    "class_resources": class_resources[],
+    // ===   Displayed on all pages AND updated once set  === //
+    "stats": {
+        "stat_block": stat_block[],
+        "others": other_info[]
+    },  
+    "base_saving_throw": number,
+    "AC": number,
+    // ===                       END                     === //
+    "proficiency": proficiency,
+
+    "movement": {
+        "value": number,
+        "units": 'ft' | 'm' 
+    },
+    // Inventory
+    "items": items[],
+    // Spells
+    "spells": spells[],
+
+    // Other custom data 
     "other_info"?: other_title[]
-}}
+}
 
 // response meta info
 export interface responseType {
