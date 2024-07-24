@@ -27,7 +27,9 @@ export function App({ }) {
                     {/*<Route index path="home" element={<DashBoard />} /> */}
                     <Route path="characters" element={<CharacterPage />} />
                     <Route path="campagins" element={<CampaginPage />} />
-                    <Route path="new-character" element={<CharacterSheetProvidor><AddSheet/></CharacterSheetProvidor>} />
+                    <Route path="" element={<CharacterSheetProvidor/>}>
+                        <Route path="new-character" element={<AddSheet />} />
+                    </Route>
                     
                     {/*Testing page here..*/}
                     <Route path="home" element={<AuthUsers/> } />

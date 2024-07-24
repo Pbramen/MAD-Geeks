@@ -5,9 +5,10 @@
 .campagin-form{
     border: 1px solid black;
     border-radius: 20px;
-    width: calc(min(80%, 1260px));
-    height: calc(min(80%, 760px));
+    width: calc(min(80%, 960px));
+    height: calc(min(80%, 1260px));
     padding: 35px;
+    overflow: scroll;
 }
 
 .pagination{
@@ -19,9 +20,12 @@
 
 .pagination-item {
     float: left;   
-    
 }
 
+.form-wrapper{
+    margin-left: 120px;
+    margin-right: 120px;
+}
 .pagination-btn {
     border: none;
     background-color:  hsla(34, 85%, 35%, 1);
