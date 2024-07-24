@@ -1,9 +1,9 @@
-import { createContext } from 'react';
-import { CharacterSheetType, responseType } from './CharacterSheetType';
+import React, { createContext, Dispatch, SetStateAction } from 'react';
+import { factoryCharacterSheet, CharacterSheetType,  } from './CharacterSheetType';
 
 interface CharacterContextType {
     payload: CharacterSheetType | null,
-    setPayload: React.Dispatch<CharacterSheetType> | null;
+    setPayload: React.Dispatch<SetStateAction<CharacterSheetType>>
 }
 
-export const SheetContext = createContext<CharacterContextType | null>({payload: null, setPayload: null});
+export const SheetContext = createContext<CharacterContextType | null >( null );

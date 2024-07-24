@@ -1,5 +1,4 @@
 import { useState, createContext } from 'react';
-import { IdentityForm } from './CharacterSheet/IdentityForm';
 import '../assets/css/form.css';
 
 
@@ -16,8 +15,6 @@ export function CampaginPage() {
     }
 
     return (
-        <MultiPageContext.Provider value={{tab, setTab, fields, setFields}}>
-            <IdentityForm />
-        </MultiPageContext.Provider>
+        <></>
     )
 }

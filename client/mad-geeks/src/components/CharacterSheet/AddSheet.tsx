@@ -2,29 +2,22 @@ import React, {useContext, useEffect, createContext} from 'react';
 import { useAxiosP } from 'hooks/useAxiosP';
 import { usePagination } from 'components/Pagination/usePagination';
 import { Form } from 'components/prefabs/FormComponents';
-import { CharaSheetContext } from 'components/context/CharacterForm.';
-import { CharacterSheetType } from './CharacterSheetType';
 import { PaginationBar } from 'components/Pagination/PaginationBar';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { CharacterSheetProvidor } from './CharacterSheetProvidor';    
-import { PaginationContext } from 'components/Pagination/PaginationContext';
+import { BiographyPage } from './BiographyPage';
+
 export const AddSheet = ({ }) => {    
     const axios = useAxiosP();
-    const { current_page, setCurrent_Page } = useContext(PaginationContext);
-    const { payload } = useContext(CharaSheetContext) as CharacterSheetType;
+    const { current_page, setCurrent_Page } = usePagination();
+
     const { pathname } = useLocation();
     const nav = useNavigate();
     useEffect(() => { 
         nav(`${pathname}?page=${current_page}`);
     }, [current_page, nav, pathname]);
     const list = ["Biography", "Classes", "Stats & Skills", "Inventory", "Spells", "Other"]
+    var output = null;
 
-    const isSubClassPageOpen = () => {
-        // check if level is set 
-        if (payload.classes.cleric?.level >= 2 || payload.level >= 3) {
-            return true;
-        }
-    }
     
     const onButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => {       
         e.preventDefault();
@@ -43,9 +36,10 @@ export const AddSheet = ({ }) => {
     switch (current_page) {
         case 0:
             // identity (name, age, background story, dob, etc)
+            output = (<BiographyPage/>)
             break;
         case 1:
-            // class selection/ level selection.
+            // class/subclass selection and level selection.
             break;
         case 2:
             // roll or pick your distrubuted stats
@@ -67,9 +61,9 @@ export const AddSheet = ({ }) => {
     return (
         <section className={'campagin-form flex flex-column '}>
             <PaginationBar list={list} eventHandler={onButtonClick} />
-            <Form style={""} >
-                {"stuff"}
-            </Form>
+            <div className="form-wrapper">
+                {output}
+            </div>
         </section>
         )   
 }
