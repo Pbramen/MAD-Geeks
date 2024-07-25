@@ -144,7 +144,7 @@ paths:
           description: No Access token send
         '403':
           description: Access token is invalid or has expried. Should call /refresh after
-  /api/clients/newUser:
+  /api/clients/register:
     post:
       tags:
         - Auth
@@ -191,7 +191,7 @@ paths:
           $ref: '#/definitions/MissingParams'
         '500':
           $ref: '#/definitions/DBErr'
-  /api/clients/validateAuth:
+  /api/clients/login:
     post:
       tags:
         - Auth
@@ -282,46 +282,7 @@ paths:
           $ref: '#/definitions/MissingParams'
         '500':
           $ref: '#/definitions/DBErr'
-  /api/clients/refresh:
-    get:
-      summary: Refreshes the access token
-      description: Middleware endpoint that is used only when user attempts to access protected data. Returns a new access token if jwt is still valid. 
-      tags:
-        - Auth
-      security:
-        - cookieJWT: []
-      responses:
-        '200':
-          description: Successful response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status:
-                    type: string
-                    example: OK
-                  access_token:
-                    type: string
-                    description: New access token for authenticated user.
-                    example: abcdef12345
-        '401':
-          description: Missing valid credentials
-          summary: Refresh token was not sent to server.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  status: 
-                    type: string
-                    example: INVALID_JWT
-                  msg:
-                    type: string
-                    example: Unauthorized request
-        '403':
-          description: Refresh token found, but not valid/expired.
-  /api/clients/logout:
+    
     delete:
       tags: 
         - Auth
@@ -397,4 +358,42 @@ paths:
                   msg:
                     type: string
                     example: Server failure. Please try again.
-    
+  /api/clients/refresh:
+    get:
+      summary: Refreshes the access token
+      description: Middleware endpoint that is used only when user attempts to access protected data. Returns a new access token if jwt is still valid. 
+      tags:
+        - Auth
+      security:
+        - cookieJWT: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  access_token:
+                    type: string
+                    description: New access token for authenticated user.
+                    example: abcdef12345
+        '401':
+          description: Missing valid credentials
+          summary: Refresh token was not sent to server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: INVALID_JWT
+                  msg:
+                    type: string
+                    example: Unauthorized request
+        '403':
+          description: Refresh token found, but not valid/expired.

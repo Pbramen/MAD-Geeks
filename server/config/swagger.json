@@ -13,8 +13,6 @@
     "apis": [
         "./routers/auth/authModel.js",
         "./yamlDocs/authModel.yaml",
-        "./yamlDocs/characterModel.yaml",
-        "./yamlDocs/campaginModel.yaml",
-        "./yamlDocs/searchBy.yaml"
+        "./yamlDocs/sheetsModel.yaml"
     ]
 }
