@@ -5,7 +5,7 @@ interface FormType{
     children: ReactNode,
     handleOnSubmit?: (e: React.FormEvent<HTMLFormElement>) => Promise<void> | void,
     handleOnChange?: (e: React.FormEvent<HTMLFormElement>) => Promise<void> | void,
-    style: string
+    style?: string
 }   
 export function Form({children, handleOnSubmit, handleOnChange, style="sign-in-form"}: FormType) {
     return (
