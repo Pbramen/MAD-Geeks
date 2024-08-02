@@ -1,299 +1,302 @@
 // type interface to use for character sheets only
 // applicable to 5.E only
-
-
-// helper interfaces 
-interface proficiency{
-    "bonus"?: string,
-    "stats"?: string[],
-    "weapons"?: string[],
-    "skills"?: {
-        "name"?: string,
-        "expertise"?: boolean
-    },
-    "saving_throws"?: {
-        "name"?: string,
-        "expertise"?: boolean
-    }
-}
-
 // s = somatic, v = verbal, m = material
 type components = 's' | 'v' | 'm';
 type spellSchool = 'Abjuration' | 'Conjuration' | 'Divination' | 'Enchantment' | 'Evocation' | 'Illusion' | 'Necromancy' | 'Transmutation';
 type spellLevel = -1 | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+type alignment = spellLevel;
 type classLevel = spellLevel | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
+type die_type = 1 | 2 | 4 | 6 | 8 | 10 | 12 | 20 | 100
 
+interface customData{
+    "value"?: number,
+    "name"?: string
+}
 interface spells {
+    "official_SRD"?: string,
     "name"?: string,
-    "description"?: string,
+    "descript"?: string,
     "components"?: components[],
     "school"?: spellSchool[],
-    "level"?: spellLevel
-}
-interface block {
-    "base_value"?: number,
-    "bonuses"?: {
-        "name"?: string,
-        "description"?: string,
-        "value"?: number
-    }
 }
 
 interface stat_block {
-    "STR"?: block,
-    "CON"?: block,
-    "DEX"?: block,
-    "WIS"?: block,
-    "INT"?: block,
-    "CHAR"?: block
-}
-interface a_class{
-    "level"?: number
-    "levels_obtained_at"?: number[]
-}
-interface class_resources{
-    "class"?: { // source 
-        "origin"?: string,
-        "subClass"?: string
-    },
-    "name"?: string, // name of the resource itself
-    "descript"?: string,
-    "cur_value"?: number,
-    "max_value"?: number
+    "base"?: number,
+    "bonuses"?: customData[]
 }
 
-//  ----- TO BE REVIEWED: ------
-interface other_title {
-    "title"?: "string",
-    "descript"?: "string"
+interface roll{
+    "die"?: die_type,
+    "quantity"?: number, // todo: limit range.
+    "min_r"?: number,
+    "max_r"?: number
 }
-// ----- END OF REVIEW: ------
-
-interface items {
-    "cost"?: {
-        // user may not use the default dnd currecny system.
-        "default_currency"?: {
-            "copper"?: number,
-            "silver"?: number,
-            "electrum"?: number,
-            "gold"?: number,
-            "platinum"?: number
-        }
+interface pool{
+    "current"?: number,
+    "max"?: number
+}
+interface bonus_info{
+    "proficiency"?: boolean,
+    "expertise"?: boolean,
+    "bonus"?: number
+}
+interface saving_throw{
+    "str": bonus_info,
+    "dex": bonus_info,
+    "con": bonus_info,
+    "wis": bonus_info,
+    "int": bonus_info,
+    "char": bonus_info
+}
+interface combat{
+    "AC"?: number,
+    "hit_die"?: {
+        "roll"?: roll,
+        "pool"?: pool
     },
-    // users may not use weight mechanics
-    "weight"?: {
-        "value"?: number,
+    "saving_throw"?: saving_throw,
+    "movement"?: number,
+    "ability_feats"?: string[]
+}
+interface skills {
+    "acrobatics"?: bonus_info,
+    "animal_handling"?: bonus_info,
+    "arcana"?: bonus_info,
+    "athletics"?: bonus_info,
+    "deception"?: bonus_info,
+    "history"?: bonus_info,
+    "insight"?: bonus_info,
+    "intimidation"?: bonus_info,
+    "investigation"?: bonus_info,
+    "medicine"?: bonus_info,
+    "nature"?: bonus_info,
+    "perception"?: bonus_info,
+    "performance"?: bonus_info,
+    "persuasion"?: bonus_info,
+    "religion"?: bonus_info,
+    "sleight_of_hand"?: bonus_info,
+    "stealth"?: bonus_info,
+    "survival"?: bonus_info
+  }
+interface weight {
+    "val": number,
+    "units": string
+}
+interface appearance {
+    "eyes"?: string,
+    "height"?: {
+        "val"?: string,
         "units"?: string
     },
-    "quantity"?: number,
-    "magic_lvl"?: number,
-    "descript"?: string
+    "weight"?: weight,
+    "skin"?: string,
+    "hair"?: string,
+    "img"?: string[],
+    "other"?: {
+        "name"?: string,
+        "value"?: string
+    }
 }
-
-// actual resposne body
-export interface CharacterSheetType {
-    // biography
+interface demographic {
     "first_name"?: string,
     "last_name"?: string,
     "middle_name"?: string,
     "dob"? : string,
     "aliases"?: string[],    
-    "background"?: {
-        "name"?: string,
-        "descript"?: string
-        },
-    "archetype"?: string, // TODO: add to schema;
-    "species"?: string, // TOOD: add to schema
+    // "background"?: {
+    //     "name"?: string,
+    //     "descript"?: string
+    //     },
+    // "archetype"?: string, // TODO: add to schema;
+    "species"?: string
+}
+interface traits {
+    "personality"?: string,
+    "ideals"?: string,
+    "bonds"?: string,
+    "flaws"?: string, 
+    "alignment"?: alignment
+}
+interface background {
+    "backstory"?: string, 
+    "allies"?: string,
+    "fraction"?: string,
+    "enemies"?: string
+}
+interface equipment{
+    "name"?: string,
+    "rarity"?: number,
+    "descript"?: string,
+    "roll"?: roll & {
+        "damage_type"?: string
+    },
+    "weight"?: weight,
+    "count"?: pool,
+}
+interface currency { 
+    "electrium"?: number,
+    "platinum"?: number,
+    "gold"?: number,
+    "silver"?: number,
+    "copper"?: number,
+    "custom"?: customData[]
+}
+interface inventory {
+    "equipment"?: equipment[],
+    "currency"?: currency
+}
+interface class_type {
+    "SRD"?: {
+        "barbarian"?: classLevel,
+        "bard"?: classLevel,
+        "cleric"?: classLevel,
+        "druid"?: classLevel,
+        "fighter"?: classLevel,
+        "monk"?: classLevel,
+        "paladin"?: classLevel,
+        "ranger"?: classLevel,
+        "rogue"?: classLevel,
+        "sorcerer"?: classLevel,
+        "warlock"?: classLevel,
+        "wizard"?: classLevel
+      },      
+    "custom"?: customData[]
+}
 
+export interface CharacterSheetType {
+    // biography
+    "demographic"?: demographic,
+    "appearance"?: appearance,
+    "traits"?: traits,
+    "background"?: background, 
     // classes & subclasses
     // TODO: Addjust this in yaml
-    level?: classLevel,
-    "classes"?: { // at least one exists...
-        "barbarian"?: a_class,
-        "bard"?: a_class,
-        "cleric"?: a_class,
-        "druid"?: a_class,
-        "fighter"?: a_class,
-        "monk"?: a_class,
-        "paladin"?: a_class,
-        "ranger"?: a_class,
-        "rogue"?: a_class,
-        "sorcerer"?: a_class,
-        "warlock"?: a_class,
-        "wizard"?: a_class,
-    },
-    "hit_die"?: {
-        "current_value"?: number,
-        "max_value"?: number
-    },
-
-    // skills and stats
-    "class_resources"?: class_resources[],
-    // ===   Displayed on all pages AND updated once set  === //
-    "stats"?: {
-        "stat_block"?: stat_block,
-        "others"?: block[]
-    },  
-    "base_saving_throw"?: number,
-    "AC"?: number,
-    // ===                       END                     === //
-    "proficiency"?: proficiency,
-
-    "movement"?: {
-        "value"?: number,
-        "units"?: 'ft' | 'm' 
-    },
+    "level"?: number,
+    "combat"?: combat,
+    "skills"?: skills,
+    "classes"?: class_type,
+    "stat_block"?: stat_block[],
+    
     // Inventory
-    "items"?: items[],
+    "inventory"?: inventory
     // Spells
     "spells"?: spells[],
 
-    // Other custom data 
-    "other_info"?: other_title[]
 }
 
 // initializes an empty array
-export function factoryCharacterSheet() {
-    // init all subobjects
-    const block: block = {
-        "base_value": -1,
-        "bonuses": {
-            "name": "",
-            "description": "",
-            "value": -1
-        }
-    }
-    const a_class: a_class = {
-        "level": 0,
-        "levels_obtained_at": []
-    }
-    const classLevel: classLevel = 0;
-    const class_resources: class_resources = {
-        "class": { // source 
-            "origin": "",
-            "subClass": ""
+export const factoryCharacterSheet = () => {
+
+    const product: CharacterSheetType = {
+        "demographic": {
+          "first_name": "",
+          "last_name": "",
+          "middle_name": "",
+          "species": "",
+          "aliases": [
+            ""
+          ]
         },
-        "name": "", 
-        "descript": "",
-        "cur_value": -1,
-        "max_value": -1
-    }
-    const stat_block: stat_block = {
-        "STR": block,
-        "CON": block,
-        "DEX": block,
-        "INT": block,
-        "WIS": block,
-        "CHAR": block,
-    }
-    const proficiency : proficiency = {
-        "bonus": "",
-        "stats": [],
-        "weapons": [],
-        "skills": {
+        "appearance": {
+          "eyes": "",
+          "height": {
+            "val": "",
+            "units": "ft"
+          },
+          "weight": {
+            "val": 0,
+            "units": "lbs"
+          },
+          "skin": "",
+          "hair": "",
+          "img": [
+            ""
+          ],
+          "other": {
             "name": "",
-            "expertise": false
+            "value": ""
+          }
         },
-        "saving_throws": {
-            "name": "",
-            "expertise": false
-        }
-    }
-
-
-
-
-const items: items  = {
-    "cost": {
-        // user may not use the default dnd currecny system.
-        "default_currency": {
-            "copper": 0,
-            "silver": 0,
-            "electrum": 0,
-            "gold": 0,
-            "platinum": 0
-        }
-    },
-    // users may not use weight mechanics
-    "weight": {
-        "value": 0,
-        "units": "lbs"
-    },
-    "quantity": 0,
-    "magic_lvl": 0,
-    "descript": ""
-    }
-
-    const spells: spells  = {
-        "name": "",
-        "description": "",
-        "components": [],
-        "school": [],
-        "level": 0
-    }
-
-    const product : CharacterSheetType = {
-        "first_name": "",
-        "last_name": "",
-        "middle_name": "",
-        "dob" : "",
-        "aliases": [],    
+        "traits": {
+          "personality": "",
+          "ideals": "",
+          "bonds": "",
+          "flaws": "",
+          "alignment": 9
+        },
         "background": {
-            "name": "",
-            "descript": ""
+          "backstory": "",
+          "allies": "",
+          "fraction": "",
+          "enemies": ""
+        },
+        "level": 0,
+        "combat": {
+          "AC": 0,
+          "hit_die": {
+            "roll": {
+              "die": 1,
+              "quantity": 100,
+              "min_r": 0,
+              "max_r": 0
             },
-        "archetype": "", // TODO: add to schema;
-        "species": "", // TOOD: add to schema
-    
-        // classes & subclasses
-        // TODO: Addjust this in yaml
-        level: classLevel,
-        "classes": { // at least one exists...
-            "barbarian": a_class,
-            "bard": a_class,
-            "cleric": a_class,
-            "druid": a_class,
-            "fighter": a_class,
-            "monk": a_class,
-            "paladin": a_class,
-            "ranger": a_class,
-            "rogue": a_class,
-            "sorcerer": a_class,
-            "warlock": a_class,
-            "wizard": a_class,
+            "pool": {
+              "current": 0,
+              "max": 0
+            }
+          },
+          "saving_throw": {
+            "str": {
+              "proficiency": false,
+              "expertise": true,
+              "bonus": 0
+            },
+            "dex": {
+              "proficiency": false,
+              "expertise": false,
+              "bonus": 0
+            },
+            "con": {
+              "proficiency": false,
+              "expertise": false,
+              "bonus": 0
+            },
+            "int": {
+              "proficiency": false,
+              "expertise": false,
+              "bonus": 0
+            },
+            "wis": {
+              "proficiency": false,
+              "expertise": false,
+              "bonus": 0
+            },
+            "char": {
+              "proficiency": false,
+              "expertise": false,
+              "bonus": 0
+            }
+          },
+          "movement": 0,
+          "ability_feats": [
+            ""
+          ]
         },
-        "hit_die": {
-            "current_value": -1,
-            "max_value": -1
+        "skills": {
         },
-    
-        // skills and stats
-        "class_resources": [],
-        // ===   Displayed on all pages AND updated once set  === //
-        "stats": {
-            "stat_block": stat_block,
-            "others": []
-        },  
-        "base_saving_throw": -1,
-        "AC": -1,
-        // ===                       END                     === //
-        "proficiency": proficiency,
-    
-        "movement": {
-            "value": -1,
-            "units": 'ft' 
+        "classes": {
+          "SRD": { },
+          "custom": []
         },
-        // Inventory
-        "items": [],
-        // Spells
-        "spells": [],
-    
-        // Other custom data 
-        "other_info": []
-    }
-    return (
-       product
-    )
+        "stat_block": [ ],
+        "inventory": {
+          "equipment": [],
+          "currency": {}
+        },
+        "spells": []
+    };
+    return product;
+
 }
 
 // response meta info

@@ -7,9 +7,73 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: rgb(47, 91, 109);
   color: white;
-
 }
 
+input, textarea{
+  z-index:7;
+  padding: 5px;
+}
+
+input[type="text"], input[type='number'], textarea{
+  background: transparent;
+  border-radius: 5px;
+  color: white;
+}
+
+input[type="number"]{
+  width: 50px;
+  text-align: right;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+input:focus-visible {
+  outline: 3px outset rgb(0, 53, 41);
+  border-radius: 5px;
+  background-color: whitesmoke;
+  color: black;
+}
+
+.width-s {
+  max-width: 100px;
+}
+.width-m{
+  min-width: 100px;
+  max-width: 45%;
+}
+
+.width-L{
+  min-width: 150px;
+  max-width: 60%;
+}
+
+.height-m{
+  min-height: 100px;
+  max-height: 45%;
+}
+
+.height-l{
+  max-height: 45%;
+}
+
+.height-w{
+  height: inherit;
+}
+.margin-sm{
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-top: 20px;
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
@@ -41,6 +105,19 @@ code {
   flex: 3 300px;
 }
 
+.grid-o{
+  display:grid;
+  column-gap: 10px;
+  row-gap: 3px;
+  margin-bottom: 35px;
+}
+.grid-o > input{
+  margin-bottom: 10px;
+}
+
+.o3x2{
+  grid-template-columns: auto auto auto;
+}
 
 .last-flex-item{
   flex: 1 300px;
@@ -58,8 +135,6 @@ code {
   max-height: 75px;
   outline: 1px solid green;
   margin-top: auto;
-  flex-basis: 100px;
-  flex-grow: 1;
   text-align: end;
 }
 

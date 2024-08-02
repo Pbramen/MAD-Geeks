@@ -1,0 +1,592 @@
+components:
+  schemas:
+    roll: 
+      type: object
+      description: Defines parameters for the die roll.
+      properties:
+        die: 
+          type: number
+          enum: [1, 2, 4, 6, 8, 10, 20, 100]
+          description: Determines the type of the die to be rolled
+        quantity:
+          type: number
+          minimum: 1
+          maximum: 100
+          description: Determines the number of die rolled
+        min_r: 
+          type: number
+          description: Sets the minimun value for each die's roll result
+        max_r:
+          type: number
+          description: Sets the maximum value for each die's roll result
+      required: 
+        - die
+        - quantity
+    damage_type:
+      type: string
+      enum: ["Acid", "Bludgeoning", "Cold", "Fire", "Force", "Lightning", "Necrotic", "Piercing", "Poison", "Psychic", "Radiant", "Slashing", "Thunder"]
+    barbarian:
+        type: object
+        properties:
+          barbarian:
+            $ref: '#/definitions/level_records'
+    paladin:
+      type: object
+      properties:
+        paladin:
+          $ref: '#/definitions/level_records'
+    druid:
+      type: object
+      properties:
+        druid:
+          $ref: '#/definitions/level_records'
+    wizard:
+      type: object
+      properties: 
+        wizard:
+          $ref: '#/definitions/level_records'
+    warlock:
+      type: object
+      properities:
+        warlock:
+          $ref: '#/definitions/level_records'
+    sorcerer:
+      type: object
+      properties: 
+        sorcerer:
+          $ref: '#/definitions/level_records'
+    bard:
+      type: object
+      properties:
+        bard:
+          $ref: '#/definitions/level_records'
+    cleric:
+      type: object
+      properties:
+        cleric:
+        $ref: '#/definitions/level_records'
+    monk:
+      type: object
+      properties:
+        monk:
+          $ref: '#/definitions/level_records'
+    ranger:
+        type: object
+        properties:
+          ranger:
+            $ref: '#/definitions/level_records'
+    rouge:
+      type: object
+      properties:
+        rouge:
+          $ref: '#/definitions/level_records'
+    artificer:
+      type: object
+      properties:
+        artificer:
+          $ref: '#/definitions/level_records'
+    warrior:
+      type: object
+      properties:
+        warrior: 
+          $ref: '#/definitions/level_records'
+      
+definitions:
+  weight: 
+    type: object
+    properties:
+      val: 
+        type: number
+        default: 0
+      units:
+        type: string
+        default: lbs
+  refillable_item:
+    type: object
+    properties:
+      current: 
+        type: number
+      max: 
+        type: number
+    required: 
+      - current
+      - max
+  stat_info: 
+    type: object
+    properties:
+      base:
+        type: number
+        description: Default stat excluding all bonuses and proficiencies
+      bonuses: 
+        type: array
+        items:
+          type: object
+          properties:
+            src: 
+              type: string
+              description: Source of the bonus (from ability feat, spell, magic item, etc)
+            value: 
+              type: number  
+              description: Amount of increase/decrease to base stat
+          required:
+            - value
+    required: 
+      - base
+      - bonus 
+  skill_info:
+    type: object
+    properties:
+      proficiency:
+        type: boolean
+        description: Determines if this skill benefits from proficiency bonus
+      expertise:
+        type: boolean
+        description: For bards (and some sub classes only), adds half their proficiency bonus 
+      bonus: 
+        type: number
+        description: Other accumulative bonuses (mostly temporary)
+    required:
+      - proficiency
+  level_records: 
+    type: number
+    minimun: 1
+    maximum: 20
+    description: Number of levels taken in this class
+    example: 1
+  class_info: 
+    type: object
+    properties:
+      level: 
+        $ref: "#/definitions/level_records"
+  character_sheet:
+    type: object
+    properties: 
+      demographic: 
+        type: object
+        properties:
+          first_name:
+            type: string
+            description: First Name of the character
+            maxLength: 32
+          last_name: 
+            type: string
+            description: Last name of the character
+            maxLength: 32
+          middle_name:
+            type: string
+            description: Middle name of the charcter
+            maxLength: 32
+          species: 
+            type: string
+            description: Character's species. (For the sake of gameplay balancing, only one species benefit may be recorded)
+          aliases: 
+            type: array
+            items: 
+              type: string
+            description: String containing all other nicknames
+        required:
+          - first-name
+          - species
+      appearance:   
+        type: object
+        description: Object that contains information related to the physical apperance of the character
+        properties:
+          eyes: 
+            type: string
+          height: 
+            type: object
+            properties:
+              val: 
+                type: string
+              units: 
+                type: string
+                default: "ft"
+                enum: ["ft", "m", "cm"]
+          weight:
+            $ref: "#/definitions/weight"
+          skin:
+            type: string
+          hair:
+            type: string
+          img: 
+            description: Array that contains a link to the character's image asset.
+            type: array
+            items: 
+              type: string
+          other:
+            type: object
+            properties:
+              name: 
+                type: string
+                description: User-entered, custom title
+              value: 
+                type: string
+                description: Value of custom data.
+      traits:
+        description: Describes behavior/personality of the character
+        type: object
+        properties: 
+          personality:
+            type: string
+          ideals:
+            type: string
+          bonds:
+            type: string
+            description: List of other characters that have established relationships with 
+          flaws:
+            type: string
+            description: The interview question - what are your weaknesses?
+          alignment: 
+            type: number
+            minimun: 1
+            maximum: 9
+            description: General alignment for the character for helping guide in rp. 1 = Chaotic Good, 2 = Chaotic Netural, 3 = Chaotic Evil, 4 = Neutral Good, 5 = True Neutral, 6 = Neutral Evil, 7 = Lawful Good, 8 = Lawful Netural, 9 = Lawful Evil,
+      background:
+        type: object
+        properties:
+          backstory: 
+            description: User-entered tragic backstory for their character.
+            type: string
+            maxLength: 4096
+          allies:  
+            description: User-entered string containing all allies they made.
+            type: string
+            maxLength: 1024
+          fraction:  
+            description: All fractions/organizaitons that user may be affilated with
+            type: string
+            maxLength: 1024
+          enemies: 
+            descriptoin: User-entered string of all enemies they may have.
+            type: string
+            maxLength: 1024
+      level: 
+        type: number
+        description: Current character's level
+      combat: 
+        type: object
+        properties: 
+          AC: 
+            type: number
+            description: Armor class of the character determined by stats, class, equipment, and etc.
+          hit_die:
+            type: object
+            properties:
+              roll:
+                $ref: "#/components/schemas/roll"
+              pool:
+                $ref: '#/definitions/refillable_item'
+            required: 
+              - roll
+              - pool
+          saving_throw: 
+            type: object
+            properties: 
+              str: 
+                $ref: '#/definitions/skill_info'
+              dex:
+                $ref: '#/definitions/skill_info'
+              con:
+                $ref: '#/definitions/skill_info'
+              int:
+                $ref: '#/definitions/skill_info'
+              wis:
+                $ref: '#/definitions/skill_info'
+              char:
+                $ref: '#/definitions/skill_info'
+          movement: 
+            type: number
+          ability_feats: 
+            type: array
+            items:
+              type: string
+        required: 
+          - AC
+          - hit_die
+          - saving_throw
+      skills: 
+        type: object
+        properties:
+          acrobatics:
+            $ref: '#/definitions/skill_info'
+          animal_handling:
+            $ref: '#/definitions/skill_info'
+          arcana:
+            $ref: '#/definitions/skill_info'
+          athletics:
+            $ref: '#/definitions/skill_info'
+          deception:
+            $ref: '#/definitions/skill_info'
+          history:
+            $ref: '#/definitions/skill_info'
+          insight:
+            $ref: '#/definitions/skill_info'
+          intimidation:
+            $ref: '#/definitions/skill_info'
+          investigation:
+            $ref: '#/definitions/skill_info'
+          medicine:
+            $ref: '#/definitions/skill_info'
+          nature:
+            $ref: '#/definitions/skill_info'
+          perception:
+            $ref: '#/definitions/skill_info'
+          performance:
+            $ref: '#/definitions/skill_info'
+          persuasion:
+            $ref: '#/definitions/skill_info'
+          religion:
+            $ref: '#/definitions/skill_info'
+          sleight_of_hand:
+            $ref: '#/definitions/skill_info'
+          survival: 
+            $ref: '#/definitions/skill_info'
+        required:
+          - acrobatics
+          - animal_handling
+          - arcana
+          - athletics
+          - deception
+          - history
+          - insight
+          - intimidation
+          - investigation
+          - medicine
+          - nature
+          - perception
+          - performance
+          - persuasion
+          - religion
+          - sleight_of_hand
+          - stealth
+          - survival
+      classes:
+        type: object
+        properties:
+          SRD:
+            anyOf:
+              - $ref: '#/components/schemas/barbarian'          
+              - $ref: '#/components/schemas/paladin'          
+              - $ref: '#/components/schemas/warrior'          
+              - $ref: '#/components/schemas/rouge'          
+              - $ref: '#/components/schemas/ranger'          
+              - $ref: '#/components/schemas/wizard'          
+              - $ref: '#/components/schemas/sorcerer'          
+              - $ref: '#/components/schemas/druid'          
+              - $ref: '#/components/schemas/warlock'
+              - $ref: '#/components/schemas/bard'
+              - $ref: '#/components/schemas/artificer'         
+          custom: 
+            type: array
+            items: 
+              type: object
+              properties:
+                name: 
+                  type: string
+                  description: Name of the custom class
+                value:
+                  type: number
+                  description: Amount of levels taken.
+            example: 
+              - name: "Custom_Class"
+                value: 3
+        example:
+          SRD:
+              barbarian: 
+                3
+              bard: 
+                1
+          custom:
+            - name: "Custom_class"
+              value: 5
+            - name: "other_class"
+              value: 1
+          
+      stat_block:
+        type: array
+        items:
+          $ref: "#/definitions/stat_info"
+        description: "Array elements are in the following order: [str, con, dex, wis, int, char] "
+      ability_feats:
+        description: A list of all ability feats taken by this character. 
+        type: array
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+              description: name of the feat taken
+            obtained_at:
+              type: number 
+              description: level user has taken this feat at.
+          required: 
+            - name
+      inventory: 
+        type: object
+        properties:
+          equipment:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the equipment
+                rarity: 
+                  type: number 
+                  description: magic level of this equipment (0 is common, 1-3 is magic)
+                  minimum: 0
+                  maximum: 3
+                  default: 0
+                descript:
+                  type: string
+                  description: Optional description of the equipment
+                roll: 
+                  allOf:
+                    - $ref: "#/components/schemas/roll"
+                    - type: object
+                      properties:
+                        damage_type:
+                          $ref: "#/components/schemas/damage_type"      
+                  example:
+                    die: 
+                      3
+                    quantity:
+                      6
+                    damage_type:
+                      Acid
+                weight: 
+                  $ref: "#/definitions/weight"
+                count:
+                  description: Quantity of the object 
+                  type: object
+                  properties:
+                    current:
+                      type: number
+                      minimum: 0
+                    max:
+                      type: number
+                      description: Optional parameter for items that refill automatically over time
+                      minimum: 0
+                  required:
+                    - quantity  
+              required:
+                - name
+                - rarity
+                - count
+          currency: 
+            type: object
+            descripton: Measure of one's current wealth
+            properties: 
+              electrium:
+                type: number
+              platinum: 
+                type: number
+              gold: 
+                type: number
+              silver:
+                type: number
+              copper:
+                type: number
+              custom:
+                type: array
+                items:
+                  type: object
+                  description: Used if campagin uses a customized currency system.
+                  properties:
+                    name:
+                      type: string
+                    value:
+                      type: number
+                  required: 
+                    - name     
+      spells: 
+        type: array
+        items:
+          type: object
+          properties:
+            official_SRD: 
+              type: string
+              description: Reference to OBJECT_ID of a commonly used spell. If this field is used, then "name" should be the only other field. 
+            name: 
+              type: string
+              description: Name of the spell. Used for lookup api calls (if from offcial SAR)
+              max_length: 32
+            components:
+              type: array
+              items:
+                type: string
+                description: Determines if the spell needs to be casted with hand movement, verbally, or requires materials.
+                enum: ['s', 'v', 'm']
+            school:
+              type: array
+              items:
+                type: string
+                description: Magic school this spell belongs to. May be affected by subclass/class features
+                enum: ["Abjuration", "Conjuration", "Divination", "Enchantment", "Evocation", "Illusion", "Necromancy", "Transmutation"]
+            descript:
+              type: string
+              description: Detailed summary of spell effects, criteria, damage, etc. Used only for preview purposes. This should only be used in custom spells
+              max_length: 1024  
+          required: 
+            - name
+    required: 
+      - level
+      - combat
+      - demographic
+      - skills
+      - classes
+      - stat_block
+      - ability_feats
+  meta_ownership:
+    type: object
+    properties: 
+        owner:
+          type: string
+          description: Object_ID of the owner
+        campagins: 
+          type: array
+          items:  
+            type: string
+            description: Array of Object_ID's containing campagins that this character is involved in.
+      
+tags:
+  - name: Character Sheet
+    description: Contains information for a single character saved by a user. 
+
+paths: 
+  /api/client/sheet: 
+    get:
+      tags: 
+        - "Character Sheet"
+      security:
+        - bearerAuth: []
+      summary: Retrieves a single character sheet
+      description: Accessible for only the currently logged in user. This endpoint will retrieve ALL character sheets that have been made by current user. Verifies the user via Auth Bearer header.
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object 
+                    properties:
+                      id: 
+                        description: Object_ID of the character sheet itself
+                        type: string
+                      payload:
+                        $ref: '#/definitions/character_sheet'
+                  - $ref: '#/definitions/meta_ownership'
+                  
+
+    post: 
+      tags:
+        - "Character Sheet"
+      security:
+        - bearerAuth: []
+      summary: Creates a single character sheet
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/definitions/character_sheet'

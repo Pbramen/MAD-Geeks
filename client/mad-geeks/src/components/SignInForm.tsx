@@ -73,8 +73,8 @@ function SignInForm() {
                 {!loading &&
                     <React.Fragment>
                         <Form style={'sign-in-form'} handleOnSubmit={validate} >
-                            <TextInput display_name={'username'} display_id={'username'} label_style={"form-label"} required={true} autoComplete={true} />
-                            <TextInput display_name={'password'} display_id={'password'} label_style={"form-label"} required={true} autoComplete={true} type={"password"}/>
+                            <TextInput input_style="form-input-m" display_name={'username'} display_id={'username'} label_style={"form-label"} required={true} autoComplete={true} />
+                            <TextInput input_style="form-input-m" display_name={'password'} display_id={'password'} label_style={"form-label"} required={true} autoComplete={true} type={"password"}/>
                             <Button type="submit" style="btn-1">Login </Button>
                         </Form>
                         <Link to="/register">Register for new account</Link>

@@ -1,70 +1,25 @@
-# Getting Started with Create React App
+# MAD-GEEKS DnD Web application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Welcome to the MAD-Geeks React App! This application is designed for Dungeon & Dragons enthusiasts to manage their campaigns, character sheets, and upcoming sessions with ease. This project is currently a work in progress, expected to be completed before the end of August 2024. 
 
-## Available Scripts
+## Completed Features
 
-In the project directory, you can run:
+- **Account Registration and Management:** Users can register for an account and manage their profile settings.
 
-### `npm start`
+## Currently Developing: 
+- **Character Sheet Management:** Users can create, edit, and manage their character sheets, keeping track of their characters' stats and progress.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Upcomming Features: 
+- **Campaign Management:** Users can create and manage their D&D campaigns, organizing their adventures and game sessions.
+- **Session Scheduling and Participation:** Users can schedule upcoming game sessions and participate in them, ensuring everyone is up-to-date and organized.
+- **PDF and Handwritten Character Sheet Upload:** Easily upload PDF files or photos of handwritten character sheets, which will be automatically stored and managed.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+- **Front-End:** React.js + Typescript
+- **Back-End:** Node.js with Express
+- **Database:** MongoDB + Mongoose ORM 
+- **Authentication:** JWT (JSON Web Tokens) for secure access
+## Contact
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+For more information, feel free to contact me at <a>peterbanhe.e@gmail.com</a> !
