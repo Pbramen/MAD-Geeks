@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { CharacterSheetType } from "./CharacterSheetType";
-import { ToggleTab } from 'components/ToggleTab';
+import { FieldSet } from "components/FieldSet";
 
 export const BiographyPage = ({ disabled , useCharacter}: { disabled: boolean, useCharacter: any }) => {
     const [payload, setPayload]= useCharacter;
@@ -38,10 +38,8 @@ export const BiographyPage = ({ disabled , useCharacter}: { disabled: boolean, u
         <React.Fragment>
             { !disabled &&
                 <React.Fragment>
-                    <fieldset>
-                        <legend>Biography</legend>
-                        <section className="flex flex-column margin-sm">
-                            <div className='grid-o o3x2'>
+                    <FieldSet legend_title="Biography">             
+                            <div className='grid-o o3x2 margin-sm'>
                                 <label htmlFor="first_name">First Name: </label>
                                 <label htmlFor="middle_name">Middle Name(s): </label>
                                 <label htmlFor="last_name">Last Name: </label>
@@ -59,14 +57,26 @@ export const BiographyPage = ({ disabled , useCharacter}: { disabled: boolean, u
                                     
                                 </select>
                             </div>
-                        </section>
-                    </fieldset>
-                    <fieldset>
-                        <ToggleTab>
+                        </FieldSet>
+                    <FieldSet legend_title="Background" toggle={true}>
+                        <p className="margin-sm">(Optional) Information regarding your background</p>
+                        <div className="flex flex-column margin-sm">
                             <label htmlFor="backstory">Backstory</label>
-                            <textarea></textarea>
-                        </ToggleTab>
-                    </fieldset>
+                            <textarea id="backstory" placeholder="Describe your character's tragic backstory here." />
+                        </div>
+                        <div className="flex flex-column margin-sm">
+                            <label htmlFor="allies">Allies</label>
+                            <textarea id="allies" placeholder="Enter a list of all friendly faces"/>
+                        </div>
+                        <div className="flex flex-column margin-sm">
+                            <label htmlFor="backstory">Enemies</label>
+                            <textarea id="enemies" placeholder="Enter a list of all enemies."/>
+                        </div>
+                        <div className="flex flex-column margin-sm">
+                            <label htmlFor="backstory">Alliances</label>
+                            <textarea id="alliances" placeholder="List all fractions, organizations or sectors."/>
+                        </div>
+                    </FieldSet>
             </React.Fragment>
             }
         </React.Fragment>

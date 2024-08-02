@@ -74,8 +74,9 @@ export const AddSheet = ({ }) => {
                         <section className="main-body">
                             {output}
                         </section>
+                        
+                    <button type="submit" className="fixed-button btn-1" style={{ 'fontSize': "1em", "padding": "5px 7px 5px 3px", 'zIndex': '7'}}>+ Add</button>
                     </Form>
-                <button type="submit" className="fixed-button btn-1" >+ Add</button>
             </section>
         </div>
 
