@@ -23,6 +23,7 @@
     display: inline-block;
   }
 
+
 .three_by_three {
     padding: 0px calc(100% - 95vw);
     grid-template-columns: auto auto auto;
@@ -38,7 +39,7 @@
 
 .stretch {
     width: inherit;
-    height: inherit;
+    height: 100%;
 
 }
 
