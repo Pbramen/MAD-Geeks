@@ -3,7 +3,7 @@
         "resolveJsonModule": true,
         "outDir": "./built",
         "allowJs": true,
-        "jsx": "react",
+        "jsx": "react-jsx",
         "target": "es6",
         "allowUnreachableCode": true,
         "allowUnusedLabels": true,
