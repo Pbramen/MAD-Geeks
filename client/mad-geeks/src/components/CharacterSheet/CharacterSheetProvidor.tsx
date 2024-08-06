@@ -7,9 +7,10 @@ import { Outlet } from "react-router-dom";
 export function CharacterSheetProvidor({ }) {
     const [payload, setPayload] = useState<CharacterSheetType | null>(factoryCharacterSheet());
     const [current_page, setCurrent_Page] = useState<number>(0);
+    const [max_page, setMax_page] = useState<number>(0);
 
     return (
-        <PaginationContext.Provider value={{current_page, setCurrent_Page}}>
+        <PaginationContext.Provider value={{current_page, setCurrent_Page, max_page, setMax_page}}>
             <SheetContext.Provider value={{ payload, setPayload } } >
                  <Outlet />
             </SheetContext.Provider>  
