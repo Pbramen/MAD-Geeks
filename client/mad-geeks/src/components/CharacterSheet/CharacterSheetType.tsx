@@ -97,18 +97,19 @@ interface appearance {
         "value"?: string
     }
 }
-interface demographic {
+export interface demographic {
     "first_name"?: string,
     "last_name"?: string,
     "middle_name"?: string,
-    "dob"? : string,
-    "aliases"?: string[],    
+    "aliases"?: string,    
     // "background"?: {
     //     "name"?: string,
     //     "descript"?: string
     //     },
     // "archetype"?: string, // TODO: add to schema;
-    "species"?: string
+    "species"?: string,
+    "age"?: number,
+    "gender"?: string
 }
 interface traits {
     "personality"?: string,
@@ -117,11 +118,12 @@ interface traits {
     "flaws"?: string, 
     "alignment"?: alignment
 }
-interface background {
+export interface background {
     "backstory"?: string, 
     "allies"?: string,
     "fraction"?: string,
-    "enemies"?: string
+    "enemies"?: string,
+    "architype"?: string
 }
 interface equipment{
     "name"?: string,
@@ -145,7 +147,7 @@ interface inventory {
     "equipment"?: equipment[],
     "currency"?: currency
 }
-interface class_type {
+export interface class_type {
     "SRD"?: {
         "barbarian"?: classLevel,
         "bard"?: classLevel,
@@ -193,9 +195,7 @@ export const factoryCharacterSheet = () => {
           "last_name": "",
           "middle_name": "",
           "species": "",
-          "aliases": [
-            ""
-          ]
+          "aliases": ""
         },
         "appearance": {
           "eyes": "",
