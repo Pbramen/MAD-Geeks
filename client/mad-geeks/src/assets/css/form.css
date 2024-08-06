@@ -3,12 +3,11 @@
     --pagination-wdth: 150px;
 }
 
-
-.toggle{
-    position: relative;
-    top: 0px;
-    
+.form-section{
+    margin-bottom: 30px;
 }
+
+
 .toggle-item{
     align-self: flex-end;
     margin: 5px 7px 0px 0px;
@@ -17,15 +16,25 @@
 legend{
     background-color: black;
     color: whitesmoke;
-    padding: 3px 6px;
+    padding: 5px 10px;
     margin-left: 10px;
+    border-radius: 100px;
+    font-size: 1.4em;
 }
 fieldset{
-    border: 3px solid white;
+    border: none;
     border-radius: 10px;
-    padding-bottom: 20px;
     z-index: 1;
     position: relative; 
+    border: 2px solid black;
+    padding: 0px 20px 50px;
+
+    box-shadow: 20px 20px rgb(8, 20, 53);
+
+}
+.grid-cell-form{
+    position: relative;
+    margin-bottom: 20px;
 }
 .tab{
     display:none;
@@ -39,14 +48,16 @@ fieldset{
 
 }
 .chara-form{
-    border: 1px solid black;
-    border-radius: 20px;
-    width: calc(min(80%, 960px));
-    height: calc(min(80%, 1980px));
-    padding: 35px;
+    border: 3px dotted rgb(28, 20, 71);
+
+    border-radius: 100px;
+    border-end-start-radius: 0px;
+    border-start-end-radius: 0px;
+    width: calc(min(90%, 1200px));
+    height: calc(min(95%, 1980px));
+    padding: 60px;
     display:flex;
     overflow: scroll;
-
 }
 .pagination-wrapper{
     align-self: flex-start;
@@ -75,15 +86,20 @@ fieldset{
 
 .pagination-btn {
     border: none;
-    background-color:  rgb(211, 116, 7);
+    background-color:  rgb(253, 129, 46);
     padding: 2px 0px 2px 35px;
     position: relative;
     width: var(--pagination-wdth);
     font-size: 0.8em;
+    font-family: Tahoma, sans-serif;
     height: 45px;
+
+
 }
 .pagination-item:nth-child(1) button{
     padding-left: 15px;
+    border-top-left-radius: 20px;
+
 }
 
 @media only screen and (min-width:1028px){
@@ -96,7 +112,7 @@ fieldset{
         left: 100%;
         border-top: var(--pagination-ht) solid transparent;
         border-bottom: var(--pagination-ht) solid transparent;
-        border-left: 20px solid rgb(211, 116, 7);
+        border-left: 20px solid rgb(253, 129, 46);
         z-index: 2; 
 
     }
@@ -111,7 +127,7 @@ fieldset{
         border-top: var(--pagination-ht) solid transparent;
         border-bottom: var(--pagination-ht) solid transparent;
         border-left: 20px solid rgb(47, 91, 109);
-        z-index: 1;    
+        z-index: 2;    
     }
 }
 
@@ -122,38 +138,40 @@ fieldset{
     border-left: 20px solid red;
 }
 
-.pagination-item button:hover {
+.pagination-item button:hover:not(:disabled){
     background-color: black;
     color: rgb(185, 191, 219);
    
 }
 
-.pagination-item button:hover:after {
+.pagination-item button:hover:not(:disabled):after{
     border-left: 20px solid black;
 }
-.pagination-item:nth-child(1) button.disabled {
+
+.pagination-btn.disabled {
     background-color: gray;
-    color: rgb(57, 54, 82);
+    color:rgb(47, 91, 109);
 }
-.pagination-item:nth-child(1) button.disabled::after{
+.pagination-btn.disabled::after {
     border-left: 20px solid gray;
 }
 
+
 .current-btn{
-    background-color: rgb(44, 50, 218);
+    background-color: rgb(17, 0, 78);
     color: rgb(185, 191, 219);
     font-size: 0.9em;
     font-weight: bold;
 }
 
 .current-btn::after{
-    border-left: 20px solid  rgb(44, 50, 218);
+    border-left: 20px solid  rgb(17, 0, 78);
     
 }
 .current-btn::before{
-    border-left: 20px solid rgba(80, 160, 170);
+    border-left: 20px solid rgb(28, 194, 130);
 }
 
 .prev-btn::before {
-    border-left: 20px solid rgba(80, 160, 170);   
+    border-left: 20px solid  rgb(28, 194, 130);  
 }
