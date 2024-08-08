@@ -1,5 +1,7 @@
-import React, {createContext, ReactNode, useContext, useState } from "react"
+import React, {ChangeEvent, ChangeEventHandler, createContext, ReactNode, useContext, useEffect, useState } from "react"
 import { generateNumberAsString } from "../../assets/js/generateString"
+import { LOADIPHLPAPI } from "dns"
+
 
 interface FormType{
     children: ReactNode,
@@ -76,6 +78,130 @@ export function TextInput({ display_id, display_name, required, _ref=null, place
     )
 }
 
+
+interface htmlType {
+    html?: "input" | "select" | "textarea",
+    name?: string, 
+    style?: string,
+    id: string,
+    label_title: string,
+    constrains?: {
+        min?: number,
+        max?: number,
+        minLength?: number,
+        maxLength?: number
+    },
+}
+
+interface ErrorCompType extends htmlType {
+    errorMessage?: string,
+    errID?: string,
+}
+function LabelwithError({id, label_title, errID, errorMessage, children} : ErrorCompType & htmlType & {children: React.ReactNode}) {
+    useEffect(() => {
+        console.log(errorMessage)
+    }, [])
+    return (
+        <>        
+            <label htmlFor={id}>{label_title}</label>
+            {children}
+            { errorMessage &&
+                (<span id={errID} aria-live="polite">{errorMessage}</span>)
+            }
+        </>
+    )
+}
+
+export interface ControlSelectType extends ErrorCompType{
+    options: [{
+        value: string,
+        title: string
+    }],
+    data: string, 
+    dispatcher?: React.ChangeEventHandler<HTMLSelectElement>
+}
+
+export function ControlSelectType({ options, label_title, id, style, name, dispatcher, data, errorMessage} : ControlSelectType){ 
+    const list = options.map((e, index) => {
+        const key = "opt" + index;
+        return (
+            <option key={key} value={e.title}>{ e.title }</option>
+        )
+    })
+    const errID= 'err' + id;
+    return (
+        <>
+            <LabelwithError id={id} label_title={label_title} errID={errID} errorMessage={errorMessage}>
+                <select aria-invalid={errorMessage ? true : false} aria-errormessage={errID} defaultValue={data} onChange={dispatcher}>
+                    <div style={{
+                        maxHeight: "200px",
+                        overflowY: 'scroll',
+                        width: 'auto'
+                    }}>
+                        {list}
+                    </div>
+                </select>
+            </LabelwithError>
+
+        </>
+    )
+}
+
+export interface ControlTextAreaType extends ErrorCompType{
+    state: string,
+    dispatcher?: React.ChangeEventHandler<HTMLTextAreaElement>
+}
+
+export function ControlTextArea({name, style, id, label_title, errID, errorMessage, constrains, state, dispatcher } : ControlTextAreaType) {
+    return(
+        <LabelwithError id={id} label_title={label_title} errID={errID} errorMessage={errorMessage}>
+            <textarea
+                {...constrains}
+                className={style}
+                id={id}
+                name={name}
+                aria-invalid={errorMessage ? true : false}
+                aria-describedby={errID}
+                onChange={dispatcher}
+            >
+                {state}
+            </textarea>
+        </LabelwithError>
+    )
+}
+
+
+// custom child component used for CONTROLLED form input elements!
+export interface ControlInputType extends ErrorCompType{
+    type: 'text' | 'number' | 'date' | 'password' | 'search' | 'image',
+    state: string, // payload state
+    dispatcher: React.ChangeEventHandler<HTMLInputElement>
+}
+
+
+
+export function ControlInput({ label_title, type, name, id, errID, state, style, errorMessage, constrains, dispatcher} : ControlInputType ) {
+    useEffect(() => {
+        console.log(state);
+    }, [state])
+    return (
+        <>
+            <LabelwithError id={id} label_title={label_title} errID={errID} errorMessage={errorMessage}>
+                <input
+                    className={style}
+                    type={type}
+                    id={id}
+                    value={state}
+                    onChange={dispatcher}
+                    name={name}
+                    {...constrains}
+                    aria-errormessage={errID}
+                    aria-invalid={errorMessage ? true : false}
+                /> 
+            </LabelwithError>
+        </>
+    )
+}
 // edit this to extend available options.
 type single_option = string
 

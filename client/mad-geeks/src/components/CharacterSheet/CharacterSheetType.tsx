@@ -12,7 +12,7 @@ interface customData{
     "value"?: number,
     "name"?: string
 }
-interface spells {
+export interface spells {
     "official_SRD"?: string,
     "name"?: string,
     "descript"?: string,
@@ -35,7 +35,7 @@ interface pool{
     "current"?: number,
     "max"?: number
 }
-interface bonus_info{
+export interface bonus_info{
     "proficiency"?: boolean,
     "expertise"?: boolean,
     "bonus"?: number
@@ -48,14 +48,9 @@ interface saving_throw{
     "int": bonus_info,
     "char": bonus_info
 }
-interface combat{
-    "AC"?: number,
-    "hit_die"?: {
-        "roll"?: roll,
-        "pool"?: pool
-    },
+export interface combat{
     "saving_throw"?: saving_throw,
-    "movement"?: number,
+    "skills"?: skills,
     "ability_feats"?: string[]
 }
 interface skills {
@@ -97,20 +92,7 @@ interface appearance {
         "value"?: string
     }
 }
-export interface demographic {
-    "first_name"?: string,
-    "last_name"?: string,
-    "middle_name"?: string,
-    "aliases"?: string,    
-    // "background"?: {
-    //     "name"?: string,
-    //     "descript"?: string
-    //     },
-    // "archetype"?: string, // TODO: add to schema;
-    "species"?: string,
-    "age"?: number,
-    "gender"?: string
-}
+
 interface traits {
     "personality"?: string,
     "ideals"?: string,
@@ -118,7 +100,7 @@ interface traits {
     "flaws"?: string, 
     "alignment"?: alignment
 }
-export interface background {
+interface background {
     "backstory"?: string, 
     "allies"?: string,
     "fraction"?: string,
@@ -143,161 +125,71 @@ interface currency {
     "copper"?: number,
     "custom"?: customData[]
 }
-interface inventory {
+export interface inventory {
     "equipment"?: equipment[],
-    "currency"?: currency
-}
-export interface class_type {
-    "SRD"?: {
-        "barbarian"?: classLevel,
-        "bard"?: classLevel,
-        "cleric"?: classLevel,
-        "druid"?: classLevel,
-        "fighter"?: classLevel,
-        "monk"?: classLevel,
-        "paladin"?: classLevel,
-        "ranger"?: classLevel,
-        "rogue"?: classLevel,
-        "sorcerer"?: classLevel,
-        "warlock"?: classLevel,
-        "wizard"?: classLevel
-      },      
-    "custom"?: customData[]
+    "currency"?: currency,
 }
 
-export interface CharacterSheetType {
-    // biography
-    "demographic"?: demographic,
+interface SRD {
+    "artificer"?: classLevel,
+    "barbarian"?: classLevel,
+    "bard"?: classLevel,
+    "cleric"?: classLevel,
+    "druid"?: classLevel,
+    "fighter"?: classLevel,
+    "monk"?: classLevel,
+    "paladin"?: classLevel,
+    "ranger"?: classLevel,
+    "rogue"?: classLevel,
+    "sorcerer"?: classLevel,
+    "warlock"?: classLevel,
+    "wizard"?: classLevel  
+}
+
+//  should be avaliable for all pages to dislay 
+export interface class_type {
+  "SRD"?: SRD,      
+  "custom"?: customData[],
+  "hit_die"?: {
+        "roll"?: roll,
+        "pool"?: pool
+  },
+  "fullname"?: string,
+  "stat_block"?: stat_block[],
+  "AC"?: number,
+  "img"?: string,
+}
+
+export interface biography{
+    "first_name"?: string,
+    "last_name"?: string,
+    "middle_name"?: string,
+    "aliases"?: string,    
+
+    "species"?: string,
+    "movement"?: number, // species and movement CAN be related 
+    "age"?: number,
+    "gender"?: string,
+    
+}
+export interface demographic {
+    "biography"?: biography, 
     "appearance"?: appearance,
     "traits"?: traits,
-    "background"?: background, 
-    // classes & subclasses
-    // TODO: Addjust this in yaml
-    "level"?: number,
-    "combat"?: combat,
-    "skills"?: skills,
-    "classes"?: class_type,
-    "stat_block"?: stat_block[],
-    
-    // Inventory
-    "inventory"?: inventory
-    // Spells
-    "spells"?: spells[],
-
+    "background": background
 }
 
-// initializes an empty array
-export const factoryCharacterSheet = () => {
+// export interface CharacterSheetType {
+//     // biography
+//     "demographic"?: demographic,
+//     "classes"?: class_type,
+//     "combat"?: combat,
+//     // Inventory
+//     "inventory"?: inventory
+//     // Spells
+//     "spells"?: spells[],
+// }
 
-    const product: CharacterSheetType = {
-        "demographic": {
-          "first_name": "",
-          "last_name": "",
-          "middle_name": "",
-          "species": "",
-          "aliases": ""
-        },
-        "appearance": {
-          "eyes": "",
-          "height": {
-            "val": "",
-            "units": "ft"
-          },
-          "weight": {
-            "val": 0,
-            "units": "lbs"
-          },
-          "skin": "",
-          "hair": "",
-          "img": [
-            ""
-          ],
-          "other": {
-            "name": "",
-            "value": ""
-          }
-        },
-        "traits": {
-          "personality": "",
-          "ideals": "",
-          "bonds": "",
-          "flaws": "",
-          "alignment": 9
-        },
-        "background": {
-          "backstory": "",
-          "allies": "",
-          "fraction": "",
-          "enemies": ""
-        },
-        "level": 0,
-        "combat": {
-          "AC": 0,
-          "hit_die": {
-            "roll": {
-              "die": 1,
-              "quantity": 100,
-              "min_r": 0,
-              "max_r": 0
-            },
-            "pool": {
-              "current": 0,
-              "max": 0
-            }
-          },
-          "saving_throw": {
-            "str": {
-              "proficiency": false,
-              "expertise": true,
-              "bonus": 0
-            },
-            "dex": {
-              "proficiency": false,
-              "expertise": false,
-              "bonus": 0
-            },
-            "con": {
-              "proficiency": false,
-              "expertise": false,
-              "bonus": 0
-            },
-            "int": {
-              "proficiency": false,
-              "expertise": false,
-              "bonus": 0
-            },
-            "wis": {
-              "proficiency": false,
-              "expertise": false,
-              "bonus": 0
-            },
-            "char": {
-              "proficiency": false,
-              "expertise": false,
-              "bonus": 0
-            }
-          },
-          "movement": 0,
-          "ability_feats": [
-            ""
-          ]
-        },
-        "skills": {
-        },
-        "classes": {
-          "SRD": { },
-          "custom": []
-        },
-        "stat_block": [ ],
-        "inventory": {
-          "equipment": [],
-          "currency": {}
-        },
-        "spells": []
-    };
-    return product;
-
-}
 
 // response meta info
 export interface responseType {

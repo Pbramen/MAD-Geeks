@@ -11,7 +11,7 @@ export function CharacterPage() {
     const subBanner: listObject[] = [
         { value: "Search", input: true, id: "search-bar" },
         { value: "Filter" },
-        { value: "+ Add", linkTo: "/new-character" },
+        { value: "+ Add", linkTo: "/new-character?page=0" },
         { value: "- Remove" }
     ]
     useEffect(() => {

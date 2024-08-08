@@ -2,11 +2,16 @@ import React, { useState, useEffect, useRef, MutableRefObject } from "react";
 import up from '../assets/svg/arrow-circle-up-svgrepo-com.svg';
 import down from '../assets/svg/arrow-circle-down-svgrepo-com.svg';
 
-export const ToggleTab = ({ children, description }: {children: React.ReactNode, description: string}) => {
+export const ToggleTab = ({ state, children, description }: {state: any, children: React.ReactNode, description: string}) => {
     const [display, setDisplay] = useState<boolean>(true);
     const [img, setImage] = useState(down);
     const expandableTab: React.MutableRefObject<any> = useRef();
 
+    useEffect(() => {
+        if (state)
+            setDisplay(true);
+    }, [state])
+    
     useEffect(() => {
         display ? setImage(()=>up) : setImage(()=>down);
 

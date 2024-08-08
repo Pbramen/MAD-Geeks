@@ -1,10 +1,31 @@
 import { SheetContext } from "./CharacterSheetContext"
 import React, { SetStateAction, useContext } from "react"
-import { CharacterSheetType } from "./CharacterSheetType";
 
 export const useCharacter = () => {
-    const { payload, setPayload } =  useContext(SheetContext);
-    if (payload !== null && setPayload !== null)
-        return { payload, setPayload };
+    const {
+        demographic,
+        setDemographic,
+        classes,
+        setClasses,
+        skills,
+        setSkills,
+        inventory,
+        setInventory,
+        spells,
+        setSpells
+    } =  useContext(SheetContext);
     
+    
+    return {
+        demographic,
+        setDemographic,
+        classes,
+        setClasses,
+        skills,
+        setSkills,
+        inventory,
+        setInventory,
+        spells,
+        setSpells
+    }
 }
