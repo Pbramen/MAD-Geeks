@@ -1,8 +1,17 @@
-const RETURN_CODE = Object.freeze({
+export const RETURN_CODE = Object.freeze({
     SUCCESS: 1,
     TYPE_ERROR: -1,
     FAILURE: 0
 })
+
+export const isDefined = (field, obj) => {
+    const value = obj[field]
+    if (field in obj) {
+        if (value == null || value== undefined) return false;
+        return value.trim() !== '' ? RETURN_CODE.SUCCESS : RETURN_CODE.FAILURE;
+    }
+    return RETURN_CODE.FAILURE;
+}
 
 export function isAlpha(a) {
     if (_checkType(a, "string")) {
@@ -40,11 +49,11 @@ export function isNumeric(a) {
     }
 }
 
-export function maxLength(a, max) {
+export const  maxLength = (a, max) => {
     return a.length > max ? RETURN_CODE.FAILURE : RETURN_CODE.SUCCESS;
 }
 
-export function minLength(a, min) { 
+export const minLength = (a, min) => { 
     return a.length < min ? RETURN_CODE.FAILURE : RETURN_CODE.SUCCESS;
 }
 
