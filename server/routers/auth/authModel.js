@@ -12,7 +12,7 @@ const { validation } = require(path.resolve(__dirname,'../../middleware/validati
 
 router.get('/', verifyJWT, test1);
 router.post('/newUser', checkPassword(), checkUsername(), email(), checkDOB(), validation, createNewUser);
-router.post('/validateAuth', checkPassword(), checkUsername(), validation, isValidAuth);
+router.post('/login', checkPassword(), checkUsername(), validation, isValidAuth);
 router.get('/refresh', handleRefreshToken);
 // deletes refresh cookie and refresh token
 router.delete('/logout', logOut);
