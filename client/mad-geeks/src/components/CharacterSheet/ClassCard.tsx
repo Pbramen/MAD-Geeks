@@ -1,6 +1,4 @@
 import React, { useState, useContext, useRef } from 'react';
-import { useCharacter } from './useCharacterPayload';
-
 
 type ClassCard<T> = {
     data: {

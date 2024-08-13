@@ -9,9 +9,12 @@ import { RegistrationPage } from './components/RegistrationPage';
 import { AuthUsers } from './components/AuthUser';
 import { useEffect } from 'react';
 import { Layout } from './Layout';
-import {PerisitLogin} from './components/PersistLogin';
-import { AddSheet } from 'components/CharacterSheet/AddSheet';
-import { CharacterSheetProvidor } from 'components/CharacterSheet/CharacterSheetProvidor';
+import { PerisitLogin } from './components/PersistLogin';
+
+import { PageSheetProvider } from 'components/context/PageSheetProvider';
+import { CreateCharacter } from 'components/CharacterSheet/CreateCharacter';
+
+import { ErrorSheetProvider } from 'components/CharacterSheet/ErrorProvider';
 export function App({ }) {
     useEffect(() => {
         console.log("App mounted");
@@ -27,10 +30,11 @@ export function App({ }) {
                     {/*<Route index path="home" element={<DashBoard />} /> */}
                     <Route path="characters" element={<CharacterPage />} />
                     <Route path="campagins" element={<CampaginPage />} />
-                    <Route path="" element={<CharacterSheetProvidor/>}>
-                        <Route path="new-character" element={<AddSheet />} />
+                    <Route path="" element={<ErrorSheetProvider />}>
+                        <Route path="" element={<PageSheetProvider />}>
+                            <Route path="new-character" element={<CreateCharacter />} />
+                        </Route>
                     </Route>
-                    
                     {/*Testing page here..*/}
                     <Route path="home" element={<AuthUsers/> } />
                 </Route>

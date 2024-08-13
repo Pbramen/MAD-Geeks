@@ -14,6 +14,8 @@
     "js-cookie": "^3.0.5",
     "jwt-decode": "^4.0.0",
     "localforage": "^1.10.0",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2",
     "match": "^1.2.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -52,5 +54,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:4000"
+  "proxy": "http://localhost:4000",
+  "devDependencies": {
+    "@hookform/devtools": "^4.3.1"
+  }
 }

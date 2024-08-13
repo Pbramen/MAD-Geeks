@@ -39,7 +39,12 @@ fieldset{
 .tab{
     display:none;
 }
-
+.hidden-item-wrapper{
+    display: none;
+}
+.pointer-not-allowed:hover{
+    cursor: not-allowed;
+}
 .fixed-button{
     margin-top: 15px;
     width: fit-content;
@@ -57,7 +62,6 @@ fieldset{
     height: calc(min(95%, 1980px));
     padding: 60px;
     display:flex;
-    overflow: scroll;
 }
 .pagination-wrapper{
     align-self: flex-start;
@@ -95,6 +99,19 @@ fieldset{
     height: 45px;
 
 
+}
+.alert-notify{
+    border: 2px solid white;
+    min-width: 25px;
+    height: 25px;
+    background-color: red;
+    color: white;
+    text-align: center;
+    margin-right: 10px;
+    display: inline-block;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
 }
 .pagination-item:nth-child(1) button{
     padding-left: 15px;

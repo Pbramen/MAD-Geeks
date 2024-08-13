@@ -83,7 +83,7 @@ input:focus-visible {
 
 
 .toggle.collapse{
-  max-height: 50px;
+  max-height: 100px;
 }
 
 .toggle.expand{
