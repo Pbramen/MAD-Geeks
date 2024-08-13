@@ -1,29 +1,48 @@
 import React, { useState, useEffect, useRef, MutableRefObject } from "react";
 import up from '../assets/svg/arrow-circle-up-svgrepo-com.svg';
 import down from '../assets/svg/arrow-circle-down-svgrepo-com.svg';
+import { useSheetErrorLocations } from "./CharacterSheet/ErrorProvider";
+import get from 'lodash.get';
 
-export const ToggleTab = ({ state, children, description }: {state: any, children: React.ReactNode, description: string}) => {
+// Toggle tab that also opens up if and error was detected!
+export const ToggleTab = ({ state=null, path, children, description}: {state?: any, path: string, children: React.ReactNode, description: string} ) => {
     const [display, setDisplay] = useState<boolean>(true);
-    const [img, setImage] = useState(down);
+    const [img, setImage] = useState(up);
+    const imageDisabled: React.MutableRefObject<HTMLImageElement> = useRef(null);
     const expandableTab: React.MutableRefObject<any> = useRef();
 
+    // opens the tab when the state changes relevant to the tab!
     useEffect(() => {
-        if (state)
+        const targetValue = get(state, path);
+        if (targetValue === undefined) {
+            if (state === undefined) {
+                console.error("State is not appropriately defined here.")
+            }
+        }
+        if (get(state, path)) {
             setDisplay(true);
+        }
     }, [state])
-    
+
+    // open/close animation.
     useEffect(() => {
         display ? setImage(()=>up) : setImage(()=>down);
-
         if (expandableTab.current) {
             const max_height = expandableTab.current.scrollHeight;
-            expandableTab.current.maxHeight = display ? `${max_height}px` : `50px`;
+            expandableTab.current.maxHeight = display ? `${max_height}px` : `100px`;
         }
     }, [display])
 
     const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        setDisplay((prev) => !prev);
+        
+        if (get(state, path)?.size === 0) {
+            setDisplay((prev) => !prev);
+        }
+    }
+    const onLoad = (e) => {
+        const target = e.target as HTMLImageElement;
+        target.style.color = 'unset';
     }
 
     return (
@@ -37,11 +56,11 @@ export const ToggleTab = ({ state, children, description }: {state: any, childre
                         "background": "transparent",
                         "border": 'none'
                     }} type="button" onClick={handleOnClick} className={`${display ? "toggle-on" : "toggle-off"}`}>
-                        <img width="30px" height="30px" src={img} alt={'Toggle Tab'} />
+                        <img style={{ color: "transparent" }} onLoad={onLoad} onError={onLoad} ref={imageDisabled} width="30px" height="30px" src={img} alt={'Toggle Tab'} />
                     </button>
                 </div>
             </div>
-              {display && <div className="hidden-item-wrapper">{children} </div>}
+            <div className={display ? "" :`hidden-item-wrapper`}>{children} </div>
         </div>
     )
 }
