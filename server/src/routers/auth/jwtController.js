@@ -18,9 +18,9 @@ const handleRefreshToken = (req, res, next) => {
             msg: 'No jwt token found'
         });
         next();
+        return;
     }
     const refreshToken = cookies.jwt;
-
     jwt.verify(
         refreshToken, process.env.REFRESH_TK_S,
         async (err, decoded) => {
@@ -34,6 +34,7 @@ const handleRefreshToken = (req, res, next) => {
                     msg: 'JWT expired, does not exist, or has been corrupted.'
                 });
                 next();
+                return;
             }
             
             console.log((decoded.exp - (Date.now() /1000)), ' seconds left');
@@ -73,6 +74,7 @@ const verifyJWT = (req, res, next) => {
                     'msg': err.message
                 })
                 next(err);
+                return;
             }
             res.locals.jwt_D = decode;
             Object.freeze(res.locals.jwt_D)

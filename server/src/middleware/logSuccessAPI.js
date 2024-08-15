@@ -12,6 +12,7 @@ const logAPIAccess = async (req, res, next) => {
             msg: "Resource not found."
         });
         next(err);
+        return;
     }
     setTimeout(async () => {
         if (res.headersSent === false) {

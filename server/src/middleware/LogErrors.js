@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const path = require("path");
-const root = process.cwd();
-const { sys_err_model } = require(path.join(root, 'mongoFunctions','schemas','logging_schema'));
-const { formatData, ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require(path.join(root, 'errorHandling','ValidationError'));
-const { generateErrorResponse } = require(path.join(root, 'errorHandling', 'customError'));
+const { sys_err_model } = require(path.resolve(__dirname, '../mongoFunctions/schemas/logging_schema'));
+const { formatData, ExpressValidatorError, InvaildAuthError, MongoDuplicateError} = require(path.resolve(__dirname, '../errorHandling/ValidationError'));
+const { generateErrorResponse } = require(path.resolve(__dirname, '../errorHandling/customError'));
 require('dotenv').config();
 /**
  * Global error handling for validators ONLY. 

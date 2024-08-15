@@ -1,9 +1,8 @@
 const { mongoose } = require("mongoose");
 const path = require('path')
-const root = process.cwd();
-const { logError } = require(path.join(root, 'mongoFunctions','textLogger'));
+const { logError } = require(path.resolve(__dirname, './textLogger'));
 require('dotenv').config();
-const { sys_err_model } = require(path.join(root, 'mongoFunctions','schemas','logging_schema'));
+const { sys_err_model } = require(path.resolve(__dirname, './schemas/logging_schema'));
 mongoose.connection.on("connected", () => {})
 const {EventEmitter} = require('events');
 
@@ -53,7 +52,7 @@ function mongoose_connect(){
     })
     .catch((err) => {
         console.log("mongodb connection failed: ", err);
-        process.exit(-1);
+        //process.exit(-1);
     })
 }
 

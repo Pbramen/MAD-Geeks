@@ -1,23 +1,23 @@
 const path = require("path")
 const express = require("express");
 
-const authRouter = require(path.join(__dirname, 'routers', 'auth', 'authModel'));
-const singleCharRouter = require(path.join(__dirname, 'routers', 'characterSheet', 'singleCharModel'));
-const multipleCharRouter = require(path.join(__dirname, 'routers', 'characterSheet', 'multipleCharModel'));
+const authRouter = require(path.resolve(__dirname, 'src/routers/auth/authModel'));
+const singleCharRouter = require(path.resolve(__dirname, 'src/routers/characterSheet/singleCharModel'));
+const multipleCharRouter = require(path.resolve(__dirname, 'src/routers/characterSheet/multipleCharModel'));
 const cors = require('cors');
 
 const swaggerjsdoc = require("swagger-jsdoc");
-const swaggerConfig = require(path.join(__dirname, 'config', 'swagger.json'));
+const swaggerConfig = require(path.resolve(__dirname, 'src/config/swagger.json'));
 const swaggerUI = require("swagger-ui-express");
 
 const cookieParser = require("cookie-parser");
-const errorHandler = require(path.join(__dirname, "middleware", "LogErrors" ));
+const errorHandler = require(path.resolve(__dirname, "src/middleware/LogErrors" ));
 
-const { mongoose_connect } = require(path.join(__dirname, 'mongoFunctions', 'mongoDB.js'));
-const { decodeTest } = require(path.join(__dirname, 'routers', 'dev', 'decodeJWT'));
-const { logAPIAccess } = require(path.join(__dirname, 'middleware','logSuccessAPI'));
-const saveJSONResponse = require(path.join(__dirname, 'middleware', 'saveResponse'));
-const {ui_config} = require(path.resolve(__dirname, "./config/swagger_css"))
+const { mongoose_connect } = require(path.resolve(__dirname, 'src/mongoFunctions/mongoDB.js'));
+const { decodeTest } = require(path.resolve(__dirname, 'src/routers/dev/decodeJWT'));
+const { logAPIAccess } = require(path.resolve(__dirname, 'src/middleware/logSuccessAPI'));
+const saveJSONResponse = require(path.resolve(__dirname, 'src/middleware/saveResponse'));
+const {ui_config} = require(path.resolve(__dirname, "src/config/swagger_css"))
 require('dotenv').config();
 
 const app = express();

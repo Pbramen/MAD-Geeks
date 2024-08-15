@@ -1,5 +1,5 @@
 const path = require('path')
-const { hashNewPassword, compareHash } = require(path.join(__dirname, '..','..','enbcrypt.js'));
+const { hashNewPassword, compareHash } = require(path.resolve(__dirname, '../../enbcrypt.js'));
 const { userModel } = require(path.join( __dirname, '..','..','mongoFunctions','schemas','client_Schema.js'));
 const { createUser, checkDuplicates } = require(path.join(__dirname, '..','..','mongoFunctions','query','postQuery.js'));
 const { signAccessToken, signRefreshToken } = require(path.join(__dirname, '..','..','jwt','jwtokenHandler.js'));
