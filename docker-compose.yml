@@ -1,0 +1,30 @@
+services:
+  client:
+    build: ./client/mad-geeks/
+    ports: 
+      - "3000:3000"
+    networks:
+      - publicNet
+    volumes:
+      - ${PWD}/client/mad-geeks/src:/app/src
+      - ${PWD}/client/mad-geeks/public:/app/public
+  backend:
+    build: ./server
+    volumes:
+      - ${PWD}/server/src:/app/src
+      - ${PWD}/server/package.json:/app/package.json
+    ports:
+      - "4000:4000"
+    networks:
+      - publicNet
+      - privateNet
+    environment:
+      - NODE_ENV=development
+    env_file:
+      - path: ./server/.env
+        required: true
+      - path: ./server/.env.development
+        required: true
+networks:
+  publicNet:
+  privateNet:

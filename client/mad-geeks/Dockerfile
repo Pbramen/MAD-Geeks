@@ -1,6 +1,10 @@
-FROM node:20
+FROM node:lts-alpine
+ENV NODE_ENV=development
 WORKDIR /app
-COPY . /app
-RUN npm install
-CMD ["npm", "start"]
+COPY ["package.json", "package-lock.json*", "./"] #cache invalidation 
+RUN npm install 
+COPY . .
 EXPOSE 3000
+RUN chown -R node /app
+USER node 
+CMD ["npm", "start"]

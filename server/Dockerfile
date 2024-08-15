@@ -1,8 +1,10 @@
-FROM node:20
+FROM node:lts-alpine
+ENV NODE_ENV=development
 WORKDIR /app
-COPY ./package.json /app
-RUN npm install 
-ENV NODE_ENV = development
+COPY ["package.json", "package-lock.json*", "./"]
+RUN npm install
 COPY . .
 EXPOSE 4000
-CMD ["node", "server.js"]
+RUN chown -R node /app
+USER node
+CMD ["npm", "run", "dev--w"]
