@@ -15,7 +15,6 @@ export const PaginationBar = ({ stateError, max = 0, list, eventHandler, current
     var isList = false;
     if (max == 0 && list) isList = true
     else if (max == 0 && !list) throw new Error("Invalid parameters sent to Pagination Bar");
-    
 
     // generate tabs based on number, else by string. This will determine each tab's location in searchParams.
     var items = !isList ? Array.from({ length: max }, (_, index) => index) : list;

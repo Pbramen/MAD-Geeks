@@ -12,14 +12,12 @@ body {
 
 input, textarea{
   z-index:7;
+  border-radius: 5px;
   padding: 5px;
+
 }
 
-input[type="text"], input[type='number'], textarea{
-  background: transparent;
-  border-radius: 5px;
-  color: white;
-}
+
 
 input[type="number"]{
   width: 50px;
@@ -32,14 +30,8 @@ input::-webkit-inner-spin-button {
   margin: 0;
 }
 
-/* Firefox */
-input[type=number] {
-  -moz-appearance: textfield;
-}
-
-
 input:focus-visible {
-  outline: 3px outset rgb(0, 53, 41);
+  outline: 3px outset rgb(202, 81, 1);
   border-radius: 5px;
   background-color: whitesmoke;
   color: black;
@@ -241,6 +233,7 @@ div[draggable="true"]:active:hover{
   margin-bottom: 5px;
 }
 
+
 .disabled{
   color: gray;
 }
@@ -248,4 +241,25 @@ div[draggable="true"]:active:hover{
 .confirm-page{
   border: 1px solid black;
   
+}
+
+input[aria-invalid=true]{
+  background-color: rgb(182, 152, 152);
+  outline: 4px solid red;
+  
+}
+.alert-text{
+  color: rgb(206, 186, 186);
+  margin-top: 3px;
+  font-weight: bolder;
+  letter-spacing: 0.045em;
+}
+
+
+.img_upload, input[name="img_upload"]{
+  border: none;
+  background-color: transparent;
+  text-align: center !important;
+  display:block;
+
 }

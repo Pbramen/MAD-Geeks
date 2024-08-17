@@ -26,7 +26,9 @@ const lookupPaths = () => {
         alignment: tab3,
         personality: tab3,
 
-        name: tab4,
+        first_name: tab4,
+        middle_name: tab4,
+        last_name: tab4,
         age: tab4,
         gender: tab4,
         species: tab4,

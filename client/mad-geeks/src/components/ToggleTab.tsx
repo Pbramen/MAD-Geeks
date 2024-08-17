@@ -5,7 +5,7 @@ import { useSheetErrorLocations } from "./CharacterSheet/ErrorProvider";
 import get from 'lodash.get';
 
 // Toggle tab that also opens up if and error was detected!
-export const ToggleTab = ({ state=null, path, children, description}: {state?: any, path: string, children: React.ReactNode, description: string} ) => {
+export const ToggleTab = ({ state=null, path, children}: {state?: any, path: string, children: React.ReactNode} ) => {
     const [display, setDisplay] = useState<boolean>(true);
     const [img, setImage] = useState(up);
     const imageDisabled: React.MutableRefObject<HTMLImageElement> = useRef(null);
@@ -47,10 +47,7 @@ export const ToggleTab = ({ state=null, path, children, description}: {state?: a
 
     return (
         <div ref={expandableTab}  className={`flex flex-column toggle ${ display ? "expand" : "collapse"}`}>
-            <div className="flex flex-row" style={{
-                "justifyContent" : 'space-between'
-            }}>
-                <summary style={{ "fontWeight": "bold", "textAlign": "center", "flexGrow": "1", "paddingTop": "20px", "fontSize": "1.2em"}}>{description}</summary>
+            
                 <div className="toggle-item">
                     <button style={{
                         "background": "transparent",
@@ -59,7 +56,7 @@ export const ToggleTab = ({ state=null, path, children, description}: {state?: a
                         <img style={{ color: "transparent" }} onLoad={onLoad} onError={onLoad} ref={imageDisabled} width="30px" height="30px" src={img} alt={'Toggle Tab'} />
                     </button>
                 </div>
-            </div>
+            
             <div className={display ? "" :`hidden-item-wrapper`}>{children} </div>
         </div>
     )

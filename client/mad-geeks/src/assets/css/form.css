@@ -4,13 +4,75 @@
 }
 
 .form-section{
-    margin-bottom: 30px;
+    margin-bottom: 45px;
+        flex: 1;
+        min-width: 0;
 }
 
+.text-wrapper{
+    display: block;
+}
+.sec-description{
+    font-weight: bold;
+    text-align: center; 
+    flex-grow: 1;
+    padding-top: 30px; 
+    font-size: 1.2em;
+}
+.optional-tag{
+    position: relative;
+    right: 10px;
+    top: -10px;
+    font-size: 0.8em;
 
+}
+.form-body{
+    margin: 30px 30px 0px 30px;
+}
+.profile-pic{
+    width: 300px;
+    height: 300px;
+    outline: 15px solid rgb(10, 10, 61);
+    border-radius: 30px;
+}
+.re-form{
+    justify-content: space-between;
+    flex: 1;
+    gap: 30px;
+    margin-bottom: 10px;
+}
+.drag-image-area{
+    background-color:rgba(140, 201, 193, 0.527);
+    display: flex;
+    border: 2.5px dashed rgb(9, 9, 59);
+    border-radius: 35px;
+    width: 300px;
+    height: 300px;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.active-section{
+    border: 2.5px solid black;
+}
+.upload-btn{
+    display: block;
+    color: rgb(0, 56, 141);
+    font-weight: bolder;
+    cursor: pointer;
+}
+.profile-wrapper{
+   margin-bottom: 50px; 
+   gap: 15px;
+   align-items: center;
+}
+.re-form > div{
+    flex-basis: 30%;
+}
 .toggle-item{
-    align-self: flex-end;
-    margin: 5px 7px 0px 0px;
+    position: absolute;
+    top: -7.5px;
+    right: 15px;
 }
 
 legend{
@@ -28,7 +90,6 @@ fieldset{
     position: relative; 
     border: 2px solid black;
     padding: 0px 20px 50px;
-
     box-shadow: 20px 20px rgb(8, 20, 53);
 
 }
@@ -76,11 +137,24 @@ fieldset{
     margin-bottom: 20px;
     width: calc((var(--pagination-wdth) * 6) + 25px) ;
     font-size: 1.2em;
+    display:flex;
+    justify-content: center;
+    flex-wrap: wrap;
 }
 
 .pagination-item {
     float: left;
     position: relative;
+}
+
+.form-textarea > div >  textarea{
+    min-width: 80%;
+    max-width: 100%;
+    min-height: 60px;
+    margin-bottom: 25px;
+}
+.form-textarea > div:last-child > textarea{
+    margin-bottom: 0px;
 }
 
 .main-body{
@@ -116,6 +190,20 @@ fieldset{
 .pagination-item:nth-child(1) button{
     padding-left: 15px;
     border-top-left-radius: 20px;
+
+}
+@media only screen and (max-width:900px){
+    .re-form{
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 0px;
+        gap: 0px;
+    }
+    .re-form > div  {
+        width: 80%;
+        max-width: 350px;
+        margin-bottom: 25px;
+    }
 
 }
 
