@@ -1,16 +1,19 @@
+import { StringLiteralLike } from "typescript";
+
 // data stored here is static and will not change over time.
-const simple_weapons= [
-    "club",
-    "dagger",
-    "greatclub",
-    "handaxe",
-    "javelin",
-    "light hammer",
-    "mace",
-    "quarterstaff",
-    "sickle",
-    "spear"
-]
+const simple_weapons = [
+    { name: "club", damage: "bludgeoning", roll: "1d4" },
+    { name: "dagger", damage: "piercing", roll: "1d4" },
+    { name: "greatclub", damage: "bludgeoning", roll: "1d8" },
+    { name: "handaxe", damage: "slashing", roll: "1d6" },
+    { name: "javelin", damage: "piercing", roll: "1d6" },
+    { name: "light hammer", damage: "bludgeoning", roll: "1d4" },
+    { name: "mace", damage: "bludgeoning", roll: "1d6" },
+    { name: "quarterstaff", damage: "bludgeoning", roll: "1d6" },
+    { name: "sickle", damage: "slashing", roll: "1d4" },
+    { name: "spear", damage: "piercing", roll: "1d6" }
+];
+
 
 const martial_weapon = [
     "battleaxe",
@@ -73,6 +76,32 @@ const finese_weapon = [
     "shortsword"
 ]
 
+type ability_names = 'str' | 'con' | 'wis' | 'cha' | 'dex' | 'int'
+type level_range = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
+
+type Feature_Descript = {
+    unlockedBy: level_range,
+    name: string,
+    description: string
+}
+interface classSpecifics {
+    recommended_stats: ability_names[],
+    proficiency: {
+        equipment: string[],
+        skills: string[],
+        saving: ability_names[]
+    },
+    resources: {
+        hit_dice: '1d4' | '1d6' | '1d8' | '1d10' | '1d12',
+        class_features: Feature_Descript[],
+        spells?: {
+            availableSpells: string[][],    // list of spells avaliable per level
+            spellsKnown: number[],          // number of prepared spells 
+            spellSlotsPerLevel: number[][]  // spell slots per level
+        }
+    }
+}
+
 const musical_instrument = [
     "drum",
     "dulcimer",
@@ -85,7 +114,7 @@ const musical_instrument = [
     "violin"
 ]
 
-const barbarian = {
+const barbarian: classSpecifics = {
     recommended_stats: ["str", "con", "dex"],
     proficiency: {
         equipment: [
@@ -106,7 +135,7 @@ const barbarian = {
         saving: ["str", "con"]
     },
     resources: {
-        hit_dice: "d12",
+        hit_dice: "1d12",
         class_features: [
             {
                 name: "Rage",
@@ -173,20 +202,11 @@ const barbarian = {
                 unlockedBy: 20,
                 description: "Your Strength and Constitution scores increase by 4, up to a maximum of 24. Your hit points increase by 40."
             }
-        ],
-        spells: {
-            avaliableSpells: [
-                [], // Barbarian doesn't cast spells
-                []
-            ],
-            cantrips: [],
-            spellSlots: [[]],
-            preparedSpells: [[]]
-        }
+        ]
     }
-    }
+};
 
-const fighter = {
+const fighter: classSpecifics = {
     recommended_stats: ["str", "con", "dex"],
     proficiency: {
         equipment: [
@@ -208,7 +228,7 @@ const fighter = {
         saving: ["str", "con"]
     },
     resources: {
-        hit_dice: "d10",
+        hit_dice: "1d10",
         class_features: [
             {
                 name: "Fighting Style",
@@ -265,29 +285,20 @@ const fighter = {
                 unlockedBy: 20,
                 description: "You regain hit points at the start of your turn if you have less than half of your hit points remaining. You regain hit points equal to 5 + your Constitution modifier."
             }
-        ],
-        spells: {
-            avaliableSpells: [
-                [], // Fighter doesn't cast spells
-                []
-            ],
-            cantrips: [],
-            spellSlots: [[]],
-            preparedSpells: [[]]
-        }
+        ]
     }
-};
+}
 
-const bard = {
+const bard: classSpecifics = {
     recommended_stats: ["cha", "dex", "con"],
     proficiency: {
         equipment: [
-            "Light armor",
-            "Simple weapons",
-            "Hand crossbows",
-            "Longswords",
-            "Rapiers",
-            "Shortswords"
+            "light armor",
+            "simple weapons",
+            "hand crossbows",
+            "longswords",
+            "rapiers",
+            "shortswords"
         ],
         skills: [
             "Acrobatics",
@@ -312,6 +323,7 @@ const bard = {
         saving: ["dex", "cha"]
     },
     resources: {
+        hit_dice: '1d6',
         class_features: [
             {
                 name: "Bardic Inspiration",
@@ -358,14 +370,24 @@ const bard = {
                 [2, 2, 0, 0, 0, 0, 0, 0, 0, 0], // class level 1
                 [2, 3, 0, 0, 0, 0, 0, 0, 0, 0], // class level 2
                 [2, 4, 2, 0, 0, 0, 0, 0, 0, 0], // class level 3
-                [3, 4, 2, 0, 0, 0, 0, 0, 0, 0], // class level 4
+                [3, 4, 3, 0, 0, 0, 0, 0, 0, 0], // class level 4
                 [3, 4, 3, 2, 0, 0, 0, 0, 0, 0], // class level 5
                 [3, 4, 3, 3, 0, 0, 0, 0, 0, 0], // class level 6
                 [3, 4, 3, 3, 1, 0, 0, 0, 0, 0], // class level 7
                 [3, 4, 3, 3, 2, 0, 0, 0, 0, 0], // class level 8
-                [3, 4, 3, 3, 1, 0, 0, 0, 0, 0], // class level 9
+                [3, 4, 3, 3, 3, 0, 0, 0, 0, 0], // class level 9
+                [4, 4, 3, 3, 3, 1, 0, 0, 0, 0], // class level 10
+                [4, 4, 3, 3, 3, 2, 0, 0, 0, 0], // class level 11
+                [4, 4, 3, 3, 3, 3, 0, 0, 0, 0], // class level 12
+                [4, 4, 3, 3, 3, 3, 1, 0, 0, 0], // class level 13
+                [4, 4, 3, 3, 3, 3, 2, 0, 0, 0], // class level 14
+                [4, 4, 3, 3, 3, 3, 3, 0, 0, 0], // class level 15
+                [4, 4, 3, 3, 3, 3, 3, 1, 0, 0], // class level 16
+                [4, 4, 3, 3, 3, 3, 3, 2, 0, 0], // class level 17
+                [4, 4, 3, 3, 3, 3, 3, 3, 0, 0], // class level 18
+                [4, 4, 3, 3, 3, 3, 3, 3, 1, 0], // class level 19
+                [4, 4, 3, 3, 3, 3, 3, 3, 2, 0], // class level 20
             ]
-
         }
     }
 };
@@ -375,6 +397,4 @@ export const class_data = {
     barbarian: barbarian,
     bard: bard,
     fighter: fighter,
-
-
 }
