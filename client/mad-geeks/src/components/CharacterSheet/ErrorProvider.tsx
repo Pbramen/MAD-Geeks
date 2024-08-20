@@ -1,3 +1,4 @@
+import { ability_score_model } from 'assets/dndClassByLevel';
 import { createContext, useContext, useState, Dispatch, SetStateAction} from 'react';
 import { Outlet } from 'react-router-dom';
 // maps the location of each error to the toggle tab and defines how many errors have occured.
@@ -12,9 +13,9 @@ export interface TErrorSheetMapping{
     },
     classes: {
         classes: Set<string | null>,
-        stats: Set<string | null>,
     },
     skills: {
+        ability_score: Set<string | null>,
         skills: Set<string | null>,
         savingThrows: Set<string | null>, 
     },
@@ -34,7 +35,7 @@ export const ErrorSheetMapping = createContext(null);
 
 // --------------------
 // import {Outlet} from 'react-dom-router'
-export const getErrorDefaults = ()=>{
+export const getErrorDefaults = () : TErrorSheetMapping=>{
     return {
     biography: {
         demographic: new Set([]),
@@ -44,9 +45,9 @@ export const getErrorDefaults = ()=>{
     },
     classes: {
         classes: new Set([]),
-        stats: new Set([]),
     },
     skills: {
+        ability_score: new Set([]),    
         skills: new Set([]),
         savingThrows: new Set([]), 
     },

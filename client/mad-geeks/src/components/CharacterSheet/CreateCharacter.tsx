@@ -5,7 +5,10 @@ import { usePageParam } from "./Pages/usePageParam";
 import { biography_fields } from "components/biographyPaths";
 import { TErrorSheetMapping } from "./ErrorProvider";
 import { useSheetErrorLocations, getErrorDefaults } from "./ErrorProvider";
-import { DevTool } from "@hookform/devtools";
+import { ClassCard } from "./ClassCard";
+import { SkillStatsPage } from "components/SkillStatsPage";
+import { class_data } from "assets/dndClassByLevel";
+import { DynamicController } from "./DynamicController";
 
 // ================== REMOVE AFTER MODULARIZING ============================
 import set from 'lodash.set'
@@ -36,10 +39,7 @@ const MultiPageLayout = ({ state, children, page, pageTracker, errors}) => {
     const { max_page, pageParam, setCurrent_Page, setPageParam, setMax_page, current_page } = pageTracker
     const n = page.length;
     
-    // useEffect(() => {
-    //     console.log("MultiPageLayout errors: ", errors);
-    // }, [errors])
-    // validates for changes against the parameter (use on page load or when attempting to nav)
+  
     const validatePageParam = (newPage : string) => {
         const intPage = parseInt(newPage);
         // move back to the front of the form if invalid 
@@ -84,96 +84,6 @@ const MultiPageLayout = ({ state, children, page, pageTracker, errors}) => {
         </> 
     )
 }
-
-//==============================================================================
-
-//==============================================================================
-// import {Controller} from 'react-hook-forms';
-
-type DynamicControllerType = {
-    html: 'input' | 'select' | 'textarea',
-    validation?: any,
-    name: string,
-    control: any,
-    path: string,
-    label: string,
-    options?: string[],
-    [key: string]: any // remainder 
-}
-
-// ...rest === field from Controller render!
-// path = path.to.error.mapping used for ui notification on failure.
-const DynamicController = ({  errors, html, validation, name, control, path, options, label, divStyle, ...rest }:DynamicControllerType ) => {
-    const errorID = 'err_' + name;
-    const [previewImg, setPreviewImg] = useState("");
-
-
-    const handleImageUpload = (e: any) => {
-        const files = e.target?.files?.[0]
-        const filePath = URL.createObjectURL(files);
-        console.log("handling impage upload...")
-        setPreviewImg(filePath.toString());
-    }
-
-
-    const input = (field: any, fieldError = null) => {
-        // if fieldError is defined, then alert the user!
-        switch (html) {
-            case 'select':
-                return (
-                    <select name={name} aria-errormessage={errorID} aria-invalid={fieldError ? true : false} id={name} {...field} {...rest}>
-                        {options &&
-                            options.map((option) => {
-                            
-                                return (<option key={option} value={option}>{option}</option>)
-                            })
-                        }
-                    </select>
-                );
-            
-            case 'textarea':
-                return (
-                    <textarea name={name} aria-invalid={fieldError ? true : false } aria-errormessage={errorID} id={name} {...field} {...rest}/>
-                )
-            case 'input':
-                // CAN ONLY BE USED IN PARENT COMPONENT! (if used in child, need to revokeURL EACH time a page is switched!)
-                if (rest.type === 'img') {
-                    return (
-                        <>
-                            <input style={{color: 'black'}} name={name} value='' aria-invalid={fieldError ? true : false} aria-errormessage={errorID} id={name} onChange={handleImageUpload}  {...rest} />
-                            {previewImg && <img src={previewImg} /> }
-                        </>
-                    )
-                }
-            default:
-                return (
-                    <input name={name} aria-invalid={fieldError ? true : false} aria-errormessage={errorID} id={name} {...field} {...rest}/>
-                )
-        }
-    }
-
-    return (
-        <Controller
-            name={name}
-            control={control}
-            defaultValue={''}
-            rules={{...validation} }
-            render={({ field: {value, onChange, onBlur}, fieldState }) => {
-                return (
-                    <div className="flex flex-column" style={divStyle}>
-                        <label htmlFor={name}>{label}</label>
-                        {input({value, onChange, onBlur }, fieldState.error)}
-                        {
-                            fieldState.error && 
-                            <span className="alert-text" aria-live='polite'>{fieldState.error.message}</span>
-                        }
-                    </div>
-                )
-            }}
-        />
-    )
-}
-
 //==============================================================================
 export const BiographyPage = ({ control, errors, sheetError }) => {
     const path = 'biography'
@@ -213,8 +123,8 @@ export const BiographyPage = ({ control, errors, sheetError }) => {
                 <div className="flex flex-column form-body">
                     <div className="flex flex-row re-form">
                         <DynamicController
-                            label="*First Name:"
-                            name="first_name"
+                            label="*Character Name:"
+                            name="charcter_name"
                             validation={{
                                 required: {
                                     value: true,
@@ -231,24 +141,6 @@ export const BiographyPage = ({ control, errors, sheetError }) => {
                             errors={errors}
                             control={control}
                             
-                        />
-                        <DynamicController
-                            label="Middle Name:"
-                            name="middle_name"
-                            path={path + '.demographic'}
-                            html="input"
-                            errors={errors}
-                            control={control}
-                            
-                        />
-                        <DynamicController
-                            label="Last Name:"
-                            name="last_name"
-                            path={path + '.demographic'}
-                            html="input"
-                            errors={errors}
-                            control={control}
-                            maxLength={32}
                         />
                     </div>
                     <div id="test" className="flex flex-row re-form" >
@@ -363,41 +255,6 @@ export const BiographyPage = ({ control, errors, sheetError }) => {
     )
 }
 
-export const ClassesPage = ({ control, errors, sheetError}) => {
-
-    const path = 'classes.'
-    const FieldSetting = {
-        legend_title: "Classes",
-        description: "Set your character's demographic information here ~ ",
-        state: sheetError,
-        toggle: true,
-        path: path
-    }
-    return (
-        <>
-            <FieldSet {...FieldSetting}>
-                <DynamicController
-                    errors={errors}
-                    name="fighter"
-                    
-                    control={control}
-                    path={path + 'fighter'}
-                    html="input"
-                    label="*Class and Levels:"
-                />
-                <DynamicController
-                    errors={errors}
-                    name="str"
-                    control={control}
-                    path={path + 'str'}
-                    html="input"
-                    label="str:"
-                />
-            </FieldSet>
-        </>
-    )
-}
-
 
 //==============================================================================
 export const CreateCharacter = () => {
@@ -408,6 +265,15 @@ export const CreateCharacter = () => {
     const [countErrors, setCountErrors] = useState([0, 0, 0, 0, 0])     // used to display alerts for each individual page.
     const timeout = useRef(null);
     const [previewImg, setPreviewImg] = useState('');
+
+    type ClassType = {
+        [key: string]: number // classname and level    
+    }
+    const [classes, setClasses] = useState<ClassType>({
+        'barbarian': 0,
+        'bard': 0,
+        'fighter': 0
+    });
 
     const {
         formState: { errors },
@@ -427,6 +293,7 @@ export const CreateCharacter = () => {
     const handleFormSubmission = ((data: React.FormEvent) => {
         // contains all the data from the form itself (does not contain the html element)
         console.log('hottogo!')
+        console.log(data);
         // handle submit will only run when there are no errors detected
         if (Object.keys(errors).length > 0) return false;
     })
@@ -491,6 +358,9 @@ export const CreateCharacter = () => {
         }
         else {
             const next = parseInt(pageParam.get('page')) + 1;
+            if (max_page < next) {
+                setMax_page(next);
+            }
             setPageParam({ "page": next.toString() })
         }
     }
@@ -502,11 +372,7 @@ export const CreateCharacter = () => {
         errors: countErrors,
         state: sheetError
     }
-    const imageHandler = (e: any) => {
-        const target = e.target;
-        const file = URL.createObjectURL(target.files[0]);
-        setPreviewImg(file);
-    }
+
     return (
         <div className="flex flex-row" style={{ flexWrap: "wrap", justifyContent:"space-between", width: "100%" }} >
             
@@ -519,14 +385,18 @@ export const CreateCharacter = () => {
                 }
                 {
                     pageNumber === 1 && (
-                        <ClassesPage control={control} errors={errors.current} sheetError={sheetError}/>
+                        <ClassCard control={control} errors={errors.current} sheetError={sheetError} classState={classes} dispatch={setClasses} />     
                     )
                 }
-                
-                <button className="btn-1"  type="button" onClick={onClicker}>Continue</button>
-                <button type="button" className="btn-1"  >Create</button>
-                
-              
+                {
+                    pageNumber === 2 && (
+                            <SkillStatsPage control={control} errors={errors.current} sheetError={sheetError} classState={classes} classData={class_data} />
+                    )
+                }
+                <div className="nav-btn">
+                    <button className="btn-1" style={{fontSize:"1.2em"}}  type="button" onClick={onClicker}>Continue</button>
+                    <button type="submit" className="btn-1" style={{fontSize:"1.2em"}}>Create</button>
+                </div>
             </form>
             </MultiPageLayout>
         </div>

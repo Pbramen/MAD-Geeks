@@ -67,13 +67,25 @@ input:focus-visible {
   margin-right: 20px;
   margin-top: 20px;
 }
-
+.highlight-resource{
+  border-radius: 30px;
+  border: none;
+  background: orange;
+  color: black;
+  font-size: 14px;
+  padding: 5px;
+}
 .toggle{
   overflow: hidden;
   transition: max-height 0.4s ease-in;
 }
 
-
+.circle{
+  border: 7.5px solid black;
+  outline: 3px outset rgb(126, 29, 0);
+  border-radius: 50%;
+  padding: 30px;
+}
 .toggle.collapse{
   max-height: 100px;
 }
@@ -86,6 +98,10 @@ input:focus-visible {
   animation: reveal 0.5s; 
 }
 
+@keyframes reveal {
+  0% { opacity: 0}
+  100% { opacity: 1}
+}
 @keyframes reveal {
   0% { opacity: 0}
   100% { opacity: 1}
@@ -233,7 +249,13 @@ div[draggable="true"]:active:hover{
   margin-bottom: 5px;
 }
 
-
+.header-2{
+  margin-bottom: 20px;
+  font-family: "Rye", serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 2em;
+}
 .disabled{
   color: gray;
 }

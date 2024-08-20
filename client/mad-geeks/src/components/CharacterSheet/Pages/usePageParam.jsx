@@ -5,7 +5,7 @@ import { usePagination } from 'components/Pagination/usePagination';
 
 export const usePageParam = () => {
     // pagination state is used to set restrictions on navigation!
-    const { current_page, setCurrent_Page, max_page} = usePagination();
+    const { current_page, setCurrent_Page, max_page, setMax_page} = usePagination();
     const [ pageParam, setPageParam] = useSearchParams({ page: current_page });
 
     useEffect(() => {
@@ -20,6 +20,7 @@ export const usePageParam = () => {
         current_page,
         setCurrent_Page,
         max_page,
+        setMax_page,
         pageParam,
         setPageParam
     }
