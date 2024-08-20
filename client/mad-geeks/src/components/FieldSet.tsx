@@ -1,7 +1,7 @@
 import React from 'react';
 import { ToggleTab } from 'components/ToggleTab';
 
-export const FieldSet = ({ state, children, legend_title, description='', path, toggle=false }: { state: any, children: React.ReactNode, description?: string, path: string,  legend_title: string, toggle?: boolean }) => {
+export const FieldSet = ({ state, children, legend_title, description='', path, toggle=false }: { state: any, children?: React.ReactNode, description?: string, path: string,  legend_title: string, toggle?: boolean }) => {
     // temporarily disabled toggle:
     
     return (

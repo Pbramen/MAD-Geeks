@@ -1,4 +1,3 @@
-import { StringLiteralLike } from "typescript";
 
 // data stored here is static and will not change over time.
 const simple_weapons = [
@@ -76,16 +75,136 @@ const finese_weapon = [
     "shortsword"
 ]
 
-type ability_names = 'str' | 'con' | 'wis' | 'cha' | 'dex' | 'int'
+// barbarian base rage pool
+const ragePool =  [
+    {
+        quantity: 2,
+        bonus: 2,
+     }, // level 1
+    {
+        quantity: 2,
+        bonus: 2
+     }, // level 2
+     {
+        quantity: 3,
+        bonus: 2
+    }, // level 3
+    {
+        quantity: 3,
+        bonus: 2
+    }, // level 4
+    {
+        quantity: 3,
+        bonus: 2
+    }, // level 5
+    {
+        quantity: 4,
+        bonus: 2
+     }, // level 6
+     {
+        quantity: 4,
+        bonus: 2
+    }, // level 7
+    {
+        quantity: 4,
+        bonus: 2
+     }, // level 8
+     {
+        quantity: 4,
+        bonus: 2
+    }, // level 9
+    {
+        quantity: 4,
+        bonus: 3
+    }, // level 10
+    {
+        quantity: 4,
+        bonus: 3
+    }, // level 11
+    {
+        quantity: 4,
+        bonus: 3
+    }, // level 12
+    {
+        quantity: 5,
+        bonus: 3
+     }, // level 13
+     {
+        quantity: 5,
+        bonus: 3
+    }, // level 14
+    {
+        quantity: 5,
+        bonus: 3
+    }, // level 15
+    {
+        quantity: 5,
+        bonus: 4
+    }, // level 16
+    {
+        quantity: 6,
+        bonus: 4
+    }, // level 17
+    {
+        quantity: 6,
+        bonus: 4
+    }, // level 18
+    {
+        quantity: 6,
+        bonus: 4
+    }, // level 19
+    {
+        quantity: 999,
+        bonus: 4
+    }, // level 20
+]
+type die_rolls = '1d2' | '1d4' | '1d6' | '1d8' | '1d10' | '1d12' | '1d20';
+export type ability_names = 'str' | 'con' | 'wis' | 'cha' | 'dex' | 'int';
 type level_range = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
 
+export const ability_score_model = [
+    {
+        "abbr": "con",
+        "term": "Constitution",
+        "description": "Determines one's tenacity and endurance in battle. How many times can I hit this apple with a hammer?"
+    },
+    {
+        "abbr": "dex",
+        "term": "Dexterity",
+        "description": "Speed, agility, and coordination. If I threw an apple at you, can you catch or dodge it?"
+    },
+    {
+        "abbr": "wis",
+        "term": "Wisdom",
+        "description": "Character's ability to critically think, analyze, and plan. Also assists in resisting mental manipulation. What recipes can I make with this apple?"
+    },
+    {
+        "abbr": "int",
+        "term": "Intelligence",
+        "description": "Knowledge, memory, and awareness of various topics. Can you identify this apple?"
+    },
+    {
+        "abbr": "char OR cha",
+        "term": "Charisma",
+        "description": "Ability to coerce others to follow your lead through your own wit or talents. Can you sell this apple?"
+    }
+]
+
+export type Resource_Pool = {
+    quantity: number, // number of uses before long/short rest
+    bonus?: number, // other unspecified bonus type (use for flat addition)
+    die_roll?: die_rolls // quality of roll
+}
 type Feature_Descript = {
     unlockedBy: level_range,
     name: string,
-    description: string
+    description: string,
+    pool?: Resource_Pool[] // length of 20 (per level)
 }
-interface classSpecifics {
+export interface classSpecifics {
+    img: string,
     recommended_stats: ability_names[],
+    description?: string,
     proficiency: {
         equipment: string[],
         skills: string[],
@@ -115,6 +234,8 @@ const musical_instrument = [
 ]
 
 const barbarian: classSpecifics = {
+    img: 'img/helmet.png',
+    description: "Relentless and reckless melee warrior! Enter a battle rage and overwhelm your foes with mighty strength!",
     recommended_stats: ["str", "con", "dex"],
     proficiency: {
         equipment: [
@@ -140,7 +261,8 @@ const barbarian: classSpecifics = {
             {
                 name: "Rage",
                 unlockedBy: 1,
-                description: "You can enter a rage as a bonus action. While raging, you gain a bonus to damage with Strength-based attacks, advantage on Strength checks and saves, and resistance to bludgeoning, piercing, and slashing damage."
+                description: "You can enter a rage as a bonus action. While raging, you gain a bonus to damage with Strength-based attacks, advantage on Strength checks and saves, and resistance to bludgeoning, piercing, and slashing damage.",
+                pool: ragePool
             },
             {
                 name: "Unarmored Defense",
@@ -165,7 +287,7 @@ const barbarian: classSpecifics = {
             {
                 name: "Extra Attack",
                 unlockedBy: 5,
-                description: "You can attack twice, instead of once, whenever you take the Attack action on your turn."
+                description: "Gain addtitional attack(s) whenever you take the Attack action on your turn.",
             },
             {
                 name: "Fast Movement",
@@ -207,6 +329,8 @@ const barbarian: classSpecifics = {
 };
 
 const fighter: classSpecifics = {
+    img: 'img/helmet.png',
+    description: "A well-balanced martial combatant, skilled in a variety of weapons, armor, and shields! Can quickly pick up new abilities or quickly upgrade ability score.",
     recommended_stats: ["str", "con", "dex"],
     proficiency: {
         equipment: [
@@ -253,7 +377,7 @@ const fighter: classSpecifics = {
             {
                 name: "Extra Attack",
                 unlockedBy: 5,
-                description: "You can attack twice, instead of once, whenever you take the Attack action on your turn."
+                description: "Gain addtitional attack(s) whenever you take the Attack action on your turn."
             },
             {
                 name: "Indomitable",
@@ -290,7 +414,9 @@ const fighter: classSpecifics = {
 }
 
 const bard: classSpecifics = {
+    img: 'img/lute.png',
     recommended_stats: ["cha", "dex", "con"],
+    description: "A caster that utilizes the power of words, songs, or music to captivise (or harm) their audience! Excells in social skills.",
     proficiency: {
         equipment: [
             "light armor",
