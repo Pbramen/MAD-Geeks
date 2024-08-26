@@ -4,6 +4,8 @@ const express = require("express");
 const authRouter = require(path.resolve(__dirname, 'src/routers/auth/authModel'));
 const singleCharRouter = require(path.resolve(__dirname, 'src/routers/characterSheet/singleCharModel'));
 const multipleCharRouter = require(path.resolve(__dirname, 'src/routers/characterSheet/multipleCharModel'));
+const SRDRouter = require(path.resolve(__dirname, 'src/routers/dndSRD/SRDModel'));
+
 const cors = require('cors');
 
 const swaggerjsdoc = require("swagger-jsdoc");
@@ -62,6 +64,8 @@ app.use( (req, res, next) => {
 
 app.use(saveJSONResponse);
 
+
+app.use('/api/SRD', SRDRouter);
 app.use('/api/clients', authRouter);
 app.use('/api/characterSheet', singleCharRouter);
 app.use('/api/characterSheets', multipleCharRouter)
