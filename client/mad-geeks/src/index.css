@@ -75,11 +75,45 @@ input:focus-visible {
   font-size: 14px;
   padding: 5px;
 }
+
+.display-stat{
+  font-size: 2.5em;
+}
+
+.card-2 {
+  padding: min(10px, 5%);
+  border-radius: 20px;
+  background-color: rgb(24, 151, 98);
+  box-shadow: 10px -10px rgb(14, 26, 26);
+  color: black; 
+}
+.point-grid{
+  display: grid;
+}
+.grayText{
+  color: rgb(61, 61, 61)
+}
+.disabled-opacity{
+  opacity: 0.25;
+}
+.point-grid > * {
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px dashed black;
+  padding: 20px;
+}
+.point-grid > h2 {
+  border-bottom: 1px solid black;
+}
 .toggle{
   overflow: hidden;
   transition: max-height 0.4s ease-in;
 }
 
+.row-hoverable:hover{
+  background-color: rgba(0, 0, 0, 0.2);
+}
 .circle{
   border: 7.5px solid black;
   outline: 3px outset rgb(126, 29, 0);
@@ -242,6 +276,26 @@ div[draggable="true"]:active:hover{
   display: none;
 }
 
+.arrow-btn {
+  background-color: transparent;
+  border: 2px solid black;
+  
+  min-width: 25px;
+  min-height: 25px;
+  font-weight: bolder;
+  font-size: 1.2em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+
+
+}
+.static-number{
+  flex: 0 0;
+  min-width: 20px;
+  text-align: center;
+}
 
 .aria-err{
   color: orange;
@@ -256,6 +310,7 @@ div[draggable="true"]:active:hover{
   font-style: normal;
   font-size: 2em;
 }
+
 .disabled{
   color: gray;
 }

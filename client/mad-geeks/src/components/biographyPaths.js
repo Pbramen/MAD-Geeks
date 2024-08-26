@@ -26,9 +26,12 @@ const lookupPaths = () => {
         alignment: tab3,
         personality: tab3,
 
+        charcter_name: tab4,
+        // for testing...
         first_name: tab4,
         middle_name: tab4,
         last_name: tab4,
+        // end testing.
         age: tab4,
         gender: tab4,
         species: tab4,
@@ -54,7 +57,14 @@ const lookupPaths = () => {
         int: tab2b,
         wis: tab2b,
         cha: tab2b
-    }]
+        },
+        {
+            id: 'skills',
+                
+        }   
+    
+    ]
+        
        
     return data;
 }

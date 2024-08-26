@@ -269,6 +269,10 @@ fieldset{
 .form-textarea > div:last-child > textarea{
     margin-bottom: 0px;
 }
+.btn-xl{
+    font-size: 1.2em;
+    
+}
 
 .main-body{
     width: 100%;

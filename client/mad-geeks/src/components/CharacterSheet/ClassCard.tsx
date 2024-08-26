@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { class_data, Resource_Pool } from 'assets/dndClassByLevel';
 import { FieldSet } from "components/FieldSet";
 
@@ -22,24 +22,54 @@ function DisplayQuantity({resource} : {resource: Resource_Pool}) {
     )
 }
 
-export function ClassCard<T>({ control, errors, sheetError, classState, dispatch}  ){
+function LimitRadioList({ checkState, setCheckState, selectOptions, level }) {
+    const quantity = selectOptions.quantity[level] || 0;
+    const array = Array.from({ length: selectOptions.options.length }, () => false);
+    // const [checkState, setCheckState] = useState(array);
+    const totalChecked = checkState.reduce((acc, curr) => {
+        const a = curr ? 1 : 0;
+        return acc += a;
+    }, 0);
+
+    const handleCheckedChange = (e, index) => {
+        // check if total amount exceeds quantity
+        if (!checkState[index] && totalChecked >= quantity) {
+            return;
+        }
+        // set the state to its opposite 
+        else {
+            // set the state
+            setCheckState(prev => prev.map((e, i) => { 
+                return i === index ? !e : e;
+            }))
+        }
+    }
+    const list = selectOptions.options.map((e, index) => {
+        
+        return (
+            <div>
+                <input id={e.id} type="checkbox" className={quantity > totalChecked ? "active-box": "disabled-box"} />
+                <label htmlFor={e.id}>{e.id}</label>
+                <div>{e.descript}</div>
+            </div>
+        )
+    })
+    console.log(list);
+    return (
+        <>
+            {list}  
+        </>
+    )
+}
+export function ClassCard({ control, errors, sheetError, classState, dispatch}  ){
     const [activeItem, setActiveItem] = useState('barbarian');
-    
-    useEffect(() => {
-        console.log(activeItem)
-    }, [activeItem])
+
     const selectItem = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         const target = e.target as HTMLDivElement;
-        console.log(target);
         setActiveItem(target.id || target.getAttribute('data-id'));
     }
 
-    const highlightChange = (e) => {
-        const target = e.target as HTMLSpanElement; 
-        console.log('this element was changed externally!')
-        
-    }
     const navList = Object.entries(class_data).map(([key, value], index) => {
         return (
             <div key={index} id={key} className={`${activeItem === key && 'active-list-tab'} list-tab ${classState[key] > 0? 'set-tab': 'border-left'}`} onClick={selectItem}>
@@ -47,14 +77,18 @@ export function ClassCard<T>({ control, errors, sheetError, classState, dispatch
             </div>
         )
     })
+
     const displayFeaturesByLevel = class_data[activeItem].resources.class_features.filter(e => {
         return e.unlockedBy <= classState[activeItem];
     }).map((e, index) => {
-        const level = classState[activeItem] || 0; 
+        const level = (classState[activeItem] - 1) > 0 ? (classState[activeItem] - 1) : 0; 
         const resource = e?.pool?.[level];
+        const selectOptions = e?.required_options;
+        var options = null;
+        
         return (
             <FieldSet key={index} state="" path="" legend_title={e.name} description={e.description}>
-                <DisplayQuantity resource={resource}/>
+                <DisplayQuantity resource={resource} />
             </FieldSet>
         )
     })

@@ -77,8 +77,14 @@
     border-radius: 5px;
     box-shadow: 5px 5px rgb(8, 20, 53);
     margin: 10px;
+    cursor: pointer;
 }
-
+.btn-1:hover{
+    background-color: black;
+}
+.btn-1:active,.btn-active, .btn-active:hover{
+    background-color: orange;
+}
 .sign-in-form > button{
     margin-top: 10px;
     width: 50%;

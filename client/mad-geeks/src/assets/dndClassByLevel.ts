@@ -159,48 +159,85 @@ const ragePool =  [
     }, // level 20
 ]
 type die_rolls = '1d2' | '1d4' | '1d6' | '1d8' | '1d10' | '1d12' | '1d20';
-export type ability_names = 'str' | 'con' | 'wis' | 'cha' | 'dex' | 'int';
+export type ability_names = 'str' | 'con' | 'wis' | 'cha' | 'char' | 'dex' | 'int';
 type level_range = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20
 
-export const ability_score_model = [
+export type AbilityScoreModelT = {
+    abbr: ability_names,
+    term: string, 
+    description: string,
+    example: string
+}
+export const ability_names_arr : ability_names[] = ['str', 'con', 'dex', 'wis', 'int', 'char'];
+// Common order for displaying stats -> str, con, dex, wis, int, char
+export const ability_score_model : AbilityScoreModelT[] = [
+    {
+        'abbr': 'str',
+        'term': 'Strength',
+        'description': "Measurement of one's athleticism and raw physical force.",
+        'example': "How far can I throw an apple?"
+    },
     {
         "abbr": "con",
         "term": "Constitution",
-        "description": "Determines one's tenacity and endurance in battle. How many times can I hit this apple with a hammer?"
+        "description": "Determines one's tenacity and endurance in battle.",
+        'example': " How many times can I hit this apple with a hammer?"
     },
     {
         "abbr": "dex",
         "term": "Dexterity",
-        "description": "Speed, agility, and coordination. If I threw an apple at you, can you catch or dodge it?"
+        "description": "Speed, agility, and coordination.",
+        'example': "If I threw an apple at you, can you catch and/or dodge it?"
     },
     {
         "abbr": "wis",
         "term": "Wisdom",
-        "description": "Character's ability to critically think, analyze, and plan. Also assists in resisting mental manipulation. What recipes can I make with this apple?"
+        "description": "Character's ability to critically think, rationalize, analyze, and plan. Determines how resistant you are against mental manipulation.",
+        "example": "What recipes can I make with this apple that would taste delicious?"
     },
     {
         "abbr": "int",
         "term": "Intelligence",
-        "description": "Knowledge, memory, and awareness of various topics. Can you identify this apple?"
+        "description": "Knowledge, memory, and awareness of various topics.",
+        "example": "Can you identify this fruit is an apple?"
     },
     {
-        "abbr": "char OR cha",
+        "abbr": "char",
         "term": "Charisma",
-        "description": "Ability to coerce others to follow your lead through your own wit or talents. Can you sell this apple?"
+        "description": "Ability to coerce others to follow your lead through your own wit or talents.",
+        "example": "Can you sell this apple?"
     }
 ]
-
-export type Resource_Pool = {
-    quantity: number, // number of uses before long/short rest
-    bonus?: number, // other unspecified bonus type (use for flat addition)
-    die_roll?: die_rolls // quality of roll
+// this is for choices only!
+export type Required_Select = {
+    quantity: number[], // by level
+    options: {id: string, descript: string}[], // note: as of now, this will not reflect changes to equipment.
 }
+
+// for features that require resource managment
+export type Resource_Pool = {
+    quantity: number,           // number of uses before long/short rest
+    bonus?: number,             // other unspecified bonus type (use for flat addition)
+    die_roll?: die_rolls        // quality of roll
+}
+
 type Feature_Descript = {
     unlockedBy: level_range,
     name: string,
     description: string,
-    pool?: Resource_Pool[] // length of 20 (per level)
+    pool?: Resource_Pool[],                 // length of 20 (per level)
+    required_options?: Required_Select      // prompts the user to select an option if feature has options
 }
+const fighting_styles: {id: string, descript: string}[]= [
+    { id: '--', descript: "Add a custom style later" },
+    { id: 'Archery', descript: "+2 to attack rolls on ranged weapons" },
+    { id: 'Defense', descript: '+1 bonus to AC while wearing armor' },
+    { id: 'Dueling', descript: '+2 bonus to damage rolls when equiped with one weapon' },
+    { id: 'Great Weapon Fighting', descript: 'Reroll damage die if you roll a 1 or 2 when a two-handed or versatile weapon' },
+    { id: 'Protection', descript: "Impose disadvantage when a creature(A) in line-of-sight attacks another creature(B) within 5 feet of you." },
+    { id: 'Two-Weapon Fighting', descript: 'You can add ability modifier to the damage of the second attack.'}]
+    
+
 export interface classSpecifics {
     img: string,
     recommended_stats: ability_names[],
@@ -357,7 +394,11 @@ const fighter: classSpecifics = {
             {
                 name: "Fighting Style",
                 unlockedBy: 1,
-                description: "You adopt a particular style of fighting as your specialty, choosing from options like Archery, Defense, Dueling, Great Weapon Fighting, Protection, or Two-Weapon Fighting."
+                description: "You adopt a particular style of fighting as your specialty, choosing from options like Archery, Defense, Dueling, Great Weapon Fighting, Protection, or Two-Weapon Fighting.",
+                required_options: {
+                    quantity: [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2], 
+                    options: fighting_styles,
+                },
             },
             {
                 name: "Second Wind",
@@ -372,12 +413,19 @@ const fighter: classSpecifics = {
             {
                 name: "Martial Archetype",
                 unlockedBy: 3,
-                description: "You choose a Martial Archetype, which grants additional features at levels 3, 7, 10, 15, and 18. Each archetype offers unique abilities."
+                description: "You choose a Martial Archetype, which grants additional features at levels 3, 7, 10, 15, and 18. Each archetype offers unique abilities.",
+                
             },
             {
                 name: "Extra Attack",
                 unlockedBy: 5,
-                description: "Gain addtitional attack(s) whenever you take the Attack action on your turn."
+                description: "Gain addtitional attack(s) whenever you take the Attack action on your turn.",
+                pool: [
+                    { quantity: 0 }, { quantity: 0 }, { quantity: 0 }, { quantity: 0 },
+                    { quantity: 1 }, { quantity: 1 }, { quantity: 1 }, { quantity: 1 }, { quantity: 1 }, { quantity: 1 }, 
+                    { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 }, { quantity: 2 },
+                    { quantity: 3 }
+                ]
             },
             {
                 name: "Indomitable",
@@ -393,11 +441,6 @@ const fighter: classSpecifics = {
                 name: "Remarkable Athlete",
                 unlockedBy: 13,
                 description: "You gain proficiency in the Acrobatics or Athletics skill if you are not already proficient, and you can add half your proficiency bonus to any Strength, Dexterity, or Constitution check you make that doesn’t already use your proficiency bonus."
-            },
-            {
-                name: "Additional Fighting Style",
-                unlockedBy: 15,
-                description: "You can choose a second Fighting Style."
             },
             {
                 name: "Superior Defense",
@@ -519,7 +562,7 @@ const bard: classSpecifics = {
 };
 
 // file contains data to be used for display during character creation. 
-export const class_data = {
+export const class_data: {[key:string]: classSpecifics} = {
     barbarian: barbarian,
     bard: bard,
     fighter: fighter,
