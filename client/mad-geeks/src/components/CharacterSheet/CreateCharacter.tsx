@@ -10,6 +10,9 @@ import { dieResults, StateManger } from "./AtomicComponents";
 import { class_data } from "assets/dndClassByLevel";
 import { DynamicController } from "./DynamicController";
 import { ability_names_arr } from "assets/dndClassByLevel";
+import axios from "api/axios";
+import { AxiosResponse } from "axios";
+
 // ================== REMOVE AFTER MODULARIZING ============================
 import set from 'lodash.set'
 import get from 'lodash.get'
@@ -261,7 +264,7 @@ export type AbilityScoreActions = 'add' | 'subtract';
 type IncrementP = { type: AbilityScoreActions, index: number, amount: number };
 type ResetP = { type: 'reset' | 'swap', pattern: PatternT, field?: string };
 type RecommendP = { type: 'recommend', pattern?: 'buy', class: string, field: string };
-type UpdateP = { type: 'update_array' | 'update_without_swapping', pattern: 'standard' | 'roll', newValue: number, index: number, ability_name?: string}
+type UpdateP = { type: 'update_array' | 'update_without_swapping', pattern: 'standard' | 'roll', newValue: number | string, index: number, ability_name?: string, oldValue?: string}
 type GenerateOptionsP = { type: 'generate_and_save', options: dieResults[] }
 export type AbilityScoreAction = IncrementP | ResetP | RecommendP | UpdateP | GenerateOptionsP
     
@@ -270,13 +273,17 @@ export type ABStateT = {
     pattern: PatternT,
     randomABSOptions: {
         results: dieResults[] | null,
-        optionsLeft : number[]
+        optionsLeft: number[],
+    },
+    standardOptions: {
+        trackOptions: { [key: string]: number },
+        trackOptionsByIndex: string[]
     }
 }
 
 
 const minInt = (min: number) => (value: number) => {
-    console.log(value, min);
+    
     return min <= value;
 }
 
@@ -286,12 +293,12 @@ const maxInt = (max: number) => (value: number) => {
 
 
 const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABStateT => {
-    console.log("hello there!")
 
     const ability_score = ['--', ...ability_names_arr];
     const dispatcher = {
         buy: {
-            base: [8, 8, 8, 8, 8, 8]
+            base: [8, 8, 8, 8, 8, 8],
+            options: [8, 8, 8, 8, 8, 8]
         },
         // [str, con, dex, wis, int, char]
         standard:  {
@@ -303,10 +310,12 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
             warlock: [8, 14, 10, 12, 13, 15],
             rogue: [8, 12, 15, 13, 10, 14],
             ranger: [10, 14, 15, 12, 13, 8],
-            base: ['--'] // fallback
+            base: ['--', '--', '--', '--', '--', '--'], // fallback
+            options: new Set([15, 14, 13, 12, 10, 8])
         }, 
         roll: {
-            base: ['--', '--', '--', '--', '--', '--']
+            base: ['--', '--', '--', '--', '--', '--'], 
+            options: ['--', '--', '--', '--', '--', '--']
         }
     }
     type LUT =  {
@@ -319,7 +328,6 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
     const validateMin = minInt(8);
     const validateMax = maxInt(15);
 
-    console.log(state, action.type);
     let p = state.pattern;
     const LUT_actions = {
         'add': {
@@ -352,17 +360,23 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
                 return { ...state, stats: dispatcher[p]['base'], pattern: p }
             }
         },
-        // on page switch 
+        // on page switch or hitting the reset button 
         'swap': {
             update: () => {
                 const a = action as ResetP;
                 p = a.pattern;
-                
-                console.log("swapping to ", p);
-                if (p === 'standard') {
-                    return { ...state, stats: dispatcher[p][a.field || 'barbarian'], pattern: p }
+                return {
+                    ...state, standardOptions: {
+                        trackOptions: { '--': -1, '15': -1, '14': -1, '13': -1, '12': -1, '10': -1, '8': -1 },
+                        trackOptionsByIndex: ['--', '--', '--', '--', '--', '--']
+                    },
+                    randomABSOptions: {
+                        stats: [],
+                        optionsLeft: dispatcher[p].options
+                    },
+                    stats: dispatcher[p]['base'],
+                    pattern: p
                 }
-                return { randomABSOptions: { stats: [], optionsLeft: dispatcher.roll.base}, stats: dispatcher[p]['base'], pattern: p }
             }
         },
         'recommend': {
@@ -374,21 +388,38 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
         'update_array': {
             update: () => {
                 const a = action as UpdateP;
-                const score = state.stats as number[] | string[]
+                //const score = state.stats as number[] | string[]
+                /*
                 
-                const oldValue = score[a.index];
-                const res = score.map((e: string | number, i: number) => {
-                    // check if index is not the selected index && updated value is found
-                    if (i !== a.index && e === a.newValue) {
-                        return oldValue;
-                    }
-                    if (i === a.index) {
-                        return a.newValue;
-                    }
+                trackOptions.current = { ...trackOptions.current, [oldValue]: -1, [selectValue]: index }
+                trackOptionsByIndex.current = trackOptionsByIndex.current.map((e, i) => {
+                if (i === index) return selectValue;
                     return e;
                 })
-    
-                return { ...state, stats: res }
+                
+                */
+
+                let newTrackOption = { ...state.standardOptions.trackOptions, [a.oldValue]: -1, [a.newValue]: a.index }
+                let newTrackOptionByIndex = state.standardOptions.trackOptionsByIndex.map((e, i) => {
+                    if (i === a.index) return a.newValue;
+                    return e;
+                })
+
+                return {
+                    ...state, 
+
+                    stats: state.stats.map((e, i) => {
+                        if (i === a.index) 
+                            return a.newValue.toString();
+                        return e;
+                    }),
+                    standardOptions: {
+                        ...state.standardOptions,
+                        trackOptions: newTrackOption,
+                        trackOptionsByIndex: newTrackOptionByIndex
+                    }
+                }
+
             }
         },
         'generate_and_save_options': {
@@ -404,8 +435,18 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
                 const score = state.stats as number[] | string[]
                 const ab_index = ability_score.indexOf(a.ability_name) - 1;
 
-                console.log(a.ability_name, 'found at ', ability_score.indexOf(a.ability_name), ' in', ability_score);
+                var random = {... state.randomABSOptions};
                 // given the new index, change the stats
+                if (a.pattern === 'roll') {
+                    random = {
+                        ...state.randomABSOptions, optionsLeft: state.randomABSOptions.optionsLeft.map((e, i) => {
+                            // set which options have been picked. if 0, no stat was allocated yet.
+                            if (i === a.index)
+                                return ability_score.indexOf(a.ability_name);
+                            // return i === ability_score.indexOf(a.ability_name) - 1 ?  : e;
+                            return e;
+                    })}
+                }
                 return {
                     ...state, stats: score.map((e: number | string, i: number) => {
                         if (ab_index !== -1 && ab_index === i) {
@@ -414,14 +455,7 @@ const abilityScoreReducer = (state:  ABStateT, action: AbilityScoreAction) : ABS
                         return e; 
                     }
                     ), 
-                    randomABSOptions: {
-                        ...state.randomABSOptions, optionsLeft: state.randomABSOptions.optionsLeft.map((e, i) => {
-                            // set which options have been picked. if 0, no stat was allocated yet.
-                            if (i === a.index)
-                                return ability_score.indexOf(a.ability_name);
-                            // return i === ability_score.indexOf(a.ability_name) - 1 ?  : e;
-                            return e;
-                    })}
+                    randomABSOptions: random
                 }
             }
         }
@@ -441,14 +475,19 @@ export const CreateCharacter = () => {
     const [sheetError, setSheetErrors] = useSheetErrorLocations();      // used for currently displayed page and final validation process.
     const [countErrors, setCountErrors] = useState([0, 0, 0, 0, 0])     // used to display alerts for each individual page.
     const timeout = useRef(null);
+    const [connectionError, setConnectionError] = useState(null);
     const [previewImg, setPreviewImg] = useState('');
     const [stats, dispatcher] = useReducer(abilityScoreReducer, {
-        stats: [8, 8, 8, 8, 8, 8],
+        stats: ['--', '--', '--', '--', '--', '--'],
         pattern: "standard",
         randomABSOptions: {
             results:
                 [{ stats: [], minIndex: 0, total: 0 }],
-            optionsLeft: [0, 0, 0, 0, 0, 0] 
+            optionsLeft: [0, 0, 0, 0, 0, 0],
+        },
+        standardOptions: {
+            trackOptions: {'--': -1, '15': -1, '14': -1, '13': -1, '12': -1, '10': -1, '8': -1},
+            trackOptionsByIndex:  ['--', '--', '--', '--', '--', '--']
         }
     })
     type ClassType = {
@@ -461,8 +500,54 @@ export const CreateCharacter = () => {
         'bard': 0,
         'fighter': 0
     });
-    const [abilityScore, setAbilityScore] = useState<number[]>([8, 8, 8, 8, 8, 8]);
-    const [allocationOption, setAllocationOption] = useState<string>('standard');
+    const [classProficencies, setClassProficencies] = useState(null);
+    // load in the background!
+
+    
+    interface PayloadSchema {
+        status: string,
+        msg: string,
+        payload: {
+            choices: number,
+            result: {
+            ability_score: {
+                index: string,
+                name: string,
+                url: string
+            },
+            desc: string[],
+            index: string,
+            name: string,
+                url: string
+        }
+        }
+    }
+
+    const getProficiencies = (name: string) : Promise<AxiosResponse<PayloadSchema>> =>  {
+        return axios.get('api/SRD/levelResource/' + name, { signal: AbortSignal.timeout(5000) })
+    }
+
+    useEffect(() => {
+        if (classProficencies === null) {
+            var data = {}
+            
+            Promise.all([getProficiencies('bard'), getProficiencies('barbarian'), getProficiencies('fighter')])
+                .then((result ) => {
+                    
+                    for (let i = 0; i < result.length; i++){
+                        let obj = result[i] as AxiosResponse<PayloadSchema>
+                        if (obj.status === 200) {
+                            console.log(obj.data.payload);
+                        }
+                    }
+                setClassProficencies(data);
+                }).catch(() => {
+                
+                setConnectionError("Server timeout!");
+                console.log("timeout error set...")
+            })
+            }
+    }, [])
     const {
         formState: { errors },
         control,
@@ -481,7 +566,6 @@ export const CreateCharacter = () => {
     const handleFormSubmission = ((data: React.FormEvent) => {
         const isValid = trigger();
         if (!isValid) {
-            console.log("Please Review your form!")
             return;
         }
         // contains all the data from the form itself (does not contain the html element)
@@ -493,7 +577,6 @@ export const CreateCharacter = () => {
 
     const validateStates = () => { 
         if (pageNumber === 2) {
-            console.log("placeholder attempting to check for valid stat allocation...")
             return false;
         }
         return false; 
@@ -513,9 +596,7 @@ export const CreateCharacter = () => {
                 countErrTemp += 1;
             }
         })
-        if (!page) {
-            detectedErrors.add('skills')
-        }
+
         
         // create a deep copy of the CURRENT page of errors AND overrite with new detected errors 
         // this will also remove corrected errors!
@@ -526,7 +607,6 @@ export const CreateCharacter = () => {
             const firstTarget = document.getElementById(arr[0]);
             firstTarget?.focus();
         }
-        console.log(newObj);
         // batch update -> set up errors so that we an update external ui components!
         setSheetErrors(newObj);
         setCountErrors((prev) => {
@@ -583,8 +663,10 @@ export const CreateCharacter = () => {
     }
 
     return (
-        <div className="flex flex-row" style={{ flexWrap: "wrap", justifyContent:"space-between", width: "100%" }} >
-            
+    <>
+        
+        <div className="flex flex-row" style={{ flexWrap: "wrap", justifyContent:"space-between", width: "100%", margin: "0 min(200px, 15%"}} >
+        {connectionError && <ErrorMessage message={connectionError} />}
         <MultiPageLayout {...MultiPageParams}>
             <form onSubmit={handleSubmit(handleFormSubmission)} onChange={handleChanges}>
                 {
@@ -609,6 +691,21 @@ export const CreateCharacter = () => {
                 </div>
             </form>
             </MultiPageLayout>
-        </div>
+            </div>
+        </>
     )  
+}
+
+const ErrorMessage = ({ message } : {message: string}) => { 
+    const [toggleOff, setToggleOff] = useState<boolean>(false);
+    if (!toggleOff)
+    {
+        return (
+            <div className="flex flex-row" style={{ alignItems: 'center', textAlign: 'center', background: "red", borderRadius: '50px', fontWeight: 'bold', padding: '5px', marginLeft: '35px' }}>
+                <span aria-live="polite" style={{ fontSize: '0.8em', cursor: 'arrow'}}>{message}</span>
+                <button type='button' style={{ cursor: "pointer", borderRadius: '50%', backgroundColor: 'black', color: "white", aspectRatio: '1/1', border: 'none', outline: 'none' }} onClick={(e)=>{e.preventDefault(); setToggleOff(true)}}>X</button>
+            </div>
+        )
+    }
+    return <></>
 }

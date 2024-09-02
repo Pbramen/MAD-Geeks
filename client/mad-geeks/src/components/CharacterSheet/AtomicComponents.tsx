@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { AbilityScoreAction, AbilityScoreActions, PatternT, ABStateT } from './CreateCharacter';
-import { ability_names_arr, class_data } from 'assets/dndClassByLevel';
+import { ability_names_arr, ability_score_model, class_data } from 'assets/dndClassByLevel';
 import { FieldSet } from 'components/FieldSet';
+import { ToggleTab } from 'components/ToggleTab';
 
 type ArrowParams = { children: React.ReactNode, identity: string, onClickHandler: React.MouseEventHandler };
 // returns an JSX component that returns buttons on both sides to help increment and decrement child value.
-const ArrowsInput = ({ children, identity, onClickHandler }: ArrowParams) => {
+export const ArrowsInput = ({ children, identity, onClickHandler }: ArrowParams) => {
     // placeholder button 
     return (
         <div className="flex flex-row" >
@@ -97,36 +98,66 @@ type StateManagerT = {
     state: ABStateT,
     setStats: React.Dispatch<AbilityScoreAction>
 }
-// parent component that soley handles state management system for point allocation system.
-export const StateManger = ({ classes, state, setStats}: StateManagerT) => {
-   const mainClass = getMaxKeyByValue(classes);
-    const patterns = useABSModel(mainClass, state, setStats);
 
-    // switch the point allocation method and reset the stats (adjust point buy back to default)
+const StatInformation = ({ mainClass}: {mainClass: string}) => {
+    return (
+        <>
+        <div style={{ margin: 'min(30px, 5%)' }} >
+        <h2>Summary of Each Ability</h2>
+            <section className='res-2-2' >
+            {ability_score_model.map((e, i) => {
+                return (
+                    <div className='aside_note deep_blue_card_shadow'>
+                        <div key={`stat_info_${i}`}>
+                            <div className="flex flex-column">
+                                <h3 ><strong style={{ color: 'black', fontSize: "1.25em" }}>{e.term} ({e.abbr})</strong></h3>
+                                <p>{e.description} </p> 
+                                <span style={{ marginLeft: "30px" }}><i>{e.example}</i></span>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+            </section>
+        </div>
+        
+        <span>For your main class: <strong>{mainClass}</strong>, we recommend to prioritize following stats: </span>
+            <ul style={{ listStyle: 'none', fontSize: '1.2em', fontWeight: 'bolder'}}>
+                {class_data[mainClass] && class_data[mainClass].recommended_stats.map((e, index) => {
+            return (
+            <li key={`stat_rec_${e}`} style={{float: 'left', marginLeft: "30px"} }>
+                {e.toUpperCase()}
+            </li>
+        )
+        })} 
+        </ul>    
+        </>
+    )
+}
+// parent component that soley handles state management system for point allocation system.
+export const StateManger = ({ classes, state, setStats }: StateManagerT) => {
+    const mainClass = getMaxKeyByValue(classes);
+    const patterns = useABSModel(mainClass, state, setStats);
+    const ability_section: React.MutableRefObject<HTMLDivElement> = useRef(null);
+    
+    useEffect(() => {
+        ability_section.current.scrollIntoView();
+    }, [ability_section])
+    
+    // switch the point allocation method and reset the stats
     const onClickHandler = (e: React.MouseEvent) => {
         const target = e.currentTarget as HTMLButtonElement;
         setStats({ type: 'swap', pattern: target.name as PatternT, field: mainClass })
     }
 
     return (
-        <>
-        <section className="flex flex-column" style={{margin: '30px 0px'}}>
-            <h2>Ability Score</h2>
-            <span>Setting your character's baseline stats will help define <i>how likely</i> they are to succeed at certain tasks, such as utilizing weapons, turn order, or social skills.</span>
-                <span>For your main class: <strong>{mainClass}</strong>, we recommend to prioritize following stats: </span>
-                <ul style={{ listStyle: 'none', fontSize: '1.2em', fontWeight: 'bolder'}}>
-                {class_data[mainClass] && class_data[mainClass].recommended_stats.map((e, index) => {
-                    return (
-                    <li key={`stat_rec_${e}`} style={{float: 'left', marginLeft: "30px"} }>
-                        {e.toUpperCase()}
-                    </li>
-                )
-                })} 
-                </ul>    
-        </section>
+        <FieldSet toggle={true} state='' path='' legend_title='Ability Score' description="Baseline character stats that helps determine how likely a character will succeed! at specific tasks!">
+            <section ref={ability_section} id="ability_section" className="flex flex-column" style={{margin: '30px 0px'}}>
+                <StatInformation mainClass={mainClass} />
+            </section>
         <SwitchTabs pattern={patterns} selected={state.pattern} onClickHandler={onClickHandler} />    
             {patterns[state.pattern]?.element || "Comming soon!"}
-        </>
+        </FieldSet>
     )
 }
 
@@ -152,10 +183,11 @@ export const ScoreTableStructure = ({children, disabledCost=false}) : React.Reac
     // 8 rows => 1 header, 1 footer, and 6 ability scores.
 
     return (
-        <StatsTable col_length={5} row_length={8}>
+        <StatsTable col_length={6} row_length={8}>
             <h2>Ability</h2>
             <h2>Score</h2>
             <h2>Bonus</h2>
+            <h2>Modifier</h2>
             <h2>Total</h2>
             <h2>Cost</h2>
             {children}
@@ -175,19 +207,38 @@ const calculatePointsLeft = (stats: number[]) => {
 }
 
 
-const CharacterScoreTable = ({ onChangeHandler, avaliableOptions, value }) => {
-    const list = ability_names_arr.map((e, i) => {
-        const onChange = onChangeHandler(i);
-        return (
-            <React.Fragment key={e + i}>
+const CharacterScoreTable = ({ onChangeHandler, state }: { onChangeHandler: any, state: ABStateT}) => {    
+    const list =
+        ability_names_arr.map((e, i) => {
+            var options = new Set(['--', 15, 14, 13, 12, 10, 8]);
+            const onChange = onChangeHandler(i);
+            const currentValue = state.stats[i]
+            const modifer = Number.isInteger(currentValue) ? Math.floor((currentValue as number - 10) / 2) : '--';
+           
+            // filter out the options that arn't needed. 
+            for (let j = 0; j < 6; j++){
+                let x = state.standardOptions.trackOptionsByIndex[j];
+                if (j !== i && x !== '--' ) {
+                    let y = parseInt(x);
+                    options.delete(y);
+                }
+            }
+
+            return (
+                <React.Fragment key={e + i}>
                 <label htmlFor={e + "_value"}>{e.toUpperCase()}</label>
-                <UniqueSelector onChangeHandler={onChange} options={avaliableOptions} identity={e} value={value.stats[i]} /> 
+                <UniqueSelector onChangeHandler={onChange} options={options} identity={e} value={state.stats[i]} /> 
+                
                 <span>+0</span>
-                <span>{value.stats[i]}</span>
+                <span>{modifer}</span>
+                <span>{state.stats[i]}</span>
                 <span>{ }</span>
             </React.Fragment>
-        )
-    })
+            )
+        })
+
+
+
     return (
         <ScoreTableStructure>
             {list}
@@ -198,21 +249,25 @@ const CharacterScoreTable = ({ onChangeHandler, avaliableOptions, value }) => {
 
 const StandardArray = ({ mainClass, state, setStats }: { mainClass: string, state: ABStateT, setStats: React.Dispatch<AbilityScoreAction>
 }) => {
-    
-    const [avaliableOptions, setAvaliableOptions] = useState(new Set( ["--", 15, 14, 13, 12, 10, 8]));
 
+
+    const avaliableOptions = ['--', 15, 14, 13, 12, 10, 8];
+    
+   
     const onChangeHandler = (index: number) => (e: React.ChangeEvent) => {
         const target = e.currentTarget as HTMLSelectElement;
         const selectValue = target.options[target.selectedIndex].value;
-        setStats({type: 'update_array', pattern:'standard', index:index, newValue: parseInt(selectValue)});
+        const oldValue = state.standardOptions.trackOptionsByIndex[index];
+
+        setStats({ type: 'update_array', index: index, newValue: selectValue, pattern: 'standard', oldValue: oldValue})
     }
 
     return (
-        <>
-            <CharacterScoreTable onChangeHandler={onChangeHandler} avaliableOptions={avaliableOptions} value={state}/>
-        </>
+        <CharacterScoreTable state={state} onChangeHandler={onChangeHandler} />
     )
 }
+
+
 
 const PointBuy = ({ mainClass, state, setStats }: { mainClass: string,     state: ABStateT,
     setStats: React.Dispatch<AbilityScoreAction>
@@ -225,7 +280,7 @@ const PointBuy = ({ mainClass, state, setStats }: { mainClass: string,     state
         const index = score[i] as  - 8;
         // stop if you dont have enough points.
         if (target.name === 'add') {
-            if (pointsLeft === 0) { 
+            if (pointsLeft <= 0) { 
                 let a = document.getElementById(target.id + '_subtract');
                 return;
             }
@@ -245,6 +300,7 @@ const PointBuy = ({ mainClass, state, setStats }: { mainClass: string,     state
     const list = ability_names_arr.map((e, i) => {
         const onClicker = onClickerHandler(i);
         const logic = displayNextCost(score[i])
+        const modifer = Number.isInteger(state.stats[i]) ? Math.floor((state.stats[i] as number - 10 )/ 2) : '--'
         return (
             <>
                 <label htmlFor={e + "_value"}>{e.toUpperCase()}</label>
@@ -252,6 +308,7 @@ const PointBuy = ({ mainClass, state, setStats }: { mainClass: string,     state
                     {state.stats[i]}
                 </ArrowsInput>
                 <span>+0</span>
+                <span>{modifer}</span>
                 <span>{state.stats[i]}</span>
                 <span>{logic}</span>
             </>
@@ -302,11 +359,6 @@ const RollCharacterStatsPage = ({setStats, state}) => {
     // Index of state.stat where this specific element is assigned to. 0 === not yet assigned.
     // const [options, setOption] = useState([0, 0, 0, 0, 0, 0]) 
     
-    useEffect(() => {
-        console.log(state.randomABSOptions.optionsLeft)
-        console.log(state.stats);
-    }, [state])
-
     const ability_score = ['--', ...ability_names_arr];
 
     const onClickHandler = () => {
@@ -319,14 +371,13 @@ const RollCharacterStatsPage = ({setStats, state}) => {
     const onChange = (index: number, total: number) => (e: React.ChangeEvent) => {
         const target = e.currentTarget as HTMLSelectElement;
         const value = target.options[target.selectedIndex].text; 
-        setStats({ type: "update_without_swapping", newValue: total, index: index, ability_name: value });
+        setStats({ type: "update_without_swapping", pattern:'roll', newValue: total, index: index, ability_name: value });
     }
 
     const generateSelectOptions = (index: number, total: number, htmlId: string) => {
         const onChangeHandler = onChange(index, total);
         const opt = new Set<string | number>([...ability_score]);
         const options = state.randomABSOptions.optionsLeft;
-        console.log(options, 'inside of generation at ', index);
         for (let i = 0; i < options.length; i++) {
             if (i !== index && options[i] > 0) {
                 opt.delete(ability_score[options[i]]);
@@ -374,8 +425,10 @@ const RollLayoutPage = ({onClickHandler, onChange, generateSelectOptions, state,
                                         })
                                     }
                                 </div>
+                                <div style={{minWidth: "200px"}}>
+                                <label htmlFor={id} style={{fontSize: '0.7em'}}>Select an Ability</label>
                                 {generateSelectOptions(x, total, id)}
-                                <span className='grayText'><i>Dropped {row.stats[row.minIndex]}</i></span>
+                                </div>
                             </div>
                         )
                     })

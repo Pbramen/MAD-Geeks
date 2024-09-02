@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { class_data, Resource_Pool } from 'assets/dndClassByLevel';
 import { FieldSet } from "components/FieldSet";
+import { ArrowsInput } from "./AtomicComponents"
 
 // displays information regarding quantity/quality of class feature!
 function DisplayQuantity({resource} : {resource: Resource_Pool}) {
@@ -83,8 +84,6 @@ export function ClassCard({ control, errors, sheetError, classState, dispatch}  
     }).map((e, index) => {
         const level = (classState[activeItem] - 1) > 0 ? (classState[activeItem] - 1) : 0; 
         const resource = e?.pool?.[level];
-        const selectOptions = e?.required_options;
-        var options = null;
         
         return (
             <FieldSet key={index} state="" path="" legend_title={e.name} description={e.description}>
@@ -93,7 +92,17 @@ export function ClassCard({ control, errors, sheetError, classState, dispatch}  
         )
     })
     
-
+    const onClickHandler = (e: React.MouseEvent) => {
+        const target = e.target as HTMLButtonElement;
+        if (target.name === 'subtract' && classState[activeItem] > 0) {
+            dispatch(prev => {return {...prev, [activeItem]: prev[activeItem] ? prev[activeItem] -= 1 : 1}});
+        }
+        else if (target.name === 'add'){
+            if (classState[activeItem] <= 19)
+                dispatch(prev => {return {...prev, [activeItem]: prev[activeItem] ? prev[activeItem] += 1 : 1}});
+        }
+        return;
+    }
         return (
             <div className="res-flex-res" >
 
@@ -101,7 +110,7 @@ export function ClassCard({ control, errors, sheetError, classState, dispatch}  
                     <span>Select your class(es):</span>
                     {navList}
                 </div>
-                <div className='flex flex-column' style={{flex: "1 0 70%"}}>
+                <div className='flex flex-column form-section' style={{ flex: "1 0 70%", padding: '20px', border: '2px solid  rgb(8, 20, 53)', borderRadius:'30px', boxShadow: "20px 20px rgb(8, 20, 53)"}}>
                     <div className="flex flex-column" style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '50px'}}>
                         <h2 className="header-2">{activeItem[0].toUpperCase() + activeItem.slice(1)}</h2>
                         <div className="circle">
@@ -110,15 +119,11 @@ export function ClassCard({ control, errors, sheetError, classState, dispatch}  
                         <span className="small-descript">{class_data[activeItem]?.description || "Unable to load description."}</span>
 
                         <div className="flex flex-row" style={{marginTop:"30px", maxWidth: '300px'}}>           
-                            <label htmlFor='classLevel' >Level(s):</label>
-                            <input
-                                id="classLevel"
-                                type='number'
-                                min={0}
-                                max={20}
-                                value={classState[activeItem]}
-                                onChange={e => dispatch(prev => {return{...prev, [activeItem]: e.target.value}})}    
-                            />
+                            <label htmlFor='classLevel_value' >Level(s):</label>
+
+                            <ArrowsInput identity="classLevel" onClickHandler={onClickHandler} >
+                                {classState[activeItem].toString()}
+                            </ArrowsInput>
                         </div>
                     </div>
                     
