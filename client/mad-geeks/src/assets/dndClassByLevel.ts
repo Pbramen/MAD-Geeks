@@ -168,43 +168,44 @@ export type AbilityScoreModelT = {
     description: string,
     example: string
 }
+
 export const ability_names_arr : ability_names[] = ['str', 'con', 'dex', 'wis', 'int', 'char'];
 // Common order for displaying stats -> str, con, dex, wis, int, char
 export const ability_score_model : AbilityScoreModelT[] = [
     {
         'abbr': 'str',
         'term': 'Strength',
-        'description': "Measurement of one's athleticism and raw physical force.",
+        'description': "Measurement of one's athleticism and raw physical force. Affects damage and hit chance of martial weapons",
         'example': "How far can I throw an apple?"
     },
     {
         "abbr": "con",
         "term": "Constitution",
-        "description": "Determines one's tenacity and endurance in battle.",
+        "description": "Determines one's tenacity and endurance in battle. Affects charcter's max health",
         'example': " How many times can I hit this apple with a hammer?"
     },
     {
         "abbr": "dex",
         "term": "Dexterity",
-        "description": "Speed, agility, and coordination.",
-        'example': "If I threw an apple at you, can you catch and/or dodge it?"
+        "description": "Speed, agility, and coordination. Affects turn order, hit change and damage of ranged and finese weapons.",
+        'example': "If I threw an apple at you, can you catch and/or dodge it? "
     },
     {
         "abbr": "wis",
         "term": "Wisdom",
-        "description": "Character's ability to critically think, rationalize, analyze, and plan. Determines how resistant you are against mental manipulation.",
+        "description": "Character's ability to critically think, rationalize, analyze, and plan. Determines how resistant you are against mental manipulation.  Affects spell casting for certain classes",
         "example": "What recipes can I make with this apple that would taste delicious?"
     },
     {
         "abbr": "int",
         "term": "Intelligence",
-        "description": "Knowledge, memory, and awareness of various topics.",
+        "description": "Knowledge, memory, and awareness of various topics. Affects spell casting for wizards.",
         "example": "Can you identify this fruit is an apple?"
     },
     {
         "abbr": "char",
         "term": "Charisma",
-        "description": "Ability to coerce others to follow your lead through your own wit or talents.",
+        "description": "Ability to coerce others to follow your lead through your own wit or talents. Used in a variety of social settings, and bardic spell casting.",
         "example": "Can you sell this apple?"
     }
 ]

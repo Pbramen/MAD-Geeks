@@ -73,17 +73,21 @@
     background-color: transparent;
     padding: 2px;
     color: whitesmoke;
-    border: 1px solid rgb(8, 20, 53);
     border-radius: 5px;
-    box-shadow: 5px 5px rgb(8, 20, 53);
+    background: linear-gradient( rgb(63, 108, 255), rgb(30, 67, 187) );
+    border: none;
+    border-top: 1px solid rgb(102, 232, 255);
+    box-shadow: 5px 5px  rgba(0, 0, 0, 0.5);
     margin: 10px;
     cursor: pointer;
+    font-size: 0.8em;
+    padding: 5px;
 }
 .btn-1:hover{
-    background-color: black;
+    background: black;
 }
 .btn-1:active,.btn-active, .btn-active:hover{
-    background-color: orange;
+    background: orange;
 }
 .sign-in-form > button{
     margin-top: 10px;
@@ -92,7 +96,7 @@
     
 }
 .sign-in-form > button.active-btn:hover, .active-btn:hover{
-    background-color: rgb(238, 134, 16);
+    background: rgb(238, 134, 16);
     cursor: pointer;
 }
 
