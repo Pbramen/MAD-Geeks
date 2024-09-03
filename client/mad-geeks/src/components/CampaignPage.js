@@ -1,5 +1,4 @@
 import { useState, createContext } from 'react';
-import '../assets/css/form.css';
 
 
 const MultiPageContext = createContext({});

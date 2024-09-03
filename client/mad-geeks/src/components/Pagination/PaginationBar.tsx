@@ -1,6 +1,6 @@
 import { usePagination } from "./usePagination"
 import React ,{ useRef, useEffect} from 'react';
-
+import '../../assets/css/pagination.css'
 type PaginationParams = {
     max?: number,
     list?: string[],

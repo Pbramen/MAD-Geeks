@@ -1,10 +1,12 @@
 import { Outlet } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
+
+// custom hooks
 import { useRefresh } from "../hooks/useRefresh";
 import { useAuth } from "../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
-import { verify } from "crypto";
 
+// send a request to the server via axios to get a refresh token
 export function PerisitLogin(){
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const refresh = useRefresh();
@@ -22,22 +24,23 @@ export function PerisitLogin(){
                     console.log("uhoh server down!");
                     nav("/login")
                 }
+                // token has expired/invalid or no token found.
                 else if (res === "AUTH_REQ") {
-                    
                     nav('/login');
                 }
             }).catch(e => 
-                console.log("uhu uwu")
+                console.error("Error when refreshing..", e)
             ).finally(() => {
                 setIsLoading(false);
             })
         }
         
-        // if access token is not set -> send request to server. 
+        // if access token is NOT already set -> send request to server. 
+        
         !auth?.accessToken ? verifyRefresh() : setIsLoading(false);
     }, [])
 
-    console.log(isLoading);
+    // TODO: add a loading page?
     return (
         <React.Fragment>
             {isLoading

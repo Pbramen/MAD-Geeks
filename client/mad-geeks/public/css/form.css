@@ -138,13 +138,6 @@ fieldset{
     padding: min(10px, 10%);
     display:flex;
 }
-.pagination-wrapper{
-    align-self: flex-start;
-    width: 100%;
-    display:flex;
-    justify-content: center;
-}
-
 
 .list-tab{
     position: relative;
@@ -256,23 +249,6 @@ fieldset{
 
 
 
-
-.pagination{
-    list-style: none;
-    overflow: hidden;
-    margin-bottom: 20px;
-    width: calc((var(--pagination-wdth) * 6) + 25px) ;
-    font-size: 1.2em;
-    display:flex;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.pagination-item {
-    float: left;
-    position: relative;
-}
-
 .form-textarea > div >  textarea{
     min-width: 80%;
     max-width: 100%;
@@ -292,18 +268,7 @@ fieldset{
     flex-grow: 1;
 }
 
-.pagination-btn {
-    border: none;
-    background-color:  rgb(253, 129, 46);
-    padding: 2px 0px 2px 35px;
-    position: relative;
-    width: var(--pagination-wdth);
-    font-size: 0.8em;
-    font-family: Tahoma, sans-serif;
-    height: 45px;
 
-
-}
 .alert-notify{
     border: 2px solid white;
     min-width: 25px;
@@ -317,11 +282,11 @@ fieldset{
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
 }
-.pagination-item:nth-child(1) button{
-    padding-left: 15px;
-    border-top-left-radius: 20px;
 
-}
+
+
+
+
 @media only screen and (max-width:900px){
     .re-form{
         flex-direction: column;
@@ -335,78 +300,4 @@ fieldset{
         margin-bottom: 25px;
     }
 
-}
-
-@media only screen and (min-width:1028px){
-    .pagination-btn::after{
-        content: "";
-        position: absolute;
-        display:block;
-        top: 50%;
-        margin-top: calc(-1 * var(--pagination-ht));
-        left: 100%;
-        border-top: var(--pagination-ht) solid transparent;
-        border-bottom: var(--pagination-ht) solid transparent;
-        border-left: 20px solid rgb(253, 129, 46);
-        z-index: 2; 
-
-    }
-    .pagination-btn::before{
-        content: "";
-        position: absolute;
-        display:block;
-        top: 50%;
-        margin-top: calc(var(--pagination-ht) * -1);
-        margin-left: 4px;
-        left: 100%;
-        border-top: var(--pagination-ht) solid transparent;
-        border-bottom: var(--pagination-ht) solid transparent;
-        border-left: 20px solid rgb(47, 91, 109);
-        z-index: 2;    
-    }
-}
-
-.pagination-item:nth-child(1) button.active {
-    background-color: red;
-}
-.pagination-item:nth-child(1) button.active::after{
-    border-left: 20px solid red;
-}
-
-.pagination-item button:hover:not(:disabled){
-    background-color: black;
-    color: rgb(185, 191, 219);
-   
-}
-
-.pagination-item button:hover:not(:disabled):after{
-    border-left: 20px solid black;
-}
-
-.pagination-btn.disabled {
-    background-color: gray;
-    color:rgb(47, 91, 109);
-}
-.pagination-btn.disabled::after {
-    border-left: 20px solid gray;
-}
-
-
-.current-btn{
-    background-color: rgb(17, 0, 78);
-    color: rgb(185, 191, 219);
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-.current-btn::after{
-    border-left: 20px solid  rgb(17, 0, 78);
-    
-}
-.current-btn::before{
-    border-left: 20px solid rgb(28, 194, 130);
-}
-
-.prev-btn::before {
-    border-left: 20px solid  rgb(28, 194, 130);  
 }

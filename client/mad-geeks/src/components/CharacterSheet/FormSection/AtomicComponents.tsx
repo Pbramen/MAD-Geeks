@@ -1,8 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AbilityScoreAction, AbilityScoreActions, PatternT, ABStateT } from './CreateCharacter';
-import { ability_names_arr, ability_score_model, class_data } from 'assets/dndClassByLevel';
+// Types
+import { AbilityScoreAction, AbilityScoreActions, PatternT } from '../model';
+import { ABStateT } from 'state/CharacterSheetReducer';
+
+// Model data
+import { ability_names_arr, ability_score_model, class_data } from 'assets/dndModel';
+
+// Reusable Components
 import { FieldSet } from 'components/FieldSet';
-import { ToggleTab } from 'components/ToggleTab';
 
 type ArrowParams = { children: React.ReactNode, identity: string, onClickHandler: React.MouseEventHandler };
 // returns an JSX component that returns buttons on both sides to help increment and decrement child value.
@@ -338,6 +343,8 @@ const StatsTable = ({ children, col_length, row_length }: {children: React.React
         </div>
     )
 }
+
+export type dieResults = { stats: number[], minIndex: number, total: number }
 // single source of truth for image dice path 
 // placeholder images...
 export const getDiceImageLocation = () => {
@@ -351,7 +358,7 @@ export const getDiceImageLocation = () => {
     }
     // TODO : add more images for up to d10!
 }
-export type dieResults = { stats: number[], minIndex: number, total: number }
+
 
 const RollCharacterStatsPage = ({setStats, state}) => {
     const { batchRoll } = useDiceRoller({ quantity: 4, quality: 6 });

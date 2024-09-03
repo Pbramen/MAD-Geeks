@@ -1,4 +1,4 @@
-import { ability_score_model } from 'assets/dndClassByLevel';
+
 import { createContext, useContext, useState, Dispatch, SetStateAction} from 'react';
 import { Outlet } from 'react-router-dom';
 // maps the location of each error to the toggle tab and defines how many errors have occured.
@@ -27,10 +27,11 @@ export interface TErrorSheetMapping{
     other: Set<string | null>
 }
 
-type SheetErrorState = [
-    sheetErrors: TErrorSheetMapping,
-    setSheetErrors: Dispatch<SetStateAction<TErrorSheetMapping>>
-]
+// type SheetErrorState = [
+//     sheetErrors: TErrorSheetMapping,
+//     setSheetErrors: Dispatch<SetStateAction<TErrorSheetMapping>>
+// ]
+
 export const ErrorSheetMapping = createContext(null);
 
 // --------------------
@@ -70,15 +71,3 @@ export const ErrorSheetProvider = ({}) => {
         </ErrorSheetMapping.Provider>
     )
 }
-
-// ==============================================================
-
-//==============================================================================
-// import {TErrorSheetMapping, ErrorSheetMapping} from '??'
-export const useSheetErrorLocations = () => {
-    const [sheetErrors, setSheetErrors] = useContext(ErrorSheetMapping);
-    if (sheetErrors === null || setSheetErrors === null) throw new Error("Unable to load context for sheet errors.");
-    return [ sheetErrors, setSheetErrors]
-}
-
-//==============================================================================

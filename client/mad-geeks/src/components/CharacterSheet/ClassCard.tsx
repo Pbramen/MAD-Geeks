@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { class_data, Resource_Pool } from 'assets/dndClassByLevel';
+import { class_data, Resource_Pool } from 'assets/dndModel';
 import { FieldSet } from "components/FieldSet";
-import { ArrowsInput } from "./AtomicComponents"
+import { ArrowsInput } from "./FormSection/AtomicComponents"
 
 // displays information regarding quantity/quality of class feature!
 function DisplayQuantity({resource} : {resource: Resource_Pool}) {

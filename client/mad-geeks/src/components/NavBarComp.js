@@ -1,5 +1,4 @@
-import React from 'react';
-import '../assets/css/nav.css';
+import '../assets/css/nav.css'
 import { Link } from 'react-router-dom';
 
 
