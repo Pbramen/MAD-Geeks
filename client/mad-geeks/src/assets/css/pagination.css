@@ -38,6 +38,9 @@
     font-family: Tahoma, sans-serif;
     height: 45px;
 }
+.pagination-btn:hover{
+    cursor: pointer;
+}
 
 .pagination-item:nth-child(1) button{
     padding-left: 15px;
@@ -93,6 +96,7 @@
 .pagination-btn.disabled {
     background-color: gray;
     color:rgb(47, 91, 109);
+    cursor: not-allowed;
 }
 .pagination-btn.disabled::after {
     border-left: 20px solid gray;

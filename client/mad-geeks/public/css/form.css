@@ -167,8 +167,6 @@ fieldset{
 
 }
 .res-2-2{
-
-    padding: min(20px, 5%);
     margin-bottom: 30px;
 }
 
@@ -178,6 +176,12 @@ fieldset{
     right: 45px;
 }
 
+.form-wrapper{
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+    margin: 0 400px;
+}
 .nav-btn {
     position: absolute;
     bottom: -10px;
@@ -187,8 +191,9 @@ fieldset{
 .aside_note{
     background-color: rgba(147, 191, 247, 0.4);
     border-radius: 40px;
-    padding: min(30px, 10%);
-    margin: 30px min(30px, 5%);
+    padding: 0.75em 1.5em ;
+    margin: 2rem min(30px, 5%);
+    min-height: 100px;
 }
 
 .deep_blue_card_shadow{
@@ -268,6 +273,13 @@ fieldset{
     flex-grow: 1;
 }
 
+@media (prefers-reduced-motion: no-preference){
+/*animation after page switching*/
+.main-body > form > *{
+    animation-duration: 0.75s;
+    animation-name: reveal;
+    animation-iteration-count: 1;
+}}
 
 .alert-notify{
     border: 2px solid white;
@@ -282,10 +294,6 @@ fieldset{
     -moz-border-radius: 50%;
     -webkit-border-radius: 50%;
 }
-
-
-
-
 
 @media only screen and (max-width:900px){
     .re-form{

@@ -4,6 +4,7 @@ import down from '../assets/svg/arrow-circle-down-svgrepo-com.svg';
 import get from 'lodash.get';
 
 // Toggle tab that also opens up if and error was detected!
+// if state is null, then no error is present!
 export const ToggleTab = ({ state=null, path, children}: {state?: any, path?: string, children: React.ReactNode} ) => {
     const [display, setDisplay] = useState<boolean>(true);
     const [img, setImage] = useState(up);
@@ -20,24 +21,24 @@ export const ToggleTab = ({ state=null, path, children}: {state?: any, path?: st
     // open / close animation.
     useEffect(() => {
         display ? setImage(()=>up) : setImage(()=>down);
-        console.log(display, 'setting');
         if (expandableTab.current) {
             const max_height = expandableTab.current.scrollHeight;
             expandableTab.current.maxHeight = display ? `${max_height}px` : `100px`;
         }
     }, [display])
 
+    // close on click => if state, can only close if valid 
     const handleOnClick = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         e.stopPropagation();
 
-        console.log(state, path, get(state, path));
         if ((state === null || state === '') || (get(state, path)?.size === 0)) {
             setDisplay((prev) => !prev);
         }
     }
     const onLoad = (e) => {
         const target = e.target as HTMLImageElement;
+        // prevent parent from attempting to modify image...
         target.style.color = 'unset';
     }
 

@@ -1,7 +1,7 @@
 import { FieldSet } from "components/FieldSet"
 import { DynamicController } from "../DynamicController"
 
-
+// biography page for character sheet builder
 export const BiographyPage = ({ control, errors, sheetError }) => {
     const path = 'biography'
 

@@ -18,8 +18,35 @@ import { AxiosResponse } from "axios";
 import { ClassCard } from "./ClassCard";
 import { MultiPageLayout } from 'components/MultiPageLayout';
 import { BiographyPage } from './FormSection/BiographyPage';
-import { StateManger } from "./FormSection/AtomicComponents";
+import { StateManger } from "./FormSection/AbilityScore/AbilityScoreManager";
 import { ErrorMessage } from 'components/SmallErrorMessage';
+
+import { ability_score_model, class_data } from 'assets/dndModel';
+const StatInformation = () => {
+    return (
+        <>
+        <div style={{ margin: 'min(30px, 5%)' }} >
+        <h2>Summary of Each Ability</h2>
+            <section className='res-2-2' >
+            {ability_score_model.map((e, i) => {
+                return (
+                    <div className='aside_note deep_blue_card_shadow'>
+                        <div key={`stat_info_${i}`}>
+                            <div className="flex flex-column">
+                                <h3 ><strong className='bold-dark-header'>{e.term} ({e.abbr})</strong></h3>
+                                <p>{e.description} </p> 
+                                <span className="example-text"><i>{e.example}</i></span>
+                            </div>
+                        </div>
+                    </div>
+                )
+            })}
+            </section>
+        </div>
+        
+        </>
+    )
+}
 
 
 //==============================================================================
@@ -29,6 +56,7 @@ export const CreateCharacter = () => {
     const [sheetError, setSheetErrors] = useSheetErrorLocations();          // used for currently displayed page and final validation process.
     const [countErrors, setCountErrors] = useState([0, 0, 0, 0, 0])         // used to display alerts for each individual page.
     const timeout = useRef(null);       
+    const [loading, setLoading] = useState<boolean>(true)
     const [connectionError, setConnectionError] = useState(null);           // display connection to third-party API error
     const { stats, dispatcher } = useAbilityReducer();
 
@@ -83,11 +111,13 @@ export const CreateCharacter = () => {
                             console.log(obj.data.payload);
                         }
                     }
-                setClassProficencies(data);
+                    setClassProficencies(data);
                 }).catch(() => {
-                
-                setConnectionError("Server timeout!");
-                console.log("timeout error set...")
+                    setConnectionError("Server timeout!");
+                }).finally(() => {
+                    setTimeout(() => {
+                        setLoading(() => false);
+                    }, 200)
             })
             }
     }, [])
@@ -198,6 +228,7 @@ export const CreateCharacter = () => {
         }
     }
 
+
     // parameters to set reusable Pagination
     const MultiPageParams = {
         page: pages,
@@ -206,25 +237,33 @@ export const CreateCharacter = () => {
         state: sheetError
     }
     const pageElements = [
-        <BiographyPage control={control} errors={errors.current} sheetError={sheetError} />,
-        <ClassCard control={control} errors={errors.current} sheetError={sheetError} classState={classes} dispatch={setClasses} />,
-        <StateManger classes={classes} state={stats} setStats={dispatcher} />
+        { element: <BiographyPage control={control} errors={errors.current} sheetError={sheetError} />,},
+        { element: <ClassCard control={control} errors={errors.current} sheetError={sheetError} classState={classes} dispatch={setClasses} />} ,
+        { element: <StateManger classes={classes} state={stats} setStats={dispatcher} />, aside: <StatInformation/> }
     ]
     return (
-    <>
-        <div className="flex flex-row" style={{ flexWrap: "wrap", justifyContent:"space-between", width: "100%", margin: "0 min(200px, 15%"}} >
-        {connectionError && <ErrorMessage message={connectionError} />}
-        <MultiPageLayout {...MultiPageParams}>
-            <form onSubmit={handleSubmit(handleFormSubmission)} onChange={handleChanges}>
-                {pageElements[pageNumber]}
-                <div className="nav-btn">
-                    <button className="btn-1" style={{fontSize:"1.2em"}}  type="button" onClick={onClicker}>Continue</button>
-                    <button type="submit" className="btn-1" style={{fontSize:"1.2em"}}>Create</button>
-                </div>
-            </form>
-            </MultiPageLayout>
+        <>
+            
+            <div className="flex flex-row form-wrapper" >
+                {connectionError && <ErrorMessage message={connectionError} onClick={(e) => setConnectionError("")} />}
+                <MultiPageLayout {...MultiPageParams}>
+                {pageElements[pageNumber]?.aside && pageElements[pageNumber].aside}
+                    <form onSubmit={handleSubmit(handleFormSubmission)} onChange={handleChanges}>
+                        { loading ? <div>Loading...</div> : 
+                        <>
+                            {pageElements[pageNumber].element}
+                            <div className="nav-btn">
+                                <button className="btn-1" style={{fontSize:"1.2em"}}  type="button" onClick={onClicker}>Continue</button>
+                                <button type="submit" className="btn-1" style={{fontSize:"1.2em"}}>Create</button>
+                            </div>
+                        </>
+                    }
+                </form>
+            </MultiPageLayout> 
             </div>
+            
         </>
-    )  
+    )
+    
 }
 

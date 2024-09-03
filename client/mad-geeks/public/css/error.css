@@ -1,7 +1,8 @@
 .small-error{
-    background-color: orange;
+    background-color: var(--error-color);
     border-radius: 50px;
     padding: 0.25em 1em 0.25em 0.2em;
+    min-width: fit-content;
 }
 
 .circle-btn{
@@ -14,6 +15,8 @@
     font-size: 1em;
     font-weight: bolder;
     margin-right: 1ch;
+    min-width: 2.925ch;
+    cursor: pointer;
 }
 
 
