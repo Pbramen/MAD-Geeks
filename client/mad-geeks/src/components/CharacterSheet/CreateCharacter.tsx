@@ -20,32 +20,41 @@ import { MultiPageLayout } from 'components/MultiPageLayout';
 import { BiographyPage } from './FormSection/BiographyPage';
 import { StateManger } from "./FormSection/AbilityScore/AbilityScoreManager";
 import { ErrorMessage } from 'components/SmallErrorMessage';
+import { StatInformation } from './SummaryAbilityScore';
 
-import { ability_score_model, class_data } from 'assets/dndModel';
-const StatInformation = () => {
-    return (
-        <>
-        <div style={{ margin: 'min(30px, 5%)' }} >
-        <h2>Summary of Each Ability</h2>
-            <section className='res-2-2' >
-            {ability_score_model.map((e, i) => {
-                return (
-                    <div className='aside_note deep_blue_card_shadow'>
-                        <div key={`stat_info_${i}`}>
-                            <div className="flex flex-column">
-                                <h3 ><strong className='bold-dark-header'>{e.term} ({e.abbr})</strong></h3>
-                                <p>{e.description} </p> 
-                                <span className="example-text"><i>{e.example}</i></span>
-                            </div>
-                        </div>
-                    </div>
-                )
-            })}
-            </section>
-        </div>
-        
-        </>
-    )
+export const useShowAbilitySummary = () => {
+    const [isSummaryVisable, setSummaryVisable] = useState<boolean>(false); 
+
+    useEffect(() => {
+        let bodyClasses = document.body.classList;
+        console.log(bodyClasses);
+        if (isSummaryVisable === true) {
+            if (bodyClasses && bodyClasses.contains('scrollable')) {
+                bodyClasses.remove('scrollable')
+            }
+            if (bodyClasses && !bodyClasses.contains('non-scrollable')) {
+                bodyClasses.add('non-scrollable')
+                console.log('body is not scrollable now!')
+            }
+        }
+        // allow body to scroll again
+        else {
+            if (bodyClasses && bodyClasses.contains('non-scrollable')) {
+                bodyClasses.remove('non-scrollable')
+            }
+            if (bodyClasses && !bodyClasses.contains('scrollable')) {
+                bodyClasses.add('scrollable')
+                console.log("body is now scrollable");
+            }
+        }
+    }, [isSummaryVisable])
+    const showSummary = (e: React.MouseEvent) => {
+        setSummaryVisable(prev => !prev);
+    }
+    
+    return {
+        isSummaryVisable, setSummaryVisable, showSummary
+    }
 }
 
 
@@ -59,7 +68,7 @@ export const CreateCharacter = () => {
     const [loading, setLoading] = useState<boolean>(true)
     const [connectionError, setConnectionError] = useState(null);           // display connection to third-party API error
     const { stats, dispatcher } = useAbilityReducer();
-
+    const { isSummaryVisable, showSummary } = useShowAbilitySummary();
     type ClassType = {
         [key: string]: number // classname and level    
     }
@@ -71,9 +80,8 @@ export const CreateCharacter = () => {
         'fighter': 0
     });
     const [classProficencies, setClassProficencies] = useState(null);
-    // load in the background!
 
-    
+
     interface PayloadSchema {
         status: string,
         msg: string,
@@ -239,15 +247,15 @@ export const CreateCharacter = () => {
     const pageElements = [
         { element: <BiographyPage control={control} errors={errors.current} sheetError={sheetError} />,},
         { element: <ClassCard control={control} errors={errors.current} sheetError={sheetError} classState={classes} dispatch={setClasses} />} ,
-        { element: <StateManger classes={classes} state={stats} setStats={dispatcher} />, aside: <StatInformation/> }
+        { element: <StateManger classes={classes} state={stats} setStats={dispatcher} onHelperClick={showSummary} />, pop_up: <StatInformation onClick={showSummary}/> }
     ]
     return (
         <>
-            
+            {pageElements[pageNumber]?.pop_up && isSummaryVisable && pageElements[pageNumber].pop_up}
             <div className="flex flex-row form-wrapper" >
                 {connectionError && <ErrorMessage message={connectionError} onClick={(e) => setConnectionError("")} />}
                 <MultiPageLayout {...MultiPageParams}>
-                {pageElements[pageNumber]?.aside && pageElements[pageNumber].aside}
+                
                     <form onSubmit={handleSubmit(handleFormSubmission)} onChange={handleChanges}>
                         { loading ? <div>Loading...</div> : 
                         <>

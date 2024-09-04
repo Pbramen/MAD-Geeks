@@ -4,21 +4,22 @@
     padding: 0.25em 1em 0.25em 0.2em;
     min-width: fit-content;
 }
-
-.circle-btn{
-    aspect-ratio: 1/1;
-    border-radius: 50%;
-    outline: none;
-    border: none;
-    background-color: black;
-    color: white;
-    font-size: 1em;
-    font-weight: bolder;
-    margin-right: 1ch;
-    min-width: 2.925ch;
-    cursor: pointer;
+@layer {
+    .circle-btn{
+        aspect-ratio: 1/1;
+        border-radius: 50%;
+        outline: none;
+        border: none;
+        background-color: black;
+        color: white;
+        font-weight: bolder;
+        margin-right: 1ch;
+        min-width: 2.925ch;
+        height: 2.925ch;
+        cursor: pointer;
+        text-align: center;
+    }
 }
-
 
 .error{
     min-height: 100vh;

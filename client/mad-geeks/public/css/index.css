@@ -1,6 +1,9 @@
 :root {
   --error-color: rgb(231, 38, 3);
   --base-background: rgb(0, 95, 87);
+  --deepblue:  rgb(17, 0, 78);
+  --highlighter-green: rgb(28, 194, 130);
+  --orange: rgb(253, 129, 46);
 }
 
 body {
@@ -14,7 +17,46 @@ body {
   color: white;
 }
 
+.scrollable {
+  overflow-y: scroll;
+}
+.non-scrollable {
+  overflow: hidden;
+}
 
+.summary-wrapper{
+  margin: -1em 0 0.5em;
+  width: fit-content;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+.summary-wrapper > img{
+  margin-right: 10px;
+}
+.red-background {
+  background-color: var(--error-color);
+}
+.inline-btn{
+  border:none;
+  background-color: transparent;
+  font-size: 1rem;
+  display:inline-block;
+  margin-right: 1ch;
+  font-weight: bolder;
+  cursor: pointer;
+  color: rgb(173, 158, 19);
+}
+
+.summary-wrapper:hover .inline-btn{
+  color: var(--deepblue)
+}
+/* for hidding labels (accessibility) */
+.off-field{
+  position: fixed;
+  top: -10000px;
+  left: -10000px;
+}
 input, textarea{
   z-index:7;
   border-radius: 5px;
@@ -336,4 +378,8 @@ input[aria-invalid=true]{
   text-align: center !important;
   display:block;
 
+}
+
+.medium-btn {
+  font-size: 1.2em;
 }

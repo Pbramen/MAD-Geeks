@@ -161,7 +161,7 @@ input {
         width: 375px;
         font-size: 1.75em;
     }
-    input, button {
+    input {
         height: 30px;
     }
     /* button{
@@ -188,11 +188,8 @@ input {
         width: 375px;
         font-size: 2em;
     }
-    input, button {
+    input {
         height: 30px;
-    }
-    button{
-        font-size: 0.65em;
     }
 }
 

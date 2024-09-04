@@ -1,10 +1,11 @@
 // types
 import { ABStateT } from "state/CharacterSheetReducer";
 import { AbilityScoreAction, AbilityScoreActions } from "components/CharacterSheet/model";
-import { dieResults } from "components/CharacterSheet/model";
+
 
 // model
 import { ability_names_arr } from "assets/dndModel";
+import { generateRollDisplay } from "./RollAllocationModel";
 
 // custom hooks
 import { getDiceImageLocation } from "hooks/getDiceImageLocation";
@@ -65,37 +66,7 @@ const generatePointBuy = (onClickerHandler, displayNextCost, score, state) => {
     })
 }
 
-const  generateRollDisplay = (generateSelectOptions, state, path, d6, onChange)=> {
-    console.log(state);
-    if (state && state.randomABSOptions && state.randomABSOptions.stats && state.randomABSOptions.stats.length === 6) {
-        return state.randomABSOptions.stats.map((row: dieResults, x: number) => {
-            const total = row.total - row.stats[row.minIndex];
-            const id = `res_table_${x}`;
-            return (
-                <div className="flex flex-column centered card-2" key={`result_wrapper_${x}`}>
-                    <label htmlFor={id} className='display-stat'><strong>{total}</strong></label>
-                    <div className="flex flex-row" style={{ flexWrap: 'wrap', justifyContent: 'space-evenly' }}>
-                        {
-                            row.stats.map((result, y) => {
-                                const id = `_${x}_${y}_img`;
-                                return <div className="flex flex-column" key={id}>
-                                    <img className={`${y === row.minIndex ? "disabled-opacity " : ''}`} id={id} src={path + d6[result - 1]} width={30} alt={'1d6 dice icon with result of ' + result.toString()} />
-                                    <label className={`${y === row.minIndex ? "disabled-opacity " : ''}`} htmlFor={id}>{result.toString()}</label>
-                                    
-                                </div>
-                            })
-                        }
-                    </div>
-                    <div style={{ minWidth: "200px" }}>
-                        <label htmlFor={id} style={{ fontSize: '0.7em' }}>Select an Ability</label>
-                        {generateSelectOptions(x, total, id)}
-                    </div>
-                </div>
-            )
-        })
-    }
-    return <></>    
-}
+
 
 
 // Standard Array ===============================================================================================
