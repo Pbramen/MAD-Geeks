@@ -14,10 +14,9 @@ export function PerisitLogin(){
     const nav = useNavigate();
     
     useEffect(() => {
-        console.log("persist is running...") 
+        //console.log("persist is running...") 
         // eslint-disable-next-line
         const verifyRefresh = async () => {
-            
             refresh().then(res => {
                 if (res === 'ERR_NETWORK') {
                     //TODO: add a server down page!

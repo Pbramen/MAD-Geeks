@@ -17,7 +17,7 @@ export const MultiPageLayout = ({ state, children, page, pageTracker, errors}) =
     const { max_page, pageParam, setCurrent_Page, setPageParam, setMax_page, current_page } = pageTracker
     const n = page.length;
     
-  
+
     const validatePageParam = (newPage : string) => {
         const intPage = parseInt(newPage);
         // move back to the front of the form if invalid 

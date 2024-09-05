@@ -1,10 +1,11 @@
 import '../assets/css/nav.css'
 import { Link } from 'react-router-dom';
-
+import { useEffect } from 'react';
 
 export function NavBarComp({ links, baseUrl='/', parent_style='nav main-nav', child_style='nav-list' }) { 
-    if (!links) {
-    }
+    useEffect(() => {
+        console.log('nav bar reloaded.')
+    }, [])
     
     const tabs = links.map((e, index) => {
         if (!e.path) {
