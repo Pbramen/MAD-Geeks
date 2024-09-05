@@ -1,5 +1,5 @@
 // types
-import { ABStateT } from "state/CharacterSheetReducer";
+import { ABStateT } from "components/CharacterSheet/state/AbilityScoreDispatcher";
 import { AbilityScoreAction, AbilityScoreActions } from "components/CharacterSheet/model";
 
 

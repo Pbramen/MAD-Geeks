@@ -15,8 +15,8 @@ export const StatInformation = ({onClick}) => {
                     <section className='res-3-2' >
                     {ability_score_model.map((e, i) => {
                         return (
-                            <div className='aside_note deep_blue_card_shadow'>
-                                <div key={`stat_info_${i}`}>
+                            <div  key={`stat_info_${i}`} className='aside_note deep_blue_card_shadow'>
+                                <div>
                                     <div className="flex flex-column stat-info">
                                         <h3 ><strong className='bold-dark-header'>{e.term} ({e.abbr})</strong></h3>
                                         <p>{e.description} </p> 

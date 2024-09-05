@@ -64,7 +64,12 @@ function LimitRadioList({ checkState, setCheckState, selectOptions, level }) {
 }
 export function ClassCard({ control, errors, sheetError, classState, dispatch}  ){
     const [activeItem, setActiveItem] = useState('barbarian');
-
+   
+    useEffect(() => {
+       
+        console.log("page loaded...")
+    }, [])
+    
     const selectItem = (e: React.MouseEvent<HTMLDivElement>) => {
         e.stopPropagation();
         const target = e.target as HTMLDivElement;

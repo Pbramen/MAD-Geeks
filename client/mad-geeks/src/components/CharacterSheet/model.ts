@@ -3,6 +3,8 @@ export type dieResults = { stats: number[], minIndex: number, total: number }
 /* ------------- Types for Character Form State ------------- */
 export type AbilityScoreT = number[] | string[]
 
+
+
 // different parameters for useReducer 
 export type IncrementP = { type: AbilityScoreActions, index: number, amount: number };
 export type ResetP = { type: 'reset' | 'swap', pattern: PatternT, field?: string };
@@ -14,5 +16,4 @@ export type AbilityScoreAction = IncrementP | ResetP | RecommendP | UpdateP | Ge
 export type PatternT = "buy" | "standard" | "roll";
 export type AbilityScoreActions = 'add' | 'subtract';
 /* -------------           END           ------------- */
-
 

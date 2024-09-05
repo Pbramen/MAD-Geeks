@@ -1,19 +1,16 @@
 
 import { useForm } from 'react-hook-form';
-import React, { useEffect, useState, useRef, useCallback} from 'react';
+import React, { useEffect, useState, useRef, useCallback, SetStateAction} from 'react';
 
 // custom hooks
-import { useAbilityReducer } from './hooks/useAbilityReducer';
+import { useAbilityReducer } from './state/useAbilityReducer';
 import { usePageParam } from "./Pages/usePageParam";
 import { useSheetErrorLocations } from './hooks/useSheetErrors';
 import { useShowAbilitySummary } from './hooks/useShowAbilitySummary';
+import { useLoadProficiencyChoices } from './hooks/useLoadProficiencyChoices';
 
 // model
 import { biography_fields } from "components/biographyPaths";
-
-// For RESTful api calls 
-import axios from "api/axios";
-import { AxiosResponse } from "axios";
 
 // reusable components
 import { ClassCard } from "./ClassCard";
@@ -22,6 +19,7 @@ import { BiographyPage } from './FormSection/BiographyPage';
 import { StateManger } from "./FormSection/AbilityScore/AbilityScoreManager";
 import { ErrorMessage } from 'components/SmallErrorMessage';
 import { StatInformation } from './SummaryAbilityScore';
+
 //==============================================================================
 export const CreateCharacter = () => {
     const pages = ['Biography', "Classes", "Skills", "Inventory", "Spells"]  // title of the current page
@@ -33,6 +31,8 @@ export const CreateCharacter = () => {
     const [connectionError, setConnectionError] = useState(null);           // display connection to third-party API error
     const { stats, dispatcher } = useAbilityReducer();
     const { isSummaryVisable, showSummary } = useShowAbilitySummary();
+    const { classProficencies, selectedSkills, setSelectedSkills } = useLoadProficiencyChoices(setConnectionError, setLoading);
+    const pageNumber = useRef(0);
     type ClassType = {
         [key: string]: number // classname and level    
     }
@@ -43,57 +43,19 @@ export const CreateCharacter = () => {
         'bard': 0,
         'fighter': 0
     });
-    const [classProficencies, setClassProficencies] = useState(null);
-
-
-    interface PayloadSchema {
-        status: string,
-        msg: string,
-        payload: {
-            choices: number,
-            result: {
-            ability_score: {
-                index: string,
-                name: string,
-                url: string
-            },
-            desc: string[],
-            index: string,
-            name: string,
-                url: string
-        }
-        }
-    }
-
-    const getProficiencies = (name: string) : Promise<AxiosResponse<PayloadSchema>> =>  {
-        return axios.get('api/SRD/levelResource/' + name, { signal: AbortSignal.timeout(5000) })
-    }
 
     useEffect(() => {
-        // When user first loads up the form, immediately attempt to grab data needed to render form elements
-        if (classProficencies === null) {
-            var data = {}
-            
-            Promise.all([getProficiencies('bard'), getProficiencies('barbarian'), getProficiencies('fighter')])
-                .then((result ) => {
-                    
-                    for (let i = 0; i < result.length; i++){
-                        let obj = result[i] as AxiosResponse<PayloadSchema>
-                        if (obj.status === 200) {
-                            console.log(obj.data.payload);
-                        }
-                    }
-                    setClassProficencies(data);
-                }).catch(() => {
-                    setConnectionError("Server timeout!");
-                }).finally(() => {
-                    setTimeout(() => {
-                        setLoading(() => false);
-                    }, 200)
-            })
-            }
-    }, [])
+        const a = parseInt(pageParam.get('page'));
+        if (Number.isNaN(a)) {
+            console.log("uhoh");
+            pageNumber.current = 0;
+        }
+        else 
+            pageNumber.current = parseInt(pageParam.get('page'))
+    }, [pageParam])
+    
 
+    // TODO: is react-hook-forms necessary?
     const {
         formState: { errors },
         control,
@@ -105,9 +67,7 @@ export const CreateCharacter = () => {
         shouldFocusError: true,
     });
     
-    // search param for page as integer
-    const pageNumber = parseInt(pageParam.get('page'));
-
+    
     // TODO: final validation  
     const handleFormSubmission = ((data: React.FormEvent) => {
         const isValid = trigger();
@@ -122,7 +82,7 @@ export const CreateCharacter = () => {
     })
 
     const validateStates = () => { 
-        if (pageNumber === 2) {
+        if (pageNumber.current === 2) {
             return false;
         }
         return false; 
@@ -135,7 +95,7 @@ export const CreateCharacter = () => {
         var countErrTemp = 0;
         // Determine all errors relevent to this page
         Object.keys(errors).forEach(e => {
-            const path = biography_fields?.[pageNumber]?.[e]
+            const path = biography_fields?.[pageNumber.current]?.[e]
             // set the error 
             if (path !== undefined) {
                 detectedErrors.add(e);
@@ -146,7 +106,7 @@ export const CreateCharacter = () => {
         
         // create a deep copy of the CURRENT page of errors AND overrite with new detected errors 
         // this will also remove corrected errors!
-        var newObj = { ...sheetError, [biography_fields?.[pageNumber]?.id]: detectedErrors };
+        var newObj = { ...sheetError, [biography_fields?.[pageNumber.current]?.id]: detectedErrors };
         // TODO: implement a way to manage form fields to focus AND scroll to first error
         if (detectedErrors) {
             const arr = Array.from(detectedErrors);
@@ -157,14 +117,19 @@ export const CreateCharacter = () => {
         setSheetErrors(newObj);
         setCountErrors((prev) => {
             return prev.map((e, index) => {
-                if (pageNumber == index)
+                if (pageNumber.current == index)
                     return countErrTemp;
                 return e;
             })
         })
-    
     }
-   
+    useEffect(() => {
+        // small hack for firefox users causing unexpected scroll behavior...
+        const a = document.getElementById('stat-page')
+        if (a)
+            a.style.display = 'none';
+        window.scrollTo(0, 0);
+    }, [pageParam])
 
     // handle error changes
     useEffect(() => {
@@ -200,7 +165,6 @@ export const CreateCharacter = () => {
         }
     }
 
-
     // parameters to set reusable Pagination
     const MultiPageParams = {
         page: pages,
@@ -209,26 +173,53 @@ export const CreateCharacter = () => {
         state: sheetError
     }
     const pageElements = [
-        { element: <BiographyPage control={control} errors={errors.current} sheetError={sheetError} />,},
-        { element: <ClassCard control={control} errors={errors.current} sheetError={sheetError} classState={classes} dispatch={setClasses} />} ,
-        { element: <StateManger classes={classes} state={stats} setStats={dispatcher} onHelperClick={showSummary} />, pop_up: <StatInformation onClick={showSummary}/> }
+        {
+            element: <BiographyPage
+                control={control}
+                errors={errors.current}
+                sheetError={sheetError} />,
+        },
+        {
+            element: <ClassCard
+                control={control}
+                errors={errors.current}
+                sheetError={sheetError}
+                classState={classes}
+                dispatch={setClasses} />
+        },
+        {
+            element: <StateManger
+                classes={classes}
+                state={stats}
+                setStats={dispatcher}
+                onHelperClick={showSummary}
+                classProficencies={classProficencies}
+                selectedSkills={selectedSkills}
+                setSelectedSkills={setSelectedSkills}
+                onNoSetClassClick={(e: React.MouseEvent) => {
+                    setPageParam({ page: '1' })
+                }}
+            />,
+            pop_up: <StatInformation onClick={showSummary} />
+        }
     ]
+    const valid = pageNumber.current < pageElements.length;
     return (
         <>
-            {pageElements[pageNumber]?.pop_up && isSummaryVisable && pageElements[pageNumber].pop_up}
+            {valid && pageElements[pageNumber.current]?.pop_up && isSummaryVisable && pageElements[pageNumber.current].pop_up}
             <div className="flex flex-row form-wrapper" >
                 {connectionError && <ErrorMessage message={connectionError} onClick={(e) => setConnectionError("")} />}
                 <MultiPageLayout {...MultiPageParams}>
                 
                     <form onSubmit={handleSubmit(handleFormSubmission)} onChange={handleChanges}>
                         { loading ? <div>Loading...</div> : 
-                        <>
-                            {pageElements[pageNumber].element}
-                            <div className="nav-btn">
-                                <button className="btn-1" style={{fontSize:"1.2em"}}  type="button" onClick={onClicker}>Continue</button>
-                                <button type="submit" className="btn-1" style={{fontSize:"1.2em"}}>Create</button>
+                            <>
+                                {valid && pageElements[pageNumber.current].element}
+                                <div className="float-right">
+                                    <button className="btn-1" style={{fontSize:"1.2em"}}  type="button" onClick={onClicker}>Continue</button>
+                                    <button type="submit" className="btn-1" style={{fontSize:"1.2em"}}>Create</button>
                             </div>
-                        </>
+                            </>
                     }
                 </form>
             </MultiPageLayout> 
@@ -236,6 +227,5 @@ export const CreateCharacter = () => {
             
         </>
     )
-    
 }
 

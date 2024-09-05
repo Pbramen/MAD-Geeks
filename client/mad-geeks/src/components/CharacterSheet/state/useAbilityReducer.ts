@@ -1,4 +1,4 @@
-import { abilityScoreReducer, ABStateT } from "state/CharacterSheetReducer";
+import { abilityScoreReducer, ABStateT } from "components/CharacterSheet/state/AbilityScoreDispatcher";
 import { useReducer } from 'react';
 
 export const useAbilityReducer =  () => {

@@ -1,4 +1,4 @@
-import { ABStateT } from "state/CharacterSheetReducer";
+import { ABStateT } from "components/CharacterSheet/state/AbilityScoreDispatcher";
 import { dieResults } from "components/CharacterSheet/model";
 
 import { ability_names_arr } from "assets/dndModel";
