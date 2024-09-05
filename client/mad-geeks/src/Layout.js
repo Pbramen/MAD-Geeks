@@ -1,13 +1,9 @@
 import { Outlet } from 'react-router-dom';
 import { NavBarComp } from './components/NavBarComp';
-import { Footer } from './components/Footer';
-import { useEffect } from 'react';
+
 import { AuthProvider } from 'components/context/AuthProvider';
 
 export const Layout = () =>{
-  useEffect(() => {
-    console.log("Layout mounted")
-  }, []);
 
   const links = [
     {
@@ -29,14 +25,13 @@ export const Layout = () =>{
   ]
 
   return (
-    <div className="flex-column full">
+    <div className="flex-column">
       <NavBarComp links={links} />
       <div className='mid flex-tripod-main'>
       <AuthProvider>
           <Outlet />
       </AuthProvider>
       </div>
-      <Footer className='footer'/>
       </div>
   );
 }

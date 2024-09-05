@@ -1,11 +1,13 @@
 :root {
   --error-color: rgb(231, 38, 3);
-  --base-background: rgb(0, 95, 87);
+  --base-background: rgb(24, 116, 93);
   --deepblue:  rgb(17, 0, 78);
   --highlighter-green: rgb(28, 194, 130);
   --orange: rgb(253, 129, 46);
 }
-
+#root{
+  flex-grow: 1;
+}
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -15,6 +17,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--base-background);
   color: white;
+  min-height: 100vh;
 }
 
 .scrollable {
@@ -24,6 +27,68 @@ body {
   overflow: hidden;
 }
 
+.centered-block{
+  display:inline-block;
+}
+
+.hztl-border{
+  border-radius: 25px;
+  padding: 0.4rem;
+  padding-right: 1ch;
+  background: lightgray;
+  color: black;
+  width: fit-content;
+  font-size: 0.8rem;
+  max-height: 1.8rem;
+}
+.flex-wrap{
+  flex-wrap: wrap;
+  
+}
+.hztl-border > input[type='checkbox']{
+  background-color: transparent;
+  height: auto;
+  margin-right: 0.7ch;
+}
+
+.hztl-border > input:disabled{
+  display: none;
+  cursor: default;
+}
+.hztl-border:has(input:disabled),
+.hztl-border > input:disabled + label{
+  cursor: default;
+  text-decoration: line-through;
+} 
+
+.hztl-border:has(input:checked){
+  background-color: var(--deepblue);
+  font-weight: bold;
+  color: white;
+}
+
+.hztl-border > label{
+  line-height: 120%;
+}
+.hztl-border:hover, .hztl-border > *:hover{
+  cursor: pointer;
+}
+.float-right{
+  float: right;
+}
+
+.sm-margin-top{
+  margin-top: 0.75em;
+}
+/*style={{marginTop:"30px", maxWidth: '300px'}} */
+
+
+/* style={{ justifyContent: 'center', alignItems: 'center', marginBottom: '50px'}} */
+
+/* style={{ flex: "1 0 70%", padding: '20px', border: '2px solid  rgb(8, 20, 53)', borderRadius:'30px', boxShadow: "20px 20px rgb(8, 20, 53)"}}*/
+.card-3{
+
+}
 .summary-wrapper{
   margin: -1em 0 0.5em;
   width: fit-content;
@@ -37,6 +102,9 @@ body {
 .red-background {
   background-color: var(--error-color);
 }
+.orange-background{
+  background-color: var(--orange);
+}
 .inline-btn{
   border:none;
   background-color: transparent;
@@ -45,11 +113,11 @@ body {
   margin-right: 1ch;
   font-weight: bolder;
   cursor: pointer;
-  color: rgb(173, 158, 19);
-}
+  color: black}
+
 
 .summary-wrapper:hover .inline-btn{
-  color: var(--deepblue)
+  color: black;
 }
 /* for hidding labels (accessibility) */
 .off-field{
@@ -261,7 +329,7 @@ code {
   font-size: 0.8em;
   width: 100%;
   background-color: rgb(8, 20, 53);
-  max-height: 75px;
+  height: 75px;
   outline: 1px solid green;
   margin-top: auto;
   text-align: end;

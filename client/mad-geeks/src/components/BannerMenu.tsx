@@ -12,11 +12,12 @@ export const BannerMenu = ({ list }: {list: listObject[]}) => {
         <section>
             <ul className="nav sub-menu">
                 {
-                    list.map((e : listObject, index: number) => {
+                    list.map((e: listObject, index: number) => {
+                        const bannerID = 'banner' + index;
                         if (e.input) {
-                            return <input className="search-bar" id={e.id} placeholder={e.value}/>
+                            return <input className="search-bar" id={e.id} key={bannerID} placeholder={e.value}/>
                         }
-                        return <li key={index} className="nav-list">{
+                        return <li key={bannerID} className="nav-list">{
                             e.linkTo ? <Link to={e.linkTo}>{e.value}</Link> : e.value
                         }</li>
                     })

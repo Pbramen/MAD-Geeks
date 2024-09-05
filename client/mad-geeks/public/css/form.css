@@ -134,7 +134,6 @@ fieldset{
 }
 /*main body for character form builder*/
 .chara-form{
-    position: relative;
     width: min(90%, 1960px);
     min-height: 680px;
     padding: min(10px, 10%);

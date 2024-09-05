@@ -7,7 +7,7 @@ import { CharacterPage } from './components/CharacterSheet/CharacterPage';
 import { GridPage } from './components/GridPage';
 import { RegistrationPage } from './components/RegistrationPage';
 import { AuthUsers } from './components/AuthUser';
-import { useEffect } from 'react';
+
 import { Layout } from './Layout';
 import { PerisitLogin } from './components/PersistLogin';
 
@@ -16,9 +16,7 @@ import { CreateCharacter } from 'components/CharacterSheet/CreateCharacter';
 
 import { ErrorSheetProvider } from 'components/CharacterSheet/ErrorProvider';
 export function App({ }) {
-    useEffect(() => {
-        console.log("App mounted");
-    }, []);
+
 
     return (
         <Routes>
