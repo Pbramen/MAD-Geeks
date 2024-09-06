@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { getResourceByClass } = require(path.resolve(__dirname, './SRDController.js'));
+const { getProficiencyChoices, getStartingEquipment } = require(path.resolve(__dirname, './SRDController.js'));
 
-router.get('/levelResource/:class', getResourceByClass);
+router.get('/levelResource/:class', getProficiencyChoices);
+router.get('/levelResource/equipment/:class', getStartingEquipment);
+
 
 module.exports = router;

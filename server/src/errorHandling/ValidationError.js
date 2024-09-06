@@ -1,5 +1,8 @@
 require("dotenv").config();
 
+
+// TODO: need to revise this entire class 
+
 const formatData = (req) => {
     return {
         endpoint: req.originalUrl,
@@ -58,6 +61,23 @@ class CustomLogger extends Error{
     }
 }
 
+class InvalidParameters extends CustomLogger{
+    data = {};
+    constructor(message, resJSON, req){
+        super(message, resJSON, req);
+        console.log(message, resJSON);
+        this.data = this.formatLog();
+        this.name = "InvalidParameters";
+        this.code = 400;
+        Error.captureStackTrace(this, this.constructor);
+    }
+
+    formatLog() {
+        super.formatLog(this.data)
+        const obj = {'err_s': this.data};
+        return obj;
+    }
+}
 
 class ExpressValidatorError extends CustomLogger{
     data = {};
@@ -111,5 +131,6 @@ module.exports = {
     ExpressValidatorError,
     InvaildAuthError,
     MongoDuplicateError,
+    InvalidParameters,
     formatData
 };
