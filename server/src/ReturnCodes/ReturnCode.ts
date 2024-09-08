@@ -1,0 +1,15 @@
+export enum StatusCode{
+    OK = 200,
+    REDIRECT = 301,
+    NOT_MODIFIED = 304,
+    BAD_REQUEST = 400,
+    UNAUTHORIZED = 401,
+    NOT_FOUND = 404,
+    TOO_MANY_REQUESTS = 429,
+    TIMEOUT = 408,
+    PAYLOAD_TOO_LARGE = 413,
+    URI_TOO_LONG = 414,
+    UNSUPPORTED_MEDIA = 415,
+    SERVER_ERROR = 500
+}
+
