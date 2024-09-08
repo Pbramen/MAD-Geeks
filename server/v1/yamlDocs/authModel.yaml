@@ -1,0 +1,399 @@
+components:
+  securitySchemes:
+    bearerAuth: 
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    cookieJWT:
+      type: apiKey
+      in: cookie
+      name: jwt
+
+tags:
+  - name: Auth
+    description: User Authentication and Authorization
+
+definitions:
+  userAuth:
+    type: object
+    required:
+      - username
+      - password
+    properties:
+      username:
+        type: string
+      password:
+        type: string
+  DBErr:
+    description: Internal Database error
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status: 
+              type: string
+              description: DB_ERR
+            msg: 
+              type: string
+  MissingParams:
+    description: Parameters are missing
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              description: ERROR
+            msg: 
+              type: string
+              description: Missing fields
+            action: 
+              type: string
+              description: None Taken
+            errors:
+              type: object
+              properties:
+                fields: 
+                  type: array
+                  items: 
+                    type: string
+                    description: List of all missing parameter required for this endpoint.
+  ValidationError:
+    type: object
+    description: Parameters has invalid input
+    content: 
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string,
+              example: "VS_FAILURE"
+            errors: 
+              type: array
+              items:
+                type: object
+                properties:
+                  'type':
+                    type: string
+                    description: Type of validation error that occured
+                  value:
+                    type: string
+                    desciption: value that failed validation test
+                  msg:
+                    type: string
+                    msg: Reason for failure
+                  path: 
+                    type: string
+                    msg: endpoint called
+                  location:
+                    type: string
+                    msg: Where this value was sent (header, body, cookie, params, etc)
+  UniqueError: 
+    description: Parameter must be unique
+    content: 
+      application/json:
+        schema:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "DUP_ERR"
+            msg:
+              type: string
+              example: "userLogin, email must be unquie"
+            errors: 
+              type: array
+              description: array of all items that must be unique
+              items:
+                type: object
+                properties:
+                  path: 
+                    type: string
+                    description: name of the field 
+                    example: "userLogin"
+                  value:
+                    type: string
+                    description: value recieved 
+                    example: "somebody"
+
+
+paths:
+  /api/clients/:
+    get:
+      security:
+      - bearerAuth: []
+      tags:
+        - Auth
+      parameters:
+        - in: header
+          name: credentials
+          schema: 
+            type: boolean
+            value: true
+            enum: [true]
+          required: true
+      summary: Get all registered usernames
+      description: For testing purposes only
+      responses:
+        '200':
+          description: Successful response
+        '401':
+          description: No Access token send
+        '403':
+          description: Access token is invalid or has expried. Should call /refresh after
+  /api/clients/register:
+    post:
+      tags:
+        - Auth
+      requestBody:
+          required: true
+          description: Basic user info needed for registration
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  username:
+                    type: string
+                    description: Unquie username
+                  password:
+                    type: string
+                    description: Password
+                  DOB: 
+                    type: string
+                    description: Date of Birth
+                  email: 
+                    type: string
+                    description: Email address of user
+      responses:
+        '200':
+          description: Success
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: ok
+                  msg:
+                    type: string
+                    description: <username> successfully created!
+                  link: 
+                    type: string
+                    description: /login
+        '409':
+          $ref: '#/definitions/UniqueError'
+        '422':
+          $ref: '#/definitions/MissingParams'
+        '500':
+          $ref: '#/definitions/DBErr'
+  /api/clients/login:
+    post:
+      tags:
+        - Auth
+      requestBody:
+          required: true
+          description: password/username combination
+          content:
+            application/json:
+              schema:
+                $ref: '#/definitions/userAuth'
+      responses:
+        '200':
+          description: Sets httpOnly refresh token as a cookie and returns an access token
+          heaers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: jwt=abcdef123456890; HttpOnly
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    description: SUCCESS
+                  msg:
+                    type: string
+                    description: AUTH_OK
+                  link:
+                    type: string
+                    description: /home
+                  roles:
+                    type: array
+                    items: 
+                      type: string
+                  accessToken: 
+                    type: string
+        '401':
+          description: Invalid User login
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    description: DENIED
+                  msg:
+                    type: string
+                    description: Invalid combination
+                  link:
+                    type: string
+                    description: /login
+        '403':
+          description: Account denied access (banned or tempoarily set inactive)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    description: DENIED
+                  msg:
+                    type: string
+                    description: ACC_DISABLED | ACC_BANNED
+                  link:
+                    type: string
+                    description: /accountDiabled | /accountBanned
+        '404':
+            description: Username not found.
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    status: 
+                      type: string
+                      description: DNE
+                    msg:
+                      type: string
+                      description: Not registered
+                    link:
+                      type: string
+                      description: /register
+        '422':
+          $ref: '#/definitions/MissingParams'
+        '500':
+          $ref: '#/definitions/DBErr'
+    
+    delete:
+      tags: 
+        - Auth
+      description: Handles user logout
+      parameters:
+        - in: cookie
+          name: jwt
+          description: HttpOnly Refresh token
+          schema:
+            type: string
+            example: abcdef12345
+      responses:
+        '200':
+          description: User successfully logged out and refresh token deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties: 
+                  status: 
+                    type: string
+                    example: ok
+                  msg:
+                    type: string
+                    example: You have successfully logged out!
+                  link:
+                    type: string
+                    example: /home
+        '203':
+          description: Deletes invalid/expried refresh token.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: Ok
+                  msg:
+                    type: string
+                    example: You have successfully logged out!
+                  link: 
+                    type: string
+                    example: /home
+        '204':
+          description: No refresh token found. 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: Ok
+                  msg:
+                    type: string
+                    example: User already logged out.
+                  link: 
+                    type: string
+                    example: /login
+        '422':
+          $ref: "#/definitions/ValidationError"
+        '500':
+          description: Failed to access database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: DB_Failure
+                  msg:
+                    type: string
+                    example: Server failure. Please try again.
+  /api/clients/refresh:
+    get:
+      summary: Refreshes the access token
+      description: Middleware endpoint that is used only when user attempts to access protected data. Returns a new access token if jwt is still valid. 
+      tags:
+        - Auth
+      security:
+        - cookieJWT: []
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  access_token:
+                    type: string
+                    description: New access token for authenticated user.
+                    example: abcdef12345
+        '401':
+          description: Missing valid credentials
+          summary: Refresh token was not sent to server.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: INVALID_JWT
+                  msg:
+                    type: string
+                    example: Unauthorized request
+        '403':
+          description: Refresh token found, but not valid/expired.

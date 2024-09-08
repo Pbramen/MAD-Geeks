@@ -1,0 +1,56 @@
+tags:
+  name: Campagins
+
+paths: 
+  /api/client/campagins:
+    get:
+      tags:
+        - 'Campagins'
+      description: "Gets all campaigns for the current user. User must be logged (valid jwt and auth bearer set) before calling this endpoint."
+      responses:
+        "200":
+          description: Successfully retrieved data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: OK
+                  msg: 
+                    type: string
+                    example: Found <len(campagins)> for <user>!
+                  payload:
+                    description: Contains list of campagin titles and their id
+                    campaigns: 
+                      type: array
+                      items: 
+                        type: object
+                        properties:
+                          name: 
+                            type: string
+                          id: 
+                            type: string
+                            description: ObjectID of the campagin 
+                          active: 
+                            type: boolean
+                            description: True if campagin is currently active (played in the last 6 months)
+        "204":
+          description: Successful operation, but user has not joined a single campagin yet
+          content: 
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status: 
+                    type: string
+                    example: OK
+                  msg: 
+                    type: String
+                    example: No campagins found!
+        '401':
+          $ref: '#/definitions/JwtExpir'
+        '403': 
+          $ref: '#/definitions/Unauthorized'
+    
