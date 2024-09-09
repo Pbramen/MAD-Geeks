@@ -1,4 +1,3 @@
-
 import cors from 'cors';
 import bodyParser from 'body-parser';
 
@@ -7,7 +6,8 @@ import mongoose from 'mongoose';
 import 'dotenv/config'
 
 import { StatusCode } from './ReturnCodes/ReturnCode';
-import { customErrorRoute } from './error/customGlobalError'
+import { customErrorRoute } from './error/customErrorRoute'
+//import { throwInvalidParamError } from './debug/testRoutes.itest';
 
 const app = express();
 const port = 4000;
@@ -17,20 +17,6 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(bodyParser.json())
 app.use(bodyParser.json({ type: 'application/json' }))
 
-app.get('/', (req, res, next) => {
-    res.status(200).json(
-        { status: 'ok', msg: 'HOTTOGO!' }
-    )
-})
-
-app.get('/async', async (req, res, next) => {
-    setTimeout(() => {
-        Promise.resolve()
-        .then(() => {
-            throw new Error("Async error thrown.")
-        }).catch(next);
-    }, 100)
-})
 
 app.listen(process.env.PORT, () => {
     console.log(`Application successfully listening on port ${port}`);
