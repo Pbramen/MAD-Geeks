@@ -28,9 +28,9 @@ export const Layout = () =>{
     <div className="flex-column">
       <NavBarComp links={links} />
       <div className='mid flex-tripod-main'>
-      <AuthProvider>
+      {/* <AuthProvider> */}
           <Outlet />
-      </AuthProvider>
+      {/* </AuthProvider> */}
       </div>
       </div>
   );

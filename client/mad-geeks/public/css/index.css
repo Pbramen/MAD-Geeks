@@ -451,3 +451,15 @@ input[aria-invalid=true]{
 .medium-btn {
   font-size: 1.2em;
 }
+
+
+.display-map {
+  display: block;
+  width: max(400px, 65%);
+  height: 400px;
+  margin: 2rem auto;
+  border-radius: 10px;
+  padding: 0.5em;
+}
+
+

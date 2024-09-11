@@ -15,6 +15,7 @@ import { PageSheetProvider } from 'components/context/PageSheetProvider';
 import { CreateCharacter } from 'components/CharacterSheet/CreateCharacter';
 
 import { ErrorSheetProvider } from 'components/CharacterSheet/ErrorProvider';
+import { MapLayout } from 'components/Geolocation/MapLayout';
 export function App({ }) {
 
 
@@ -24,7 +25,7 @@ export function App({ }) {
                 <Route path="login" element={ <SignInForm/>} />
                 <Route path="register" element={<RegistrationPage />} />
                 
-                <Route element={<PerisitLogin/>}>
+                {/* <Route element={<PerisitLogin/>}> */}
                     {/*<Route index path="home" element={<DashBoard />} /> */}
                     <Route path="characters" element={<CharacterPage />} />
                     <Route path="campagins" element={<CampaginPage />} />
@@ -39,10 +40,10 @@ export function App({ }) {
 
 
                 {/* Testing pages */}
-               
+                <Route path="map" element={<MapLayout />} />
                 <Route path="test" element={<GridPage/> } />
                 
-            </Route>
+            {/* </Route> */}
         </Routes>
     )
 }
