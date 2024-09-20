@@ -1,5 +1,5 @@
 import { Response, Request, NextFunction } from "express"
-import { StatusCode } from "../ReturnCodes/ReturnCode";
+import { StatusCode } from "../response/ReturnCode";
 import 'dotenv';
 
 
