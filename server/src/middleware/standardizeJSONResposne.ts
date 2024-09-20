@@ -8,34 +8,52 @@ type JSONResponeSchema = {
     [key: string]: any
 }
 
-const standardResponse = (res: Response, code: number, status: string, message: string, payload?: any, rest?: any) => {
-    if (res.headersSent === true) {
+
+type ResponseParameters = {
+    res: Response, 
+    code: number,
+    status: string, 
+    message: string,
+    descript: string, 
+    payload?: any,
+    rest?: any
+}
+const standardResponse = (props: ResponseParameters) => {
+    if (props.res.headersSent === true) {
         return; 
     }
 
-    if (code > 501) {
-        code = 500;
-    }
-    var json : JSONResponeSchema= {
-        status: status,
-        message: message,
+    // hide details of interal server failure from client
+    if (props.code > 501) {
+        props.code = 400;
     }
 
-    if (payload !== null) {
-        json["payload"] = payload;
+    // description of the results : used for internal logging purposes. 
+    props.res.locals.descript = props.descript; 
+
+    var json : JSONResponeSchema= {
+        status: props.status,
+        message: props.message,
     }
-    res.status(code).json(json);
+
+    if (props.payload !== null) {
+        json["payload"] = props.payload;
+    }
+    if (props.rest != null) {
+        json = {...json, ...props.rest}
+    }
+    props.res.status(props.code).json(json);
 }
 
-export const successfulResponse = (res: Response, code: number, status: string, message: string, payload?: any, rest?: any) => {
-    standardResponse(res, code, status, message, payload, rest);
+export const successfulResponse = (props: ResponseParameters) => {
+    standardResponse(props);
     if (process.env.NODE_ENV == 'development') {
         console.log('Response successfully sent')
     }
 }
 
-export const failedResponse = (res: Response, code: number, status: string, message: string, payload?: any, rest?: any) => {
-    standardResponse(res, code, status, message, payload, rest);
+export const failedResponse = (props: ResponseParameters) => {
+    standardResponse(props);
     if (process.env.NODE_ENV == 'development') {
         console.log('Response failed successfully')
     }

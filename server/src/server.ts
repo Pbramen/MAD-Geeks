@@ -4,13 +4,15 @@ import bodyParser from 'body-parser';
 import express from 'express';
 import 'dotenv/config'
 
-import './postgress/connection';
+import { seq_connection } from './postgress/connection';
 
 import { StatusCode } from './response/ReturnCode';
 import { customErrorRoute } from './error/customErrorRoute';
-//import { throwInvalidParamError } from './debug/testRoutes.itest';
-import './routes/auth/JWT_controller';
-import { seq_connection } from './postgress/connection';
+
+import './middleware/routes/auth/JWT_controller';
+import { router as userRoutes } from './middleware/routes/auth/user_model';
+import { failedResponse } from './middleware/standardizeJSONResposne';
+
 const app = express();
 const port = 4000;
 
@@ -20,15 +22,16 @@ seq_connection.start_connection().catch((error) => {
 })
 
 
-app.use((req, res, next) => {
+app.use((_, __, next) => {
     // test the connection per request:
     seq_connection.start_connection()
         .then(next)
         .catch(next)
 })
 
-app.use((req, res) => {
-    console.log('passed as expected!');
+app.use((req, res, next) => {
+    console.log('\tcalling endpoint: ', req.originalUrl)
+    next();
 })
 
 app.use(cors());
@@ -41,22 +44,36 @@ app.listen(process.env.PORT, () => {
     console.log(`Application successfully listening on port ${port}`);
 })
 
+app.use('/user', userRoutes);
 
-app.use((req, res) => {
-    if (req.body) {
-        console.log(req.body);
-    }
-    
+app.use((req, res, next) => {
     if (!res.headersSent) {
-        return res.status(404).json(
-            {
-                status: StatusCode.NOT_FOUND,
-                msg: "Sorry, the endpoint you are looking for is in another castle!"
-            }
-        )
+        return failedResponse({
+            res: res,
+            code: StatusCode.NOT_FOUND,
+            status: 'Invalid Endpoint',
+            message: 'Sorry, the endpoint you are looking for is in another castle!',
+            descript: 'INVALID_ENDPOINT_ACCESS'
+        });
     }
-    else
-        console.log("Headers already sent!");
+    else {
+        if (!res.locals.descript) {            
+            return next(new Error("You Must set res.locals.descript for logging purposes"));
+        }
+        // log data here... 
+        const json = {
+            method: req.method,
+            protocol: req.protocol,
+            httpVersion: req.httpVersion,
+            endpoint: req.originalUrl,
+            origin: req.baseUrl || 'none',
+            body: req.body || 'N/A',
+            status: req.statusCode || 200,
+            action: res.locals.action_taken
+        }
+        //console.log("Headers have been sent!", JSON.stringify(json, null, 3));
+    }
+        
 })
 
 app.use(customErrorRoute)
